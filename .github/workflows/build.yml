@@ -1,0 +1,96 @@
+name: Build and push UI
+on:
+  pull_request:
+    branches:
+      - release/v*
+  push:
+    branches:
+      - release/v*
+
+jobs:
+  version:
+    name: Compute Go module version
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      count: ${{ steps.version.outputs.count }}
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      # We count the number of commits since the initial import of the upstream repo
+      # and use that as the patch version of the Go module.
+      # The minor version is upstream version formatted as increasing integer.
+      - name: Compute Go module version
+        id: version
+        run: |
+          start=$(git log --pretty=format:%H -- src/package.json | tail -n 1)
+          count=$(git rev-list --count $start..HEAD)
+          IFS='.' read -r -a semver <<< "${GITHUB_REF/refs\/heads\/release\/v/}"
+          version=0.$(printf "%d%02d%02d" ${semver[@]}).$count
+          echo "Count: $count"
+          echo "count=${count}" >> "$GITHUB_OUTPUT"
+          echo "Version: $version"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build UI
+    # We only build the UI if we are on a pull request or if we are on a push that
+    # is not the initial import (count > 0).
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && fromJSON(needs.version.outputs.count) > 0)
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.20"
+      - name: Run Dagger pipeline
+        working-directory: builder
+        run: go run main.go
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ui
+          path: embed
+
+  push:
+    name: Push built UI
+    # We only push the UI if we are on a push that is not the initial import (count > 0).
+    if: github.event_name == 'push' && fromJSON(needs.version.outputs.count) > 0
+    needs:
+      - build
+      - version
+    environment: restricted
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate an app token
+        id: generate_token
+        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          token: ${{ steps.generate_token.outputs.token }}
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ui
+          path: embed
+      - name: Push tag
+        run: |
+          version=v${{ needs.version.outputs.version }}
+          git config user.name "FastTrackML CI"
+          git config user.email "fasttrackml@gr-oss.io"
+          git checkout --detach
+          git rm -r src
+          git add -f embed
+          git commit -m "Built UI $version"
+          git tag -a $version -m "Built UI $version"
+          git push origin $version
