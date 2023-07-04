@@ -118,7 +118,7 @@ const routes = {
   IMAGE_EXPLORE: {
     path: PathEnum.Images_Explore,
     component: ImagesExplore,
-    showInSidebar: true,
+    showInSidebar: false,
     displayName: 'Images',
     icon: 'images',
     isExact: true,
@@ -135,7 +135,7 @@ const routes = {
   FIGURES_EXPLORER: {
     path: PathEnum.Figures_Explorer,
     component: FiguresExplore,
-    showInSidebar: true,
+    showInSidebar: false,
     icon: 'figures',
     displayName: 'Figures',
     isExact: true,
@@ -144,7 +144,7 @@ const routes = {
   AUDIOS_EXPLORER: {
     path: PathEnum.Audios_Explorer,
     component: AudiosExplorer,
-    showInSidebar: true,
+    showInSidebar: false,
     icon: 'audios',
     displayName: 'Audios',
     isExact: true,

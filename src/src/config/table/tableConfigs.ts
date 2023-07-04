@@ -85,21 +85,6 @@ export const TABLE_DEFAULT_CONFIG: Record<string, any> = {
     },
     height: '0.5',
   },
-  [AppNameEnum.IMAGES]: {
-    resizeMode: ResizeModeEnum.Resizable,
-    rowHeight: RowHeightSize.md,
-    sortFields: [],
-    hiddenMetrics: [],
-    hiddenColumns: ['hash', 'description'],
-    nonHidableColumns: new Set(['#', 'run', 'actions']),
-    columnsWidths: {},
-    columnsOrder: {
-      left: ['run'],
-      middle: [],
-      right: [],
-    },
-    height: '0.5',
-  },
   [AppNameEnum.SCATTERS]: {
     resizeMode: ResizeModeEnum.Resizable,
     rowHeight: RowHeightSize.md,
@@ -128,50 +113,10 @@ export const AVOID_COLUMNS_TO_HIDE_LIST = new Set([
 ]);
 
 export const EXPLORE_SELECTED_RUNS_CONFIG: Record<string, AppNameEnum[]> = {
-  [AppNameEnum.RUNS]: [
-    AppNameEnum.METRICS,
-    AppNameEnum.IMAGES,
-    AppNameEnum.FIGURES,
-    AppNameEnum.AUDIOS,
-  ],
-  [AppNameEnum.METRICS]: [
-    AppNameEnum.RUNS,
-    AppNameEnum.IMAGES,
-    AppNameEnum.FIGURES,
-    AppNameEnum.AUDIOS,
-  ],
-  [AppNameEnum.PARAMS]: [
-    AppNameEnum.RUNS,
-    AppNameEnum.IMAGES,
-    AppNameEnum.METRICS,
-    AppNameEnum.FIGURES,
-    AppNameEnum.AUDIOS,
-  ],
-  [AppNameEnum.SCATTERS]: [
-    AppNameEnum.RUNS,
-    AppNameEnum.IMAGES,
-    AppNameEnum.METRICS,
-    AppNameEnum.FIGURES,
-    AppNameEnum.AUDIOS,
-  ],
-  [AppNameEnum.IMAGES]: [
-    AppNameEnum.RUNS,
-    AppNameEnum.METRICS,
-    AppNameEnum.FIGURES,
-    AppNameEnum.AUDIOS,
-  ],
-  dashboard: [
-    AppNameEnum.RUNS,
-    AppNameEnum.METRICS,
-    AppNameEnum.IMAGES,
-    AppNameEnum.FIGURES,
-    AppNameEnum.AUDIOS,
-  ],
-  experiment: [
-    AppNameEnum.RUNS,
-    AppNameEnum.METRICS,
-    AppNameEnum.IMAGES,
-    AppNameEnum.FIGURES,
-    AppNameEnum.AUDIOS,
-  ],
+  [AppNameEnum.RUNS]: [AppNameEnum.METRICS],
+  [AppNameEnum.METRICS]: [AppNameEnum.RUNS],
+  [AppNameEnum.PARAMS]: [AppNameEnum.RUNS, AppNameEnum.METRICS],
+  [AppNameEnum.SCATTERS]: [AppNameEnum.RUNS, AppNameEnum.METRICS],
+  dashboard: [AppNameEnum.RUNS, AppNameEnum.METRICS],
+  experiment: [AppNameEnum.RUNS, AppNameEnum.METRICS],
 };

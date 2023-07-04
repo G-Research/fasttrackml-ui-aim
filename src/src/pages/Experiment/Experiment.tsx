@@ -43,13 +43,6 @@ const ExperimentRunsTab = React.lazy(
     ),
 );
 
-const ExperimentNotesTab = React.lazy(
-  () =>
-    import(
-      /* webpackChunkName: "ExperimentOverviewTab" */ './components/ExperimentNotesTab'
-    ),
-);
-
 const ExperimentSettingsTab = React.lazy(
   () =>
     import(
@@ -60,7 +53,6 @@ const ExperimentSettingsTab = React.lazy(
 const tabs: Record<string, string> = {
   overview: 'Overview',
   runs: 'Runs',
-  notes: 'Notes',
   settings: 'Settings',
 };
 
@@ -103,12 +95,6 @@ function Experiment(): React.FunctionComponentElement<React.ReactNode> {
         experimentId,
       },
       Component: ExperimentRunsTab,
-    },
-    notes: {
-      props: {
-        experimentId,
-      },
-      Component: ExperimentNotesTab,
     },
     settings: {
       props: {
