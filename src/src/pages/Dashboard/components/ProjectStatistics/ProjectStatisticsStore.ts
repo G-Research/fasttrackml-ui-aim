@@ -6,14 +6,7 @@ import { SequenceTypesEnum } from 'types/core/enums';
 function projectStatisticsEngine() {
   const { fetchData, state, destroy } = createResource<GetParamsResult>(() =>
     getParams({
-      sequence: [
-        SequenceTypesEnum.Metric,
-        SequenceTypesEnum.Images,
-        SequenceTypesEnum.Figures,
-        SequenceTypesEnum.Texts,
-        SequenceTypesEnum.Audios,
-        SequenceTypesEnum.Distributions,
-      ],
+      sequence: [SequenceTypesEnum.Metric],
       exclude_params: true,
     }),
   );

@@ -1,30 +1,39 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import { Drawer, Tooltip } from '@material-ui/core';
 
 import logoImg from 'assets/logo.svg';
-import { ReactComponent as DiscordIcon } from 'assets/icons/discord.svg';
 
 import { Icon, Text } from 'components/kit';
 import { IconName } from 'components/kit/Icon';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
-import CommunityPopup from 'components/CommunityPopup';
 
 import { PathEnum } from 'config/enums/routesEnum';
-import { AIM_VERSION } from 'config/config';
+import { getAPIHost } from 'config/config';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DOCUMENTATIONS } from 'config/references';
 
 import routes, { IRoute } from 'routes/routes';
 
 import { trackEvent } from 'services/analytics';
+import NetworkService from 'services/NetworkService';
 
 import { getItem } from 'utils/storage';
 
 import './Sidebar.scss';
 
 function SideBar(): React.FunctionComponentElement<React.ReactNode> {
+  const [version, setVersion] = React.useState('unknown');
+
+  useEffect(() => {
+    fetch('/version').then((response) => {
+      response.text().then((version) => {
+        setVersion(version);
+      });
+    });
+  }, []);
+
   function getPathFromStorage(route: PathEnum): PathEnum | string {
     const path = getItem(`${route.slice(1)}Url`) ?? '';
     if (path !== '' && path.startsWith(route)) {
@@ -81,21 +90,11 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
             })}
           </ul>
           <div className='Sidebar__bottom'>
-            <CommunityPopup>
-              <Tooltip title='Community Discord' placement='right'>
-                <a
-                  target='_blank'
-                  href='https://community.aimstack.io/'
-                  rel='noreferrer'
-                  className='Sidebar__bottom__anchor'
-                  onClick={() =>
-                    trackEvent(ANALYTICS_EVENT_KEYS.sidebar.discord)
-                  }
-                >
-                  <DiscordIcon />
-                </a>
-              </Tooltip>
-            </CommunityPopup>
+            <Tooltip title='Switch UI' placement='right'>
+              <a href='/' className='Sidebar__bottom__anchor'>
+                <Icon name='live-demo' />
+              </a>
+            </Tooltip>
             <Tooltip title='Docs' placement='right'>
               <a
                 target='_blank'
@@ -107,7 +106,7 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
                 <Icon name='full-docs' />
               </a>
             </Tooltip>
-            <Text tint={30}>v{AIM_VERSION}</Text>
+            <Text tint={30}>{version}</Text>
           </div>
         </Drawer>
       </div>
