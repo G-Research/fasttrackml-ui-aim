@@ -10,7 +10,6 @@ on:
 jobs:
   version:
     name: Compute Go module version
-    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     outputs:
       count: ${{ steps.version.outputs.count }}
@@ -28,12 +27,14 @@ jobs:
         run: |
           start=$(git log --pretty=format:%H -- src/package.json | tail -n 1)
           count=$(git rev-list --count $start..HEAD)
-          IFS='.' read -r -a semver <<< "${GITHUB_REF/refs\/heads\/release\/v/}"
-          version=0.$(printf "%d%02d%02d" ${semver[@]}).$count
           echo "Count: $count"
           echo "count=${count}" >> "$GITHUB_OUTPUT"
-          echo "Version: $version"
-          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" == "push" ]; then
+            IFS='.' read -r -a semver <<< "${GITHUB_REF/refs\/heads\/release\/v/}"
+            version=0.$(printf "%d%02d%02d" ${semver[@]}).$count
+            echo "Version: $version"
+            echo "version=${version}" >> "$GITHUB_OUTPUT"
+          fi
 
   build:
     name: Build UI
