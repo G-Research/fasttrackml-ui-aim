@@ -37,162 +37,175 @@ Rulesets have been created to enforce that:
 Here is what they look like with the GitHub API at the time of writing:
 ```json
 [
-    {
-        "name": "Require pull request reviews and linear history for main branch and release branches",
-        "target": "branch",
-        "conditions": {
-            "ref_name": {
-                "exclude": [],
-                "include": [
-                    "refs/heads/main",
-                    "refs/heads/release/v*"
-                ]
-            }
-        },
-        "rules": [
-            {
-                "type": "required_linear_history"
-            },
-            {
-                "parameters": {
-                    "dismiss_stale_reviews_on_push": true,
-                    "require_code_owner_review": false,
-                    "require_last_push_approval": true,
-                    "required_approving_review_count": 1,
-                    "required_review_thread_resolution": false
-                },
-                "type": "pull_request"
-            }
+  {
+    "name": "App can create release branches",
+    "target": "branch",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "refs/heads/release/v*"
         ]
+      }
     },
-    {
-        "name": "App can create release branches",
-        "target": "branch",
-        "conditions": {
-            "ref_name": {
-                "exclude": [],
-                "include": [
-                    "refs/heads/release/v*"
-                ]
-            }
-        },
-        "rules": [
-            {
-                "type": "creation"
-            }
+    "rules": [
+      {
+        "type": "creation"
+      }
+    ],
+    "bypass_actors": [
+      {
+        "actor_id": 0,
+        "actor_type": "Integration",
+        "bypass_mode": "always"
+      }
+    ]
+  },
+  {
+    "name": "App can create version tags",
+    "target": "tag",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "refs/tags/v*"
+        ]
+      }
+    },
+    "rules": [
+      {
+        "type": "creation"
+      }
+    ],
+    "bypass_actors": [
+      {
+        "actor_id": 0,
+        "actor_type": "Integration",
+        "bypass_mode": "always"
+      }
+    ]
+  },
+  {
+    "name": "Block creations and updates for all other branches",
+    "target": "branch",
+    "conditions": {
+      "ref_name": {
+        "exclude": [
+          "refs/heads/main",
+          "refs/heads/release/v*"
         ],
-        "bypass_actors": [
-            {
-                "actor_id": 0,
-                "actor_type": "Integration",
-                "bypass_mode": "always"
-            }
-        ]
+        "include": []
+      }
     },
-    {
-        "name": "App can create version tags",
-        "target": "tag",
-        "conditions": {
-            "ref_name": {
-                "exclude": [],
-                "include": [
-                    "refs/tags/v*"
-                ]
-            }
-        },
-        "rules": [
-            {
-                "type": "creation"
-            }
+    "rules": [
+      {
+        "type": "creation"
+      },
+      {
+        "type": "update"
+      }
+    ],
+    "bypass_actors": []
+  },
+  {
+    "name": "Block creations for all other tags",
+    "target": "tag",
+    "conditions": {
+      "ref_name": {
+        "exclude": [
+          "refs/tags/v*"
         ],
-        "bypass_actors": [
-            {
-                "actor_id": 0,
-                "actor_type": "Integration",
-                "bypass_mode": "always"
-            }
-        ]
+        "include": []
+      }
     },
-    {
-        "name": "Block creations for all other branches",
-        "target": "branch",
-        "conditions": {
-            "ref_name": {
-                "exclude": [
-                    "refs/heads/main",
-                    "refs/heads/release/v*"
-                ],
-                "include": []
-            }
-        },
-        "rules": [
-            {
-                "type": "creation"
-            }
+    "rules": [
+      {
+        "type": "creation"
+      }
+    ],
+    "bypass_actors": []
+  },
+  {
+    "name": "Block force pushes and deletions for all branches",
+    "target": "branch",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "~ALL"
         ]
+      }
     },
-    {
-        "name": "Block creations for all other tags",
-        "target": "tag",
-        "conditions": {
-            "ref_name": {
-                "exclude": [
-                    "refs/tags/v*"
-                ],
-                "include": []
-            }
-        },
-        "rules": [
-            {
-                "type": "creation"
-            }
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      }
+    ],
+    "bypass_actors": []
+  },
+  {
+    "name": "Block force pushes, updates and deletions for all tags",
+    "target": "tag",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "~ALL"
         ]
+      }
     },
-    {
-        "name": "Block force pushes, updates and deletions for all branches",
-        "target": "branch",
-        "conditions": {
-            "ref_name": {
-                "exclude": [],
-                "include": [
-                    "~ALL"
-                ]
-            }
-        },
-        "rules": [
-            {
-                "type": "deletion"
-            },
-            {
-                "type": "non_fast_forward"
-            },
-            {
-                "type": "update"
-            }
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      },
+      {
+        "type": "update"
+      }
+    ],
+    "bypass_actors": []
+  },
+  {
+    "name": "Require pull request reviews and linear history for main branch and release branches",
+    "target": "branch",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "refs/heads/main",
+          "refs/heads/release/v*"
         ]
+      }
     },
-    {
-        "name": "Block force pushes, updates and deletions for all tags",
-        "target": "tag",
-        "conditions": {
-            "ref_name": {
-                "exclude": [],
-                "include": [
-                    "~ALL"
-                ]
-            }
-        },
-        "rules": [
-            {
-                "type": "deletion"
-            },
-            {
-                "type": "non_fast_forward"
-            },
-            {
-                "type": "update"
-            }
-        ]
-    }
+    "rules": [
+      {
+        "type": "required_linear_history"
+      },
+      {
+        "type": "pull_request",
+        "parameters": {
+          "require_code_owner_review": false,
+          "require_last_push_approval": true,
+          "dismiss_stale_reviews_on_push": true,
+          "required_approving_review_count": 1,
+          "required_review_thread_resolution": false
+        }
+      }
+    ],
+    "bypass_actors": []
+  }
 ]
+```
+
+The rules can be exported with the following scripts using [`gh`](https://cli.github.com):
+```sh
+for rule in $(gh api /repos/G-Research/fasttrackml-ui-aim/rulesets -q '.[].id')
+do
+  gh api /repos/G-Research/fasttrackml-ui-aim/rulesets/$rule | jq '[{name: .name, target: .target, conditions: .conditions, rules: .rules, bypass_actors: .bypass_actors}]'
+done | jq -s add
 ```
