@@ -1,9 +1,12 @@
+import _ from 'lodash-es';
+
 import { notificationContainerStore } from 'components/NotificationContainer';
 
 import {
   getExperimentById,
   getExperiments,
   updateExperimentById,
+  deleteExperimentById,
   IExperimentData,
 } from 'modules/core/api/experimentsApi';
 import createResource from 'modules/core/utils/createResource';
@@ -50,6 +53,22 @@ function experimentEngine() {
       });
   }
 
+  function deleteExperiment(successCallback: () => void = _.noop) {
+    const experimentData = experimentState.getState().data;
+    deleteExperimentById(experimentData?.id || '')
+      .then(() => {
+        analytics.trackEvent('[Experiment] Delete Experiment');
+        successCallback();
+      })
+      .catch((err) => {
+        notificationContainerStore.onNotificationAdd({
+          id: Date.now(),
+          messages: [err.message || 'Something went wrong'],
+          severity: 'error',
+        });
+      });
+  }
+
   return {
     fetchExperimentData,
     experimentState,
@@ -58,6 +77,7 @@ function experimentEngine() {
     experimentsState,
     destroyExperiments,
     updateExperiment,
+    deleteExperiment,
   };
 }
 

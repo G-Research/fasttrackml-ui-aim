@@ -67,6 +67,7 @@ function Experiment(): React.FunctionComponentElement<React.ReactNode> {
     experimentsState,
     getExperimentsData,
     updateExperiment,
+    deleteExperiment,
   } = useExperimentState(experimentId);
   const { notificationState, onNotificationDelete } =
     useNotificationContainer();
@@ -98,8 +99,10 @@ function Experiment(): React.FunctionComponentElement<React.ReactNode> {
     },
     settings: {
       props: {
+        experimentId: experimentData?.id,
         experimentName: experimentData?.name ?? '',
         updateExperiment,
+        deleteExperiment,
         description: experimentData?.description ?? '',
       },
       Component: ExperimentSettingsTab,
