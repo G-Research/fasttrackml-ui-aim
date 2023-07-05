@@ -99,7 +99,6 @@ function Experiment(): React.FunctionComponentElement<React.ReactNode> {
     },
     settings: {
       props: {
-        experimentId: experimentData?.id,
         experimentName: experimentData?.name ?? '',
         updateExperiment,
         deleteExperiment,

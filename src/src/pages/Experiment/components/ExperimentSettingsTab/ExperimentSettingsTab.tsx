@@ -15,7 +15,6 @@ import { IExperimentSettingsTabProps } from '.';
 import './ExperimentSettingsTab.scss';
 
 function ExperimentSettingsTab({
-  experimentId,
   experimentName,
   description,
   updateExperiment,
