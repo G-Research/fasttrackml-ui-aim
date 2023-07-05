@@ -10,6 +10,9 @@ import { DOCUMENTATIONS } from 'config/references';
 import './QuickStart.scss';
 
 function QuickStart() {
+  // Get fasttrack server hostname from current browser location
+  const { hostname, port } = window.location;
+  const fasttrack_server = `http://${hostname}:${port}`;
   return (
     <div className='QuickStart'>
       <Text
@@ -28,24 +31,22 @@ function QuickStart() {
           tint={100}
           className='QuickStart__section__title'
         >
-          Integrate Aim with your code
+          Integrate FasttrackML with your code
         </Text>
         <CodeBlock
-          code={`from aim import Run
+          code={`from mlflow import log_metric, log_param
 
-# Initialize a new run
-run = Run()
+# Set FasttrackML tracking server
+mlflow.set_tracking_uri("${fasttrack_server}")
 
-# Log run parameters
-run["hparams"] = {
-    "learning_rate": 0.001,
-    "batch_size": 32
-}
+# Log parameters
+log_param("learning_rate", 0.001)
+log_param("batch_size", 32)
 
 # Log metrics
 for i in range(10):
-    run.track(i, name='loss', step=i, context={ "subset":"train" })
-    run.track(i, name='acc', step=i, context={ "subset":"train" })`}
+    log_metric(key="loss", value=0.0 + i, step=i)
+    log_metric(key="acc", value=0.0 + i, step=i)`}
         />
         <Text
           component='p'
