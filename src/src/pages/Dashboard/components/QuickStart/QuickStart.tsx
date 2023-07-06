@@ -11,8 +11,8 @@ import './QuickStart.scss';
 
 function QuickStart() {
   // Get fasttrack server hostname from current browser location
-  const { hostname, port } = window.location;
-  const fasttrack_server = `http://${hostname}:${port}`;
+  const { hostname, port, protocol } = window.location;
+  const fasttrack_server = `${protocol}//${hostname}:${port}`;
   return (
     <div className='QuickStart'>
       <Text
@@ -31,22 +31,24 @@ function QuickStart() {
           tint={100}
           className='QuickStart__section__title'
         >
-          Integrate FasttrackML with your code
+          Integrate FastTrackML with your code
         </Text>
         <CodeBlock
-          code={`from mlflow import log_metric, log_param
+          code={`from mlflow import log_metric, log_param, set_tracking_uri
 
-# Set FasttrackML tracking server
-mlflow.set_tracking_uri("${fasttrack_server}")
+# Set FastTrackML tracking server
+set_tracking_uri("${fasttrack_server}")
 
 # Log parameters
-log_param("learning_rate", 0.001)
-log_param("batch_size", 32)
+log_params({
+    "learning_rate": 0.001,
+    "batch_size": 32,
+})
 
 # Log metrics
 for i in range(10):
-    log_metric(key="loss", value=0.0 + i, step=i)
-    log_metric(key="acc", value=0.0 + i, step=i)`}
+    log_metric(key="loss", value=i, step=i)
+    log_metric(key="acc", value=i, step=i)`}
         />
         <Text
           component='p'
