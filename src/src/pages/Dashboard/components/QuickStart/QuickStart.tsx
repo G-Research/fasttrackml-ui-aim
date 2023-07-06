@@ -34,7 +34,7 @@ function QuickStart() {
           Integrate FastTrackML with your code
         </Text>
         <CodeBlock
-          code={`from mlflow import log_metric, log_param, set_tracking_uri
+          code={`from mlflow import log_metric, log_params, set_tracking_uri
 
 # Set FastTrackML tracking server
 set_tracking_uri("${fasttrack_server}")
