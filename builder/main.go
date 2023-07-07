@@ -42,7 +42,9 @@ func main() {
 		WithExec([]string{"mkdir", "public"}).
 		WithExec([]string{"npm", "ci"}).
 		WithDirectory("/src",
-			client.Host().Directory(src),
+			client.Host().Directory(src, dagger.HostDirectoryOpts{
+				Exclude: []string{"node_modules", "public/vs"},
+			}),
 		).
 		WithExec([]string{"npm", "run", "build"}).
 		Directory("build").
