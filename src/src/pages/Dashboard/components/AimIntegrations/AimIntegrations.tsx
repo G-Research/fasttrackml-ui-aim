@@ -22,6 +22,10 @@ function AimIntegrations() {
       setExpanded(newExpanded ? panel : false);
     };
 
+  // Get fasttrack server hostname from current browser location
+  const { hostname, port, protocol } = window.location;
+  const fasttrack_server = `${protocol}//${hostname}:${port}`;
+
   const integrations = [
     {
       title: 'Integrate PyTorch Lightning',
