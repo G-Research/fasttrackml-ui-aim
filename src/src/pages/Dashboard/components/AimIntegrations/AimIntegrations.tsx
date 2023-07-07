@@ -60,15 +60,22 @@ trainer = Trainer(
     {
       title: 'Integrate Keras & tf.keras',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.KERAS,
-      code: `import aim
+      code: `import mlflow
+from mlflow import set_tracking_uri
+import mlflow.keras
+
+# Set FastTrackML tracking server
+set_tracking_uri("${fasttrack_server}")
 
 # ...
-model.fit(x_train, y_train, epochs=epochs, callbacks=[
-    aim.keras.AimCallback(repo='/path/to/logs/dir', experiment='experiment_name')
-    
-    # Use aim.tensorflow.AimCallback in case of tf.keras
-    aim.tensorflow.AimCallback(repo='/path/to/logs/dir', experiment='experiment_name')
-])
+# Build, compile, enable autologging, and train your model
+keras_model = ...
+keras_model.compile(optimizer="rmsprop", loss="mse", metrics=["accuracy"])
+
+# autolog your metrics, parameters, and model
+mlflow.keras.autolog()
+results = keras_model.fit(
+    x_train, y_train, epochs=20, batch_size=128, validation_data=(x_val, y_val))
 # ...`,
     },
     {
