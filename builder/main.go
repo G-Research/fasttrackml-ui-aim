@@ -26,6 +26,10 @@ func main() {
 	}
 	defer client.Close()
 
+	if err := os.RemoveAll(dst); err != nil {
+		log.Fatalln(err)
+	}
+
 	_, err = client.Pipeline("build").
 		Container().
 		From("node:16").
