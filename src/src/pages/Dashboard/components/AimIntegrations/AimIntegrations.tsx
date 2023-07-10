@@ -113,14 +113,25 @@ model.fit(train_data, train_labels, log_cout=AimLogger(loss_function='Logloss'),
     {
       title: 'Integrate fastai',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.FASTAI,
-      code: `from aim.fastai import AimCallback
+      code: `import mlflow.fastai
+import mlflow
+from mlflow import set_tracking_uri
 
-# ...
-learn = cnn_learner(dls, resnet18, pretrained=True,
-                    loss_func=CrossEntropyLossFlat(),
-                    metrics=accuracy, model_dir="/tmp/model/",
-                    cbs=AimCallback(repo='.', experiment='fastai_test'))
-# ...`,
+# Set FastTrackML tracking server
+set_tracking_uri("${fasttrack_server}")
+
+# Define the Learner model
+model = ...
+
+# log the fastai Leaner model
+with mlflow.start_run() as run:
+    model.fit(epochs, learning_rate)
+    mlflow.fastai.log_model(model, "model")
+
+# Load the model for scoring
+model_uri = "runs:/{}/model".format(run.info.run_id)
+loaded_model = mlflow.fastai.load_model(model_uri)
+results = loaded_model.predict(predict_data)`,
     },
     {
       title: 'Integrate LightGBM',
