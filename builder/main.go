@@ -26,6 +26,10 @@ func main() {
 	}
 	defer client.Close()
 
+	if err := os.RemoveAll(dst); err != nil {
+		log.Fatalln(err)
+	}
+
 	_, err = client.Pipeline("build").
 		Container().
 		From("node:16").
@@ -38,7 +42,9 @@ func main() {
 		WithExec([]string{"mkdir", "public"}).
 		WithExec([]string{"npm", "ci"}).
 		WithDirectory("/src",
-			client.Host().Directory(src),
+			client.Host().Directory(src, dagger.HostDirectoryOpts{
+				Exclude: []string{"node_modules", "public/vs"},
+			}),
 		).
 		WithExec([]string{"npm", "run", "build"}).
 		Directory("build").
