@@ -55,18 +55,20 @@ function experimentEngine() {
 
   function deleteExperiment(successCallback: () => void = _.noop) {
     const experimentData = experimentState.getState().data;
-    deleteExperimentById(experimentData?.id || '')
-      .then(() => {
-        analytics.trackEvent('[Experiment] Delete Experiment');
-        successCallback();
-      })
-      .catch((err) => {
-        notificationContainerStore.onNotificationAdd({
-          id: Date.now(),
-          messages: [err.message || 'Something went wrong'],
-          severity: 'error',
+    if (experimentData !== null && experimentData !== undefined) {
+      deleteExperimentById(experimentData.id)
+        .then(() => {
+          analytics.trackEvent('[Experiment] Delete Experiment');
+          successCallback();
+        })
+        .catch((err) => {
+          notificationContainerStore.onNotificationAdd({
+            id: Date.now(),
+            messages: [err.message || 'Something went wrong'],
+            severity: 'error',
+          });
         });
-      });
+    }
   }
 
   return {
@@ -82,3 +84,4 @@ function experimentEngine() {
 }
 
 export default experimentEngine();
+
