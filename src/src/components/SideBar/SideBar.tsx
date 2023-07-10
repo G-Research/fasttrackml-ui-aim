@@ -10,14 +10,13 @@ import { IconName } from 'components/kit/Icon';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
 import { PathEnum } from 'config/enums/routesEnum';
-import { getAPIHost } from 'config/config';
+import { isDEVModeOn } from 'config/config';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DOCUMENTATIONS } from 'config/references';
 
 import routes, { IRoute } from 'routes/routes';
 
 import { trackEvent } from 'services/analytics';
-import NetworkService from 'services/NetworkService';
 
 import { getItem } from 'utils/storage';
 
@@ -27,7 +26,8 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
   const [version, setVersion] = React.useState('unknown');
 
   useEffect(() => {
-    fetch('/version').then((response) => {
+    const baseURL = isDEVModeOn ? 'http://localhost:5000' : '';
+    fetch(baseURL + '/version').then((response) => {
       response.text().then((version) => {
         setVersion(version);
       });
