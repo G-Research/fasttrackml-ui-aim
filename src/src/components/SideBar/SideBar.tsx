@@ -10,7 +10,7 @@ import { IconName } from 'components/kit/Icon';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
 import { PathEnum } from 'config/enums/routesEnum';
-import { isDEVModeOn } from 'config/config';
+import { getBaseHost } from 'config/config';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DOCUMENTATIONS } from 'config/references';
 
@@ -26,8 +26,7 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
   const [version, setVersion] = React.useState('unknown');
 
   useEffect(() => {
-    const baseURL = isDEVModeOn ? 'http://localhost:5000' : '';
-    fetch(baseURL + '/version').then((response) => {
+    fetch(`${getBaseHost()}/version`).then((response) => {
       response.text().then((version) => {
         setVersion(version);
       });

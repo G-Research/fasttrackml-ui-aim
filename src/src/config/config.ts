@@ -15,6 +15,10 @@ try {
 
 const isDEVModeOn: boolean = process.env.NODE_ENV === 'development';
 
+function getBaseHost(): string {
+  return isDEVModeOn ? 'http://localhost:5000' : '';
+}
+
 function getBasePath(isApiBasePath: boolean = true): string {
   if (globalScope.API_BASE_PATH === '{{ base_path }}') {
     return isApiBasePath ? '' : '/';
@@ -22,9 +26,7 @@ function getBasePath(isApiBasePath: boolean = true): string {
   return `${globalScope.API_BASE_PATH}`;
 }
 
-let API_HOST: string = isDEVModeOn
-  ? `http://127.0.0.1:5000${getBasePath()}/api`
-  : `${getBasePath()}/api`;
+let API_HOST: string = `${getBaseHost()}${getBasePath()}/api`;
 
 function getAPIHost() {
   return API_HOST;
@@ -32,9 +34,7 @@ function getAPIHost() {
 
 function setAPIBasePath(basePath: string) {
   globalScope.API_BASE_PATH = basePath;
-  API_HOST = isDEVModeOn
-    ? `http://127.0.0.1:5000${getBasePath()}/api`
-    : `${getBasePath()}/api`;
+  API_HOST = `${getBaseHost()}${getBasePath()}/api`;
 }
 
 export const AIM_VERSION = version;
@@ -48,4 +48,4 @@ export function checkIsBasePathInCachedEnv(basePath: string) {
   return PATHS_TO_SHOW_CACHE_BANNERS.includes(parsed_path);
 }
 
-export { isDEVModeOn, getBasePath, getAPIHost, setAPIBasePath };
+export { getBaseHost, getBasePath, getAPIHost, setAPIBasePath };
