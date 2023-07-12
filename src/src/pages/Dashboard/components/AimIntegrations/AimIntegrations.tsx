@@ -22,6 +22,10 @@ function AimIntegrations() {
       setExpanded(newExpanded ? panel : false);
     };
 
+  // Get fasttrack server hostname from current browser location
+  const { hostname, port, protocol } = window.location;
+  const fasttrack_server = `${protocol}//${hostname}:${port}`;
+
   const integrations = [
     {
       title: 'Integrate PyTorch Lightning',
@@ -35,19 +39,37 @@ trainer = pl.Trainer(logger=AimLogger(experiment='experiment_name'))
     {
       title: 'Integrate Hugging Face',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.HUGGING_FACE,
-      code: `from aim.hugging_face import AimCallback
+      code: `import mlflow
+import transformers
+      
+      
+def create_huggingface_model(model_path):
+    architecture = "lordtt13/emo-mobilebert"
+    mlflow.transformers.save_model(
+        transformers_model={
+            "model": transformers.TFMobileBertForSequenceClassification.from_pretrained(
+                architecture
+            ),
+            "tokenizer": transformers.AutoTokenizer.from_pretrained(architecture),
+        },
+        path=model_path,
+    )
+    llm = mlflow.transformers.load_model(model_path)
+    prompt = PromptTemplate(
+        input_variables=["product"],
+        template="What is a good name for a company that makes {product}?",
+    )
+    hf_pipe = HuggingFacePipeline(pipeline=llm)
+    return LLMChain(llm=hf_pipe, prompt=prompt)
 
-# ...
-aim_callback = AimCallback(repo='/path/to/logs/dir', experiment='mnli')
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset if training_args.do_train else None,
-    eval_dataset=eval_dataset if training_args.do_eval else None,
-    callbacks=[aim_callback],
-    # ...
-)
-# ...`,
+
+mlflow.set_tracking_uri("${fasttrack_server}")
+
+model = create_huggingface_model(model_path)
+with mlflow.start_run():
+    logged_model = mlflow.langchain.log_model(model, "langchain_model")
+
+loaded_model = mlflow.langchain.load_model(logged_model.model_uri)`,
     },
     {
       title: 'Integrate Keras & tf.keras',
