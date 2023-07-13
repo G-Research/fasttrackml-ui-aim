@@ -41,8 +41,10 @@ trainer = pl.Trainer(logger=AimLogger(experiment='experiment_name'))
       docsLink: DOCUMENTATIONS.INTEGRATIONS.HUGGING_FACE,
       code: `import mlflow
 import transformers
-      
-      
+
+# Set FastTrackML tracking server 
+mlflow.set_tracking_uri("${fasttrack_server}")
+
 def create_huggingface_model(model_path):
     architecture = "lordtt13/emo-mobilebert"
     mlflow.transformers.save_model(
@@ -62,8 +64,6 @@ def create_huggingface_model(model_path):
     hf_pipe = HuggingFacePipeline(pipeline=llm)
     return LLMChain(llm=hf_pipe, prompt=prompt)
 
-
-mlflow.set_tracking_uri("${fasttrack_server}")
 
 model = create_huggingface_model(model_path)
 with mlflow.start_run():
