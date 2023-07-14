@@ -22,6 +22,9 @@ function AimIntegrations() {
       setExpanded(newExpanded ? panel : false);
     };
 
+  const { hostname, port, protocol } = window.location;
+  const fasttrack_server = `${protocol}//${hostname}:${port}`;
+
   const integrations = [
     {
       title: 'Integrate PyTorch Lightning',
@@ -79,11 +82,38 @@ tuner.search(
     {
       title: 'Integrate XGBoost',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.XGBOOST,
-      code: `from aim.xgboost import AimCallback
+      code: `from sklearn import datasets
+from sklearn.model_selection import train_test_split
+import xgboost as xgb
+
+
+from mlflow import set_tracking_uri, start_run
+import mlflow.xgboost
+
+# Set FastTrackML tracking server
+set_tracking_uri("${fasttrack_server}")
 
 # ...
-aim_callback = AimCallback(repo='/path/to/logs/dir', experiment='experiment_name')
-bst = xgb.train(param, xg_train, num_round, watchlist, callbacks=[aim_callback])
+# prepare train and test data
+iris = datasets.load_iris()
+X = iris.data
+y = iris.target
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# enable auto logging
+mlflow.xgboost.autolog()
+
+dtrain = xgb.DMatrix(X_train, label=y_train)
+dtest = xgb.DMatrix(X_test, label=y_test)
+
+with start_run():
+    # train model
+    params = {
+        "objective": "multi:softprob",
+        "num_class": 3,
+        # ...
+    }
+    model = xgb.train(params, dtrain, evals=[(dtrain, "train")])
 # ...`,
     },
     {
