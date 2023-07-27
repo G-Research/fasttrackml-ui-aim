@@ -61,13 +61,13 @@ trainer = Trainer(
       title: 'Integrate Keras & tf.keras',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.KERAS,
       code: `import mlflow
-from mlflow import set_tracking_uri
 import mlflow.keras
 
 # Set FastTrackML tracking server
-set_tracking_uri("${fasttrack_server}")
+mlflow.set_tracking_uri("${fasttrack_server}")
 
 # ...
+
 # Build, compile, enable autologging, and train your model
 keras_model = ...
 keras_model.compile(optimizer="rmsprop", loss="mse", metrics=["accuracy"])
@@ -115,10 +115,9 @@ model.fit(train_data, train_labels, log_cout=AimLogger(loss_function='Logloss'),
       docsLink: DOCUMENTATIONS.INTEGRATIONS.FASTAI,
       code: `import mlflow.fastai
 import mlflow
-from mlflow import set_tracking_uri
 
 # Set FastTrackML tracking server
-set_tracking_uri("${fasttrack_server}")
+mlflow.set_tracking_uri("${fasttrack_server}")
 
 # Define the Learner model
 model = ...
