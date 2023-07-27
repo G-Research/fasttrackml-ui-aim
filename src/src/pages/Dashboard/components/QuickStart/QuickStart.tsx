@@ -34,21 +34,21 @@ function QuickStart() {
           Integrate FastTrackML with your code
         </Text>
         <CodeBlock
-          code={`from mlflow import log_metric, log_params, set_tracking_uri
+          code={`import mlflow
 
 # Set FastTrackML tracking server
-set_tracking_uri("${fasttrack_server}")
+mlflow.set_tracking_uri("${fasttrack_server}")
 
 # Log parameters
-log_params({
+mlflow.log_params({
     "learning_rate": 0.001,
     "batch_size": 32,
 })
 
 # Log metrics
 for i in range(10):
-    log_metric(key="loss", value=i, step=i)
-    log_metric(key="acc", value=i, step=i)`}
+    mlflow.log_metric(key="loss", value=i, step=i)
+    mlflow.log_metric(key="acc", value=i, step=i)`}
         />
         <Text
           component='p'
