@@ -33,11 +33,12 @@ function AimIntegrations() {
       code: `from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import MLFlowLogger
 
-mlf_logger = MLFlowLogger(
-    experiment_name='experiment_name',
-    tracking_uri='${fasttrack_server}'
+trainer = Trainer(
+      logger=MLFlowLogger(
+            experiment_name='experiment_name',
+            tracking_uri='${fasttrack_server}'
+      )
 )
-trainer = Trainer(logger=mlf_logger)
 # ...`,
     },
     {
