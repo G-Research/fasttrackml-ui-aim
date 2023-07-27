@@ -136,30 +136,23 @@ results = loaded_model.predict(predict_data)`,
     {
       title: 'Integrate LightGBM',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.LIGHT_GBM,
-      code: `from lightgbm import LGBMClassifier
-from sklearn import datasets
+      code: `import lightgbm as lgb
 import mlflow
-from mlflow import set_tracking_uri
 
 # Set FastTrackML tracking server
-set_tracking_uri("${fasttrack_server}")
+mlflow.set_tracking_uri("${fasttrack_server}")
 
-# Auto log all MLflow entities
+#...
+
+# enable auto logging
 mlflow.lightgbm.autolog()
 
-# Load iris dataset
-X, y = datasets.load_iris(return_X_y=True, as_frame=True)
-
-# Initialize our model
-model = LGBMClassifier(objective="multiclass", random_state=42)
-
-# Train the model
-model.fit(X, y)
-
-# Load model for inference
-model_uri = f"runs:/{mlflow.last_active_run().info.run_id}/model"
-loaded_model = mlflow.lightgbm.load_model(model_uri)
-print(loaded_model.predict(X[:5]))`,
+with mlflow.start_run():
+        # train model
+        model = lgb.train(
+            params, train_set, num_boost_round=10, valid_sets=[train_set], valid_names=["train"]
+        )
+#...`,
     },
 
     {
