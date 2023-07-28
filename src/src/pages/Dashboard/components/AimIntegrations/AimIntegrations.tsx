@@ -31,10 +31,9 @@ function AimIntegrations() {
       title: 'Integrate PyTorch Lightning',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.PYTORCH_LIGHTNING,
       code: `import pytorch_lightning as pl
-from pytorch_lightning.loggers import MLFlowLogger
 
 trainer = pl.Trainer(
-      logger=MLFlowLogger(
+      logger=pl.loggers.MLFlowLogger(
             experiment_name='experiment_name',
             tracking_uri='${fasttrack_server}'
       )
