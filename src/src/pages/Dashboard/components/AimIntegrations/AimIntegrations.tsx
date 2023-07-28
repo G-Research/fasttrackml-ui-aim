@@ -61,8 +61,7 @@ trainer = Trainer(
     {
       title: 'Integrate Keras & tf.keras',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.KERAS,
-      code: `import mlflow
-import mlflow.keras
+      code: `import mlflow.keras
 
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri("${fasttrack_server}")
