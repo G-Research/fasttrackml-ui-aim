@@ -5,14 +5,12 @@ import { Link } from '@material-ui/core';
 import { Text } from 'components/kit';
 import CodeBlock from 'components/CodeBlock/CodeBlock';
 
+import { getTrackingURI } from 'config/config';
 import { DOCUMENTATIONS } from 'config/references';
 
 import './QuickStart.scss';
 
 function QuickStart() {
-  // Get fasttrack server hostname from current browser location
-  const { hostname, port, protocol } = window.location;
-  const fasttrack_server = `${protocol}//${hostname}:${port}`;
   return (
     <div className='QuickStart'>
       <Text
@@ -37,7 +35,7 @@ function QuickStart() {
           code={`import mlflow
 
 # Set FastTrackML tracking server
-mlflow.set_tracking_uri("${fasttrack_server}")
+mlflow.set_tracking_uri("${getTrackingURI()}")
 
 # Log parameters
 mlflow.log_params({

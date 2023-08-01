@@ -10,7 +10,7 @@ import { IconName } from 'components/kit/Icon';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
 import { PathEnum } from 'config/enums/routesEnum';
-import { getBaseHost } from 'config/config';
+import { getBaseHost, getPrefix } from 'config/config';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DOCUMENTATIONS } from 'config/references';
 
@@ -90,7 +90,7 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
           </ul>
           <div className='Sidebar__bottom'>
             <Tooltip title='Switch UI' placement='right'>
-              <a href='/' className='Sidebar__bottom__anchor'>
+              <a href={getPrefix()} className='Sidebar__bottom__anchor'>
                 <Icon name='live-demo' />
               </a>
             </Tooltip>
