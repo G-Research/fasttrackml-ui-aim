@@ -50,9 +50,13 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: "1.20"
+      - name: Expose GitHub Runtime
+        uses: crazy-max/ghaction-github-runtime@v2
       - name: Run Dagger pipeline
         working-directory: builder
         run: go run main.go
+        env:
+          _EXPERIMENTAL_DAGGER_CACHE_CONFIG: type=gha,mode=max,url=${{ env.ACTIONS_CACHE_URL }},token=${{ env.ACTIONS_RUNTIME_TOKEN }}
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
