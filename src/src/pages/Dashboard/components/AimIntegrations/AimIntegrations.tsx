@@ -84,14 +84,11 @@ tuner.search(
       docsLink: DOCUMENTATIONS.INTEGRATIONS.XGBOOST,
       code: `from sklearn import datasets
 from sklearn.model_selection import train_test_split
+import mlflow.xgboost
 import xgboost as xgb
 
-
-from mlflow import set_tracking_uri, start_run
-import mlflow.xgboost
-
 # Set FastTrackML tracking server
-set_tracking_uri("${fasttrack_server}")
+mlflow.set_tracking_uri("${fasttrack_server}")
 
 # ...
 # prepare train and test data
@@ -106,7 +103,7 @@ mlflow.xgboost.autolog()
 dtrain = xgb.DMatrix(X_train, label=y_train)
 dtest = xgb.DMatrix(X_test, label=y_test)
 
-with start_run():
+with mlflow.start_run():
     # train model
     params = {
         "objective": "multi:softprob",
