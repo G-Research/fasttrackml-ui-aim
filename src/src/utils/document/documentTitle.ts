@@ -8,12 +8,12 @@ export function getDocumentTitle(pathname: string): {
   if (paths[0]) {
     return { title: _.capitalize(paths[0]), withPrefix: true };
   }
-  return { title: 'Aim', withPrefix: false };
+  return { title: 'FastTrackML (modern)', withPrefix: false };
 }
 
 export function setDocumentTitle(
-  title: string = 'Aim',
+  title: string = 'FastTrackML (modern)',
   withPrefix: boolean = false,
 ): void {
-  document.title = title + (withPrefix ? ' | Aim' : '');
+  document.title = title + (withPrefix ? ' | FastTrackML (modern)' : '');
 }
