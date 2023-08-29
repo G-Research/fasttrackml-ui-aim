@@ -1,3 +1,5 @@
+[![FastTrackML banner](https://fasttrackml.io/images/github-banner.svg)](https://fasttrackml.io/)
+
 # fasttrackml-ui-aim
 
 Modern Aim UI built for FastTrackML
