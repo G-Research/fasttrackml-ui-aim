@@ -22,6 +22,7 @@ function AimIntegrations() {
       setExpanded(newExpanded ? panel : false);
     };
 
+  // Get fasttrack server hostname from current browser location
   const { hostname, port, protocol } = window.location;
   const fasttrack_server = `${protocol}//${hostname}:${port}`;
 
@@ -29,10 +30,14 @@ function AimIntegrations() {
     {
       title: 'Integrate PyTorch Lightning',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.PYTORCH_LIGHTNING,
-      code: `from aim.pytorch_lightning import AimLogger
+      code: `import pytorch_lightning as pl
 
-# ...
-trainer = pl.Trainer(logger=AimLogger(experiment='experiment_name'))
+trainer = pl.Trainer(
+      logger=pl.loggers.MLFlowLogger(
+            experiment_name='experiment_name',
+            tracking_uri='${fasttrack_server}'
+      )
+)
 # ...`,
     },
     {
@@ -55,15 +60,21 @@ trainer = Trainer(
     {
       title: 'Integrate Keras & tf.keras',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.KERAS,
-      code: `import aim
+      code: `import mlflow.keras
+
+# Set FastTrackML tracking server
+mlflow.set_tracking_uri("${fasttrack_server}")
 
 # ...
-model.fit(x_train, y_train, epochs=epochs, callbacks=[
-    aim.keras.AimCallback(repo='/path/to/logs/dir', experiment='experiment_name')
-    
-    # Use aim.tensorflow.AimCallback in case of tf.keras
-    aim.tensorflow.AimCallback(repo='/path/to/logs/dir', experiment='experiment_name')
-])
+
+# Build, compile, enable autologging, and train your model
+keras_model = ...
+keras_model.compile(optimizer="rmsprop", loss="mse", metrics=["accuracy"])
+
+# autolog your metrics, parameters, and model
+mlflow.keras.autolog()
+results = keras_model.fit(
+    x_train, y_train, epochs=20, batch_size=128, validation_data=(x_val, y_val))
 # ...`,
     },
     {
@@ -125,30 +136,42 @@ model.fit(train_data, train_labels, log_cout=AimLogger(loss_function='Logloss'),
     {
       title: 'Integrate fastai',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.FASTAI,
-      code: `from aim.fastai import AimCallback
+      code: `import mlflow.fastai
+
+# Set FastTrackML tracking server
+mlflow.set_tracking_uri(${fasttrack_server})
 
 # ...
-learn = cnn_learner(dls, resnet18, pretrained=True,
-                    loss_func=CrossEntropyLossFlat(),
-                    metrics=accuracy, model_dir="/tmp/model/",
-                    cbs=AimCallback(repo='.', experiment='fastai_test'))
+
+# Enable auto logging
+mlflow.fastai.autolog()
+
+# Start MLflow session
+with mlflow.start_run() as run:
+    model.fit(epochs, learning_rate)
+
 # ...`,
     },
     {
       title: 'Integrate LightGBM',
       docsLink: DOCUMENTATIONS.INTEGRATIONS.LIGHT_GBM,
-      code: `from aim.lightgbm import AimCallback
+      code: `import lightgbm as lgb
+import mlflow
 
-# ...
-aim_callback = AimCallback(experiment='lgb_test')
-aim_callback.experiment['hparams'] = params
+# Set FastTrackML tracking server
+mlflow.set_tracking_uri("${fasttrack_server}")
 
-gbm = lgb.train(params,
-                lgb_train,
-                num_boost_round=20,
-                valid_sets=lgb_eval,
-                callbacks=[aim_callback, lgb.early_stopping(stopping_rounds=5)])
-# ...`,
+#...
+
+# enable auto logging
+mlflow.lightgbm.autolog()
+
+with mlflow.start_run():
+        # train model
+        model = lgb.train(
+            params, train_set, num_boost_round=10, valid_sets=[train_set], valid_names=["train"]
+        )
+#...`,
     },
 
     {
@@ -178,7 +201,7 @@ aim_logger.attach_output_handler(
   return (
     <div className='AimIntegrations'>
       <Text tint={100} weight={600} size={18}>
-        Integrate Aim with your favorite ML framework
+        Integrate FastTrackML with your favorite ML framework
       </Text>
       <div className='AimIntegrations__section'>
         {integrations.map((item, i) => (
