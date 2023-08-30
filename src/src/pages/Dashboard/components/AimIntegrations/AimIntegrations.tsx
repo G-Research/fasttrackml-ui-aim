@@ -28,38 +28,23 @@ function AimIntegrations() {
 
   const integrations = [
     {
-      title: 'Integrate PyTorch Lightning',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.PYTORCH_LIGHTNING,
+      title: 'Integrate PyTorch',
       code: `import pytorch_lightning as pl
+import mlflow.pytorch
 
-trainer = pl.Trainer(
-      logger=pl.loggers.MLFlowLogger(
-            experiment_name='experiment_name',
-            tracking_uri='${fasttrack_server}'
-      )
-)
-# ...`,
-    },
-    {
-      title: 'Integrate Hugging Face',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.HUGGING_FACE,
-      code: `from aim.hugging_face import AimCallback
+mlflow.set_tracking_uri("${fasttrack_server}")
+mlflow.pytorch.autolog()
 
-# ...
-aim_callback = AimCallback(repo='/path/to/logs/dir', experiment='mnli')
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset if training_args.do_train else None,
-    eval_dataset=eval_dataset if training_args.do_eval else None,
-    callbacks=[aim_callback],
-    # ...
+# ....
+trainer = pl.Trainer.from_argparse_args(
+    args, callbacks=[], checkpoint_callback=checkpoint_callback
 )
+trainer.fit(model, dm)
+trainer.test()
 # ...`,
     },
     {
       title: 'Integrate Keras & tf.keras',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.KERAS,
       code: `import mlflow.keras
 
 # Set FastTrackML tracking server
@@ -78,21 +63,7 @@ results = keras_model.fit(
 # ...`,
     },
     {
-      title: 'Integrate KerasTuner',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.KERAS_TUNER,
-      code: `from aim.keras_tuner import AimCallback
-
-# ...
-tuner.search(
-    train_ds,
-    validation_data=test_ds,
-    callbacks=[AimCallback(tuner=tuner, repo='.', experiment='keras_tuner_test')],
-)
-# ...`,
-    },
-    {
       title: 'Integrate XGBoost',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.XGBOOST,
       code: `from sklearn import datasets
 from sklearn.model_selection import train_test_split
 import mlflow.xgboost
@@ -125,17 +96,7 @@ with mlflow.start_run():
 # ...`,
     },
     {
-      title: 'Integrate CatBoost',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.CATBOOST,
-      code: `from aim.catboost import AimLogger
-
-# ...
-model.fit(train_data, train_labels, log_cout=AimLogger(loss_function='Logloss'), logging_level="Info")
-# ...`,
-    },
-    {
       title: 'Integrate fastai',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.FASTAI,
       code: `import mlflow.fastai
 
 # Set FastTrackML tracking server
@@ -154,9 +115,8 @@ with mlflow.start_run() as run:
     },
     {
       title: 'Integrate LightGBM',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.LIGHT_GBM,
       code: `import lightgbm as lgb
-import mlflow
+import mlflow.lightgbm
 
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri("${fasttrack_server}")
@@ -172,29 +132,6 @@ with mlflow.start_run():
             params, train_set, num_boost_round=10, valid_sets=[train_set], valid_names=["train"]
         )
 #...`,
-    },
-
-    {
-      title: 'Integrate PyTorch Ignite',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.PYTORCH_IGNITE,
-      code: `from aim.pytorch_ignite import AimLogger
-
-# ...
-aim_logger = AimLogger()
-
-aim_logger.log_params({
-    "model": model.__class__.__name__,
-    "pytorch_version": str(torch.__version__),
-    "ignite_version": str(ignite.__version__),
-})
-
-aim_logger.attach_output_handler(
-    trainer,
-    event_name=Events.ITERATION_COMPLETED,
-    tag="train",
-    output_transform=lambda loss: {'loss': loss}
-)
-# ...`,
     },
   ];
 
@@ -223,24 +160,6 @@ aim_logger.attach_output_handler(
             </AccordionSummary>
             <AccordionDetails className='AimIntegrations__section__accordion__details'>
               <CodeBlock code={item.code} />
-              <Text
-                component='p'
-                size={12}
-                weight={600}
-                tint={100}
-                className='AimIntegrations__section__text'
-              >
-                See documentation{' '}
-                <Link
-                  target='_blank'
-                  href={item.docsLink}
-                  rel='noreferrer'
-                  className='QuickStart__section__text__link'
-                >
-                  here
-                </Link>
-                .
-              </Text>
             </AccordionDetails>
           </Accordion>
         ))}
