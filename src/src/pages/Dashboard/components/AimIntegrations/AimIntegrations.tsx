@@ -28,9 +28,9 @@ function AimIntegrations() {
 
   const integrations = [
     {
-      title: 'Integrate PyTorch',
+      title: 'Integrate PyTorch Lightning',
       code: `import pytorch_lightning as pl
-import mlflow.pytorch
+import mlflow
 
 mlflow.set_tracking_uri("${fasttrack_server}")
 mlflow.pytorch.autolog()
@@ -45,19 +45,16 @@ trainer.test()
     },
     {
       title: 'Integrate Keras & tf.keras',
-      code: `import mlflow.keras
+      code: `from tensorflow import keras
+import mlflow
 
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri("${fasttrack_server}")
 
+# Enable autologging
+mlflow.tensorflow.autolog()
+
 # ...
-
-# Build, compile, enable autologging, and train your model
-keras_model = ...
-keras_model.compile(optimizer="rmsprop", loss="mse", metrics=["accuracy"])
-
-# autolog your metrics, parameters, and model
-mlflow.keras.autolog()
 results = keras_model.fit(
     x_train, y_train, epochs=20, batch_size=128, validation_data=(x_val, y_val))
 # ...`,
@@ -66,66 +63,57 @@ results = keras_model.fit(
       title: 'Integrate XGBoost',
       code: `from sklearn import datasets
 from sklearn.model_selection import train_test_split
-import mlflow.xgboost
+import mlflow
 import xgboost as xgb
 
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri("${fasttrack_server}")
 
-# ...
-# prepare train and test data
-iris = datasets.load_iris()
-X = iris.data
-y = iris.target
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# enable auto logging
+# Enable autologging
 mlflow.xgboost.autolog()
 
-dtrain = xgb.DMatrix(X_train, label=y_train)
-dtest = xgb.DMatrix(X_test, label=y_test)
-
+# Start MLflow session
 with mlflow.start_run():
-    # train model
-    params = {
-        "objective": "multi:softprob",
-        "num_class": 3,
-        # ...
-    }
+# ...
     model = xgb.train(params, dtrain, evals=[(dtrain, "train")])
 # ...`,
     },
     {
       title: 'Integrate fastai',
-      code: `import mlflow.fastai
+      code: `from fastai.learner import Learner
+import mlflow
 
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri(${fasttrack_server})
 
 # ...
 
-# Enable auto logging
+# Enable autologging
 mlflow.fastai.autolog()
 
-# Start MLflow session
-with mlflow.start_run() as run:
-    model.fit(epochs, learning_rate)
+# Create Learner model
+learn = Learner(get_data_loaders(), Model(), loss_func=nn.MSELoss(), splitter=splitter)
 
+# Start MLflow session
+with mlflow.start_run():
+    # Train and fit with default or supplied command line arguments
+    learn.fit_one_cycle(args.epochs, args.lr)
 # ...`,
     },
     {
       title: 'Integrate LightGBM',
       code: `import lightgbm as lgb
-import mlflow.lightgbm
+import mlflow
 
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri("${fasttrack_server}")
 
 #...
 
-# enable auto logging
+# Enable autologging
 mlflow.lightgbm.autolog()
 
+# Start MLflow session
 with mlflow.start_run():
         # train model
         model = lgb.train(
