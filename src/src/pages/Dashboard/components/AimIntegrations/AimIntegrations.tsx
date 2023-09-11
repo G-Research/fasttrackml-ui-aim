@@ -29,155 +29,103 @@ function AimIntegrations() {
   const integrations = [
     {
       title: 'Integrate PyTorch Lightning',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.PYTORCH_LIGHTNING,
       code: `import pytorch_lightning as pl
-
-trainer = pl.Trainer(
-      logger=pl.loggers.MLFlowLogger(
-            experiment_name='experiment_name',
-            tracking_uri='${fasttrack_server}'
-      )
-)
-# ...`,
-    },
-    {
-      title: 'Integrate Hugging Face',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.HUGGING_FACE,
-      code: `from aim.hugging_face import AimCallback
-
-# ...
-aim_callback = AimCallback(repo='/path/to/logs/dir', experiment='mnli')
-trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset=train_dataset if training_args.do_train else None,
-    eval_dataset=eval_dataset if training_args.do_eval else None,
-    callbacks=[aim_callback],
-    # ...
-)
-# ...`,
-    },
-    {
-      title: 'Integrate Keras & tf.keras',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.KERAS,
-      code: `import mlflow.keras
+import mlflow
 
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri("${fasttrack_server}")
 
+# Enable autologging
+mlflow.pytorch.autolog()
+
 # ...
+trainer = pl.Trainer()
+trainer.fit(model, dm)
+trainer.test()
+# ...`,
+    },
+    {
+      title: 'Integrate Keras & tf.keras',
+      code: `from tensorflow import keras
+import mlflow
 
-# Build, compile, enable autologging, and train your model
-keras_model = ...
-keras_model.compile(optimizer="rmsprop", loss="mse", metrics=["accuracy"])
+# Set FastTrackML tracking server
+mlflow.set_tracking_uri("${fasttrack_server}")
 
-# autolog your metrics, parameters, and model
-mlflow.keras.autolog()
+# Enable autologging
+mlflow.tensorflow.autolog()
+
+# ...
 results = keras_model.fit(
     x_train, y_train, epochs=20, batch_size=128, validation_data=(x_val, y_val))
 # ...`,
     },
     {
-      title: 'Integrate KerasTuner',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.KERAS_TUNER,
-      code: `from aim.keras_tuner import AimCallback
-
-# ...
-tuner.search(
-    train_ds,
-    validation_data=test_ds,
-    callbacks=[AimCallback(tuner=tuner, repo='.', experiment='keras_tuner_test')],
-)
-# ...`,
-    },
-    {
       title: 'Integrate XGBoost',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.XGBOOST,
-      code: `from aim.xgboost import AimCallback
+      code: `import mlflow
+import xgboost as xgb
 
-# ...
-aim_callback = AimCallback(repo='/path/to/logs/dir', experiment='experiment_name')
-bst = xgb.train(param, xg_train, num_round, watchlist, callbacks=[aim_callback])
-# ...`,
-    },
-    {
-      title: 'Integrate CatBoost',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.CATBOOST,
-      code: `from aim.catboost import AimLogger
+# Set FastTrackML tracking server
+mlflow.set_tracking_uri("${fasttrack_server}")
 
-# ...
-model.fit(train_data, train_labels, log_cout=AimLogger(loss_function='Logloss'), logging_level="Info")
-# ...`,
+# Enable autologging
+mlflow.xgboost.autolog()
+
+# Start MLflow session
+with mlflow.start_run():
+    # ...
+    model = xgb.train(params, dtrain, evals=[(dtrain, "train")])
+    # ...`,
     },
     {
       title: 'Integrate fastai',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.FASTAI,
-      code: `import mlflow.fastai
+      code: `from fastai.learner import Learner
+import mlflow
 
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri(${fasttrack_server})
 
-# ...
-
-# Enable auto logging
+# Enable autologging
 mlflow.fastai.autolog()
 
-# Start MLflow session
-with mlflow.start_run() as run:
-    model.fit(epochs, learning_rate)
+# ...
 
-# ...`,
+# Create Learner model
+learn = Learner(get_data_loaders(), Model(), loss_func=nn.MSELoss(), splitter=splitter)
+
+# Start MLflow session
+with mlflow.start_run():
+    # ...
+    learn.fit_one_cycle(args.epochs, args.lr)
+    # ...`,
     },
     {
       title: 'Integrate LightGBM',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.LIGHT_GBM,
       code: `import lightgbm as lgb
 import mlflow
 
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri("${fasttrack_server}")
 
-#...
-
-# enable auto logging
+# Enable autologging
 mlflow.lightgbm.autolog()
 
-with mlflow.start_run():
-        # train model
-        model = lgb.train(
-            params, train_set, num_boost_round=10, valid_sets=[train_set], valid_names=["train"]
-        )
-#...`,
-    },
-
-    {
-      title: 'Integrate PyTorch Ignite',
-      docsLink: DOCUMENTATIONS.INTEGRATIONS.PYTORCH_IGNITE,
-      code: `from aim.pytorch_ignite import AimLogger
-
 # ...
-aim_logger = AimLogger()
 
-aim_logger.log_params({
-    "model": model.__class__.__name__,
-    "pytorch_version": str(torch.__version__),
-    "ignite_version": str(ignite.__version__),
-})
-
-aim_logger.attach_output_handler(
-    trainer,
-    event_name=Events.ITERATION_COMPLETED,
-    tag="train",
-    output_transform=lambda loss: {'loss': loss}
-)
-# ...`,
+# Start MLflow session
+with mlflow.start_run():
+    # ...
+    model = lgb.train(
+        params, train_set, num_boost_round=10, valid_sets=[train_set], valid_names=["train"]
+    )
+    # ...`,
     },
   ];
 
   return (
     <div className='AimIntegrations'>
       <Text tint={100} weight={600} size={18}>
-        Integrate Aim with your favorite ML framework
+        Integrate FastTrackML with your favorite ML framework
       </Text>
       <div className='AimIntegrations__section'>
         {integrations.map((item, i) => (
@@ -199,24 +147,6 @@ aim_logger.attach_output_handler(
             </AccordionSummary>
             <AccordionDetails className='AimIntegrations__section__accordion__details'>
               <CodeBlock code={item.code} />
-              <Text
-                component='p'
-                size={12}
-                weight={600}
-                tint={100}
-                className='AimIntegrations__section__text'
-              >
-                See documentation{' '}
-                <Link
-                  target='_blank'
-                  href={item.docsLink}
-                  rel='noreferrer'
-                  className='QuickStart__section__text__link'
-                >
-                  here
-                </Link>
-                .
-              </Text>
             </AccordionDetails>
           </Accordion>
         ))}
