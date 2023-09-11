@@ -32,13 +32,14 @@ function AimIntegrations() {
       code: `import pytorch_lightning as pl
 import mlflow
 
+# Set FastTrackML tracking server
 mlflow.set_tracking_uri("${fasttrack_server}")
+
+# Enable autologging
 mlflow.pytorch.autolog()
 
-# ....
-trainer = pl.Trainer.from_argparse_args(
-    args, callbacks=[], checkpoint_callback=checkpoint_callback
-)
+# ...
+trainer = pl.Trainer()
 trainer.fit(model, dm)
 trainer.test()
 # ...`,
@@ -55,15 +56,14 @@ mlflow.set_tracking_uri("${fasttrack_server}")
 mlflow.tensorflow.autolog()
 
 # ...
+
 results = keras_model.fit(
     x_train, y_train, epochs=20, batch_size=128, validation_data=(x_val, y_val))
-# ...`,
+    # ...`,
     },
     {
       title: 'Integrate XGBoost',
-      code: `from sklearn import datasets
-from sklearn.model_selection import train_test_split
-import mlflow
+      code: `import mlflow
 import xgboost as xgb
 
 # Set FastTrackML tracking server
@@ -74,9 +74,9 @@ mlflow.xgboost.autolog()
 
 # Start MLflow session
 with mlflow.start_run():
-# ...
+    # ...
     model = xgb.train(params, dtrain, evals=[(dtrain, "train")])
-# ...`,
+    # ...`,
     },
     {
       title: 'Integrate fastai',
@@ -86,10 +86,10 @@ import mlflow
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri(${fasttrack_server})
 
-# ...
-
 # Enable autologging
 mlflow.fastai.autolog()
+
+# ...
 
 # Create Learner model
 learn = Learner(get_data_loaders(), Model(), loss_func=nn.MSELoss(), splitter=splitter)
@@ -98,7 +98,7 @@ learn = Learner(get_data_loaders(), Model(), loss_func=nn.MSELoss(), splitter=sp
 with mlflow.start_run():
     # Train and fit with default or supplied command line arguments
     learn.fit_one_cycle(args.epochs, args.lr)
-# ...`,
+    # ...`,
     },
     {
       title: 'Integrate LightGBM',
@@ -108,18 +108,18 @@ import mlflow
 # Set FastTrackML tracking server
 mlflow.set_tracking_uri("${fasttrack_server}")
 
-#...
-
 # Enable autologging
 mlflow.lightgbm.autolog()
 
+# ...
+
 # Start MLflow session
 with mlflow.start_run():
-        # train model
-        model = lgb.train(
-            params, train_set, num_boost_round=10, valid_sets=[train_set], valid_names=["train"]
-        )
-#...`,
+    # train model
+    model = lgb.train(
+        params, train_set, num_boost_round=10, valid_sets=[train_set], valid_names=["train"]
+    )
+    # ...`,
     },
   ];
 
