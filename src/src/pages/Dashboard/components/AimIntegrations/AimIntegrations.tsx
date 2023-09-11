@@ -56,10 +56,9 @@ mlflow.set_tracking_uri("${fasttrack_server}")
 mlflow.tensorflow.autolog()
 
 # ...
-
 results = keras_model.fit(
     x_train, y_train, epochs=20, batch_size=128, validation_data=(x_val, y_val))
-    # ...`,
+# ...`,
     },
     {
       title: 'Integrate XGBoost',
@@ -96,7 +95,7 @@ learn = Learner(get_data_loaders(), Model(), loss_func=nn.MSELoss(), splitter=sp
 
 # Start MLflow session
 with mlflow.start_run():
-    # Train and fit with default or supplied command line arguments
+    # ...
     learn.fit_one_cycle(args.epochs, args.lr)
     # ...`,
     },
@@ -115,7 +114,7 @@ mlflow.lightgbm.autolog()
 
 # Start MLflow session
 with mlflow.start_run():
-    # train model
+    # ...
     model = lgb.train(
         params, train_set, num_boost_round=10, valid_sets=[train_set], valid_names=["train"]
     )
