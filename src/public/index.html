@@ -208,7 +208,10 @@
       })();
     </script>
     <script>
-      window.API_BASE_PATH = '/aim';
+      const found = window.location.pathname.match(/^(\/ns\/[^/]+\/)aim/);
+      const prefix = found ? found[1] : '/';
+      window.PREFIX = prefix;
+      window.API_BASE_PATH = prefix + 'aim';
       window.externalPublicPath = '%PUBLIC_URL%/';
     </script>
   </head>

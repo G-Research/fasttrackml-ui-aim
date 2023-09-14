@@ -2,6 +2,7 @@ import { version } from '../../package.json';
 
 interface GlobalScope extends Window {
   API_BASE_PATH?: string;
+  PREFIX?: string;
 }
 
 let globalScope: GlobalScope;
@@ -32,6 +33,19 @@ function getAPIHost() {
   return API_HOST;
 }
 
+function getPrefix(): string {
+  return `${globalScope.PREFIX}`;
+}
+
+function getTrackingURI(): string {
+  let host = getBaseHost();
+  if (host === '') {
+    const { protocol, hostname, port } = window.location;
+    host = `${protocol}//${hostname}${port ? `:${port}` : ''}`;
+  }
+  return `${host}${getPrefix()}`;
+}
+
 function setAPIBasePath(basePath: string) {
   globalScope.API_BASE_PATH = basePath;
   API_HOST = `${getBaseHost()}${getBasePath()}/api`;
@@ -48,4 +62,11 @@ export function checkIsBasePathInCachedEnv(basePath: string) {
   return PATHS_TO_SHOW_CACHE_BANNERS.includes(parsed_path);
 }
 
-export { getBaseHost, getBasePath, getAPIHost, setAPIBasePath };
+export {
+  getBaseHost,
+  getBasePath,
+  getAPIHost,
+  getPrefix,
+  getTrackingURI,
+  setAPIBasePath,
+};

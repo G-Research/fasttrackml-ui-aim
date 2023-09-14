@@ -4,13 +4,12 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Link,
 } from '@material-ui/core';
 
 import { Icon, Text } from 'components/kit';
 import CodeBlock from 'components/CodeBlock/CodeBlock';
 
-import { DOCUMENTATIONS } from 'config/references';
+import { getTrackingURI } from 'config/config';
 
 import './AimIntegrations.scss';
 
@@ -22,10 +21,6 @@ function AimIntegrations() {
       setExpanded(newExpanded ? panel : false);
     };
 
-  // Get fasttrack server hostname from current browser location
-  const { hostname, port, protocol } = window.location;
-  const fasttrack_server = `${protocol}//${hostname}:${port}`;
-
   const integrations = [
     {
       title: 'Integrate PyTorch Lightning',
@@ -33,7 +28,7 @@ function AimIntegrations() {
 import mlflow
 
 # Set FastTrackML tracking server
-mlflow.set_tracking_uri("${fasttrack_server}")
+mlflow.set_tracking_uri("${getTrackingURI()}")
 
 # Enable autologging
 mlflow.pytorch.autolog()
@@ -50,7 +45,7 @@ trainer.test()
 import mlflow
 
 # Set FastTrackML tracking server
-mlflow.set_tracking_uri("${fasttrack_server}")
+mlflow.set_tracking_uri("${getTrackingURI()}")
 
 # Enable autologging
 mlflow.tensorflow.autolog()
@@ -66,7 +61,7 @@ results = keras_model.fit(
 import xgboost as xgb
 
 # Set FastTrackML tracking server
-mlflow.set_tracking_uri("${fasttrack_server}")
+mlflow.set_tracking_uri("${getTrackingURI()}")
 
 # Enable autologging
 mlflow.xgboost.autolog()
@@ -83,7 +78,7 @@ with mlflow.start_run():
 import mlflow
 
 # Set FastTrackML tracking server
-mlflow.set_tracking_uri(${fasttrack_server})
+mlflow.set_tracking_uri(${getTrackingURI()})
 
 # Enable autologging
 mlflow.fastai.autolog()
@@ -105,7 +100,7 @@ with mlflow.start_run():
 import mlflow
 
 # Set FastTrackML tracking server
-mlflow.set_tracking_uri("${fasttrack_server}")
+mlflow.set_tracking_uri("${getTrackingURI()}")
 
 # Enable autologging
 mlflow.lightgbm.autolog()
