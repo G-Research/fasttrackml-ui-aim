@@ -7,11 +7,11 @@ export const METRICS_ALIGNMENT_LIST: {
 }[] = [
   {
     value: AlignmentOptionsEnum.STEP,
-    label: 'Step',
+    label: 'Log Iteration',
   },
   {
     value: AlignmentOptionsEnum.EPOCH,
-    label: 'Epoch',
+    label: 'Step',
   },
   {
     value: AlignmentOptionsEnum.RELATIVE_TIME,
