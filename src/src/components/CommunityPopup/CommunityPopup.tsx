@@ -6,6 +6,8 @@ import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 
 import { trackEvent } from 'services/analytics';
 
+import { getItem, setItem } from 'utils/storage';
+
 import { Button, Text } from '../kit';
 
 import { ICommunityPopupProps } from './';
@@ -20,7 +22,7 @@ function CommunityPopup(props: ICommunityPopupProps) {
   let timeoutIdRef = React.useRef<number>();
 
   React.useEffect(() => {
-    const popupSeenStorage = localStorage.getItem(COMMUNITY_POPUP_SEEN);
+    const popupSeenStorage = getItem(COMMUNITY_POPUP_SEEN);
 
     if (popupSeenStorage === 'true') {
       setOpen(false);
@@ -33,12 +35,12 @@ function CommunityPopup(props: ICommunityPopupProps) {
   }, []);
 
   const onSkip = React.useCallback(() => {
-    localStorage.setItem(COMMUNITY_POPUP_SEEN, 'true');
+    setItem(COMMUNITY_POPUP_SEEN, 'true');
     setOpen(false);
   }, []);
 
   const onJoin = React.useCallback(() => {
-    localStorage.setItem(COMMUNITY_POPUP_SEEN, 'true');
+    setItem(COMMUNITY_POPUP_SEEN, 'true');
     window.open(COMMUNITY_URL, '_blank');
     trackEvent(ANALYTICS_EVENT_KEYS.sidebar.discord);
     setOpen(false);
