@@ -16,7 +16,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       # We count the number of commits since the initial import of the upstream repo
@@ -45,20 +45,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: "1.20"
+          go-version: "1.21"
+          check-latest: true
+          cache: false
       - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v2
+        uses: crazy-max/ghaction-github-runtime@v3
       - name: Run Dagger pipeline
         working-directory: builder
         run: go run main.go
         env:
           _EXPERIMENTAL_DAGGER_CACHE_CONFIG: type=gha,mode=max,url=${{ env.ACTIONS_CACHE_URL }},token=${{ env.ACTIONS_RUNTIME_TOKEN }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ui
           path: embed
@@ -75,16 +77,16 @@ jobs:
     steps:
       - name: Generate an app token
         id: generate_token
-        uses: tibdex/github-app-token@b62528385c34dbc9f38e5f4225ac829252d1ea92
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ steps.generate_token.outputs.token }}
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ui
           path: embed
