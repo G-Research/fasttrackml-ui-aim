@@ -32,6 +32,7 @@ A GitHub app has been created with the `contents:write` permissions on this repo
 
 Rulesets have been created to enforce that:
 - `main` and `release/v*` branches require pull request reviews
+- `release/v*` branches require status checks to pass
 - the GitHub app can create new `release/v*` branches
 - the GitHub app can create new `v*` tags
 - everything else (branch creation or deletion) is denied
@@ -196,6 +197,33 @@ Here is what they look like with the GitHub API at the time of writing:
           "dismiss_stale_reviews_on_push": true,
           "required_approving_review_count": 1,
           "required_review_thread_resolution": false
+        }
+      }
+    ],
+    "bypass_actors": []
+  },
+  {
+    "name": "Require status checks to pass for release branch",
+    "target": "branch",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "refs/heads/release/v*"
+        ]
+      }
+    },
+    "rules": [
+      {
+        "type": "required_status_checks",
+        "parameters": {
+          "strict_required_status_checks_policy": true,
+          "required_status_checks": [
+            {
+              "context": "Build UI",
+              "integration_id": 15368
+            }
+          ]
         }
       }
     ],
