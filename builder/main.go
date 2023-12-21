@@ -40,7 +40,7 @@ func main() {
 		).
 		WithWorkdir("/src").
 		WithExec([]string{"mkdir", "public"}).
-		WithExec([]string{"npm", "ci"}).
+		WithExec([]string{"npm", "ci", "--legacy-peer-deps"}).
 		WithDirectory("/src",
 			client.Host().Directory(src, dagger.HostDirectoryOpts{
 				Exclude: []string{"node_modules", "public/vs"},
