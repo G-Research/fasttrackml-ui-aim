@@ -2716,6 +2716,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         let rowIndex = 0;
         const sameValueColumns: string[] = [];
         const columnsFlattenValues: { [key: string]: Set<any> } = {};
+        const metricsInitialRowData = getMetricsInitialRowData(metricsColumns);
         processedData.forEach((metricsCollection: any) => {
           const groupKey = metricsCollection.key;
           const columnsValues: { [key: string]: string[] } = {};
@@ -2740,7 +2741,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
             };
           }
           metricsCollection.data.forEach((metric: any) => {
-            const metricsRowValues = getMetricsInitialRowData(metricsColumns);
+            const metricsRowValues = { ...metricsInitialRowData };
             metric.run.traces.metric.forEach((trace: any) => {
               const metricHash = getMetricHash(trace.name, trace.context);
               metricsRowValues[metricHash] = formatValue(trace.last_value.last);
@@ -3473,6 +3474,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         let rowIndex = 0;
         const sameValueColumns: string[] = [];
         const columnsFlattenValues: { [key: string]: Set<any> } = {};
+        const metricsInitialRowData = getMetricsInitialRowData(metricsColumns);
 
         processedData.forEach(
           (metricsCollection: IMetricsCollection<IParam>) => {
@@ -3523,7 +3525,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
             }
 
             metricsCollection.data.forEach((metric: any) => {
-              const metricsRowValues = getMetricsInitialRowData(metricsColumns);
+              const metricsRowValues = { ...metricsInitialRowData };
               metric.run.traces.metric.forEach((trace: any) => {
                 const metricHash = getMetricHash(trace.name, trace.context);
                 metricsRowValues[metricHash] = formatValue(
@@ -5188,6 +5190,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         let rowIndex = 0;
         const sameValueColumns: string[] = [];
         const columnsFlattenValues: { [key: string]: Set<any> } = {};
+        const metricsInitialRowData = getMetricsInitialRowData(metricsColumns);
 
         processedData.forEach(
           (metricsCollection: IMetricsCollection<IParam>) => {
@@ -5238,7 +5241,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
             }
 
             metricsCollection.data.forEach((metric: any) => {
-              const metricsRowValues = getMetricsInitialRowData(metricsColumns);
+              const metricsRowValues = { ...metricsInitialRowData };
               metric.run.traces.metric.forEach((trace: any) => {
                 const metricHash = getMetricHash(
                   trace.name,

@@ -29,7 +29,7 @@ function CodeBlock({
         <ErrorBoundary>
           <CopyToClipBoard
             className='CodeBlock__copy__button'
-            contentRef={elementRef}
+            copyContent={code}
           />
         </ErrorBoundary>
       </div>

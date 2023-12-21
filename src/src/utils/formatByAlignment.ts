@@ -44,8 +44,9 @@ function formatValueByAlignment({
 function getKeyByAlignment(alignmentConfig?: IAlignmentConfig): string {
   switch (alignmentConfig?.type) {
     case AlignmentOptionsEnum.STEP:
+      return 'logging iteration';
     case AlignmentOptionsEnum.EPOCH:
-      return alignmentConfig?.type;
+      return 'step';
     case AlignmentOptionsEnum.ABSOLUTE_TIME:
     case AlignmentOptionsEnum.RELATIVE_TIME:
       return alignmentConfig?.type.replace('_', ' ');

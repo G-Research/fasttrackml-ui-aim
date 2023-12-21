@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash-es';
 import classNames from 'classnames';
 import moment from 'moment';
 import {
@@ -43,11 +42,6 @@ import RunSelectPopoverContent from './RunSelectPopoverContent';
 
 import './RunDetail.scss';
 
-const RunDetailNotesTab = React.lazy(
-  () =>
-    import(/* webpackChunkName: "RunDetailNotesTab" */ './RunDetailNotesTab'),
-);
-
 const RunDetailParamsTab = React.lazy(
   () =>
     import(/* webpackChunkName: "RunDetailParamsTab" */ './RunDetailParamsTab'),
@@ -64,35 +58,14 @@ const RunDetailMetricsAndSystemTab = React.lazy(
       /* webpackChunkName: "RunDetailMetricsAndSystemTab" */ './RunDetailMetricsAndSystemTab'
     ),
 );
-const TraceVisualizationContainer = React.lazy(
-  () =>
-    import(
-      /* webpackChunkName: "TraceVisualizationContainer" */ './TraceVisualizationContainer'
-    ),
-);
 const RunOverviewTab = React.lazy(
   () => import(/* webpackChunkName: "RunOverviewTab" */ './RunOverviewTab'),
-);
-const RunLogsTab = React.lazy(
-  () => import(/* webpackChunkName: "RunLogsTab" */ './RunLogsTab'),
-);
-const RunLogRecords = React.lazy(
-  () => import(/* webpackChunkName: "RunLogRecords" */ './RunLogRecords'),
 );
 
 const tabs: Record<string, string> = {
   overview: 'Overview',
   run_parameters: 'Run Params',
-  notes: 'Notes',
-  logs: 'Logs',
-  messages: 'Messages',
   metrics: 'Metrics',
-  system: 'System',
-  distributions: 'Distributions',
-  images: 'Images',
-  audios: 'Audios',
-  texts: 'Texts',
-  figures: 'Figures',
   settings: 'Settings',
 };
 
@@ -136,73 +109,12 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
         isRunInfoLoading={runData?.isRunInfoLoading}
       />
     ),
-    logs: (
-      <RunLogsTab
-        runHash={runHash}
-        runLogs={runData?.runLogs}
-        inProgress={_.isNil(runData?.runInfo?.end_time)}
-        updatedLogsCount={runData?.updatedLogsCount}
-        isRunLogsLoading={runData?.isRunLogsLoading}
-      />
-    ),
-    messages: (
-      <RunLogRecords
-        runHash={runHash}
-        inProgress={_.isNil(runData?.runInfo?.end_time)}
-      />
-    ),
     metrics: (
       <RunDetailMetricsAndSystemTab
         runHash={runHash}
         runTraces={runData?.runTraces}
         runBatch={runData?.runMetricsBatch}
         isRunBatchLoading={runData?.isRunBatchLoading}
-      />
-    ),
-    system: (
-      <RunDetailMetricsAndSystemTab
-        runHash={runHash}
-        runTraces={runData?.runTraces}
-        runBatch={runData?.runSystemBatch}
-        isSystem
-        isRunBatchLoading={runData?.isRunBatchLoading}
-      />
-    ),
-    distributions: (
-      <TraceVisualizationContainer
-        runHash={runHash}
-        traceType='distributions'
-        traceInfo={runData?.runTraces}
-      />
-    ),
-    images: (
-      <TraceVisualizationContainer
-        runHash={runHash}
-        traceType='images'
-        traceInfo={runData?.runTraces}
-        runParams={runData?.runParams}
-      />
-    ),
-    audios: (
-      <TraceVisualizationContainer
-        runHash={runHash}
-        traceType='audios'
-        traceInfo={runData?.runTraces}
-        runParams={runData?.runParams}
-      />
-    ),
-    texts: (
-      <TraceVisualizationContainer
-        runHash={runHash}
-        traceType='texts'
-        traceInfo={runData?.runTraces}
-      />
-    ),
-    figures: (
-      <TraceVisualizationContainer
-        runHash={runHash}
-        traceType='figures'
-        traceInfo={runData?.runTraces}
       />
     ),
     settings: (
@@ -213,7 +125,6 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
         runHash={runHash}
       />
     ),
-    notes: <RunDetailNotesTab runHash={runHash} />,
   };
 
   function getRunsOfExperiment(
