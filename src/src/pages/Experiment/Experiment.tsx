@@ -43,13 +43,6 @@ const ExperimentRunsTab = React.lazy(
     ),
 );
 
-const ExperimentNotesTab = React.lazy(
-  () =>
-    import(
-      /* webpackChunkName: "ExperimentOverviewTab" */ './components/ExperimentNotesTab'
-    ),
-);
-
 const ExperimentSettingsTab = React.lazy(
   () =>
     import(
@@ -60,7 +53,6 @@ const ExperimentSettingsTab = React.lazy(
 const tabs: Record<string, string> = {
   overview: 'Overview',
   runs: 'Runs',
-  notes: 'Notes',
   settings: 'Settings',
 };
 
@@ -75,6 +67,7 @@ function Experiment(): React.FunctionComponentElement<React.ReactNode> {
     experimentsState,
     getExperimentsData,
     updateExperiment,
+    deleteExperiment,
   } = useExperimentState(experimentId);
   const { notificationState, onNotificationDelete } =
     useNotificationContainer();
@@ -104,16 +97,11 @@ function Experiment(): React.FunctionComponentElement<React.ReactNode> {
       },
       Component: ExperimentRunsTab,
     },
-    notes: {
-      props: {
-        experimentId,
-      },
-      Component: ExperimentNotesTab,
-    },
     settings: {
       props: {
         experimentName: experimentData?.name ?? '',
         updateExperiment,
+        deleteExperiment,
         description: experimentData?.description ?? '',
       },
       Component: ExperimentSettingsTab,

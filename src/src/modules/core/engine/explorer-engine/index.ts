@@ -13,6 +13,8 @@ import getQueryParamsFromState from 'modules/core/utils/getQueryParamsFromState'
 import { AimFlatObjectBase } from 'types/core/AimObjects';
 import { SequenceTypesEnum } from 'types/core/enums';
 
+import { setItem } from 'utils/storage';
+
 import createPipelineEngine, { IPipelineEngine } from '../pipeline';
 import createInstructionsEngine, { IInstructionsEngine } from '../instructions';
 import { INotificationsState, PipelineStatusEnum } from '../types';
@@ -354,7 +356,7 @@ function createEngine<TObject = any>(
     const removeHistoryListener =
       config.persist &&
       browserHistory.listen((update: Update) => {
-        localStorage.setItem(
+        setItem(
           `${basePath}Url`,
           update.location.pathname + update.location.search,
         );
