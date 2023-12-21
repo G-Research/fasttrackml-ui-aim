@@ -22,62 +22,6 @@ const statisticsInitialMap: Record<string, IProjectStatistic> = {
     iconBgColor: '#7A4CE0',
     navLink: routes.METRICS.path,
   },
-  systemMetrics: {
-    label: 'Sys. metrics',
-    count: 0,
-    icon: 'metrics',
-    iconBgColor: '#AF4EAB',
-    navLink: `${routes.METRICS.path}?select=${encode({
-      advancedQuery: "metric.name.startswith('__system__') == True",
-      advancedMode: true,
-    })}`,
-  },
-  [SequenceTypesEnum.Figures]: {
-    label: 'Figures',
-    icon: 'figures',
-    count: 0,
-    iconBgColor: '#18AB6D',
-    navLink: routes.FIGURES_EXPLORER.path,
-  },
-  [SequenceTypesEnum.Images]: {
-    label: 'Images',
-    icon: 'images',
-    count: 0,
-    iconBgColor: '#F17922',
-    navLink: routes.IMAGE_EXPLORE.path,
-  },
-  [SequenceTypesEnum.Audios]: {
-    label: 'Audios',
-    icon: 'audios',
-    count: 0,
-    iconBgColor: '#FCB500',
-    navLink: routes.AUDIOS_EXPLORER.path,
-    badge: {
-      value: 'New',
-      style: { backgroundColor: '#1473e6', color: '#fff' },
-    },
-  },
-  [SequenceTypesEnum.Texts]: {
-    label: 'Texts',
-    icon: 'text',
-    count: 0,
-    iconBgColor: '#E149A0',
-    navLink: routes.TEXT_EXPLORER.path,
-    badge: {
-      value: 'New',
-      style: { backgroundColor: '#1473e6', color: '#fff' },
-    },
-  },
-  [SequenceTypesEnum.Distributions]: {
-    label: 'Distributions',
-    icon: 'distributions',
-    count: 0,
-    iconBgColor: '#0394B4',
-    navLink: '',
-    badge: {
-      value: 'Explorer coming soon',
-    },
-  },
 };
 
 const runsCountingInitialMap: Record<'archived' | 'runs', IProjectStatistic> = {

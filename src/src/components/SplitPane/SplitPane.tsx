@@ -4,6 +4,8 @@ import classNames from 'classnames';
 
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
+import { getItem, setItem } from 'utils/storage';
+
 import { SplitPaneProps, SplitPaneContext } from '.';
 
 import './SplitPane.scss';
@@ -41,7 +43,7 @@ function SplitPane(props: SplitPaneProps) {
         onDragEnd(endSizes);
       }
       if (useLocalStorage) {
-        localStorage.setItem(`${id}-panesSizes`, JSON.stringify(endSizes));
+        setItem(`${id}-panesSizes`, JSON.stringify(endSizes));
       }
     },
     [onDragEnd, id, useLocalStorage],
@@ -50,7 +52,7 @@ function SplitPane(props: SplitPaneProps) {
   const getSizes = React.useCallback(
     (useLocalStorage: boolean, id: string, sizes?: number[]) => {
       if (useLocalStorage) {
-        const savedSizes = localStorage.getItem(`${id}-panesSizes`);
+        const savedSizes = getItem(`${id}-panesSizes`);
         if (savedSizes) {
           return JSON.parse(savedSizes);
         }

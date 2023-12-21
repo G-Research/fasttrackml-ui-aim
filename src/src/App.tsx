@@ -27,7 +27,7 @@ const isVisibleCacheBanner = checkIsBasePathInCachedEnv(basePath) && inIframe();
 // loading monaco from node modules instead of CDN
 loader.config({
   paths: {
-    vs: `${getBasePath()}/static-files/vs`,
+    vs: '/static/aim/vs',
   },
 });
 
