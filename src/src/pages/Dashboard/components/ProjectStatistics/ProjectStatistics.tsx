@@ -22,6 +22,16 @@ const statisticsInitialMap: Record<string, IProjectStatistic> = {
     iconBgColor: '#7A4CE0',
     navLink: routes.METRICS.path,
   },
+  systemMetrics: {
+    label: 'Sys. metrics',
+    count: 0,
+    icon: 'metrics',
+    iconBgColor: '#AF4EAB',
+    navLink: `${routes.METRICS.path}?select=${encode({
+      advancedQuery: "metric.name.startswith('system/')",
+      advancedMode: true,
+    })}`,
+  },
 };
 
 const runsCountingInitialMap: Record<'archived' | 'runs', IProjectStatistic> = {
@@ -59,7 +69,7 @@ function ProjectStatistics() {
       let systemMetricsCount = 0;
       let sequenceItemsCount = 0;
       for (let [itemKey, itemData] of Object.entries(seqData)) {
-        if (itemKey.startsWith('__system__')) {
+        if (itemKey.startsWith('system/')) {
           systemMetricsCount += itemData.length;
         } else {
           sequenceItemsCount += itemData.length;

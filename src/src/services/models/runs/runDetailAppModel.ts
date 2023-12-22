@@ -146,7 +146,7 @@ function processRunBatchData(
       }),
       sortKey: `${run.name}${contextName}`,
     };
-    if (run.name.startsWith('__system__')) {
+    if (run.name.startsWith('system/')) {
       runSystemBatch.push(metric);
     } else {
       runMetricsBatch.push(metric);
