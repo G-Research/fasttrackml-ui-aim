@@ -52,12 +52,17 @@ function RunOverviewSidebar({
   const insightsList = React.useMemo(() => {
     const path = url.split('/').slice(0, -1).join('/');
     const systemMetricsLength: number =
-      traces.metric.filter((m) => m.name.startsWith('__system__')).length || 0;
+      traces.metric.filter((m) => m.name.startsWith('system/')).length || 0;
     return [
       {
         name: 'Metrics',
         path: `${path}/metrics`,
         value: traces?.metric?.length - systemMetricsLength || 0,
+      },
+      {
+        name: 'System',
+        path: `${path}/system`,
+        value: systemMetricsLength,
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -66,6 +66,7 @@ const tabs: Record<string, string> = {
   overview: 'Overview',
   run_parameters: 'Run Params',
   metrics: 'Metrics',
+  system: 'System',
   settings: 'Settings',
 };
 
@@ -114,6 +115,15 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
         runHash={runHash}
         runTraces={runData?.runTraces}
         runBatch={runData?.runMetricsBatch}
+        isRunBatchLoading={runData?.isRunBatchLoading}
+      />
+    ),
+    system: (
+      <RunDetailMetricsAndSystemTab
+        runHash={runHash}
+        runTraces={runData?.runTraces}
+        runBatch={runData?.runSystemBatch}
+        isSystem
         isRunBatchLoading={runData?.isRunBatchLoading}
       />
     ),
