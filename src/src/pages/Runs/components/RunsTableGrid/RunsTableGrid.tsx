@@ -14,7 +14,6 @@ import { ITableColumn } from 'types/pages/metrics/components/TableColumns/TableC
 import { ITagInfo } from 'types/pages/tags/Tags';
 
 import { formatSystemMetricName } from 'utils/formatSystemMetricName';
-import alphabeticalSortComparator from 'utils/alphabeticalSortComparator';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import { getMetricLabel } from 'utils/app/getMetricLabel';
 import { isSystemMetric } from 'utils/isSystemMetric';
@@ -149,14 +148,24 @@ function getRunsTableColumns(
         };
         isSystem ? systemMetricsList.push(column) : metricsList.push(column);
       });
-      acc = [
-        ...acc,
-        ...metricsList.sort(alphabeticalSortComparator({ orderBy: 'key' })),
-        ...systemMetricsList.sort(
-          alphabeticalSortComparator({ orderBy: 'key' }),
-        ),
-      ];
-      return acc;
+      acc = [...acc, ...metricsList, ...systemMetricsList];
+      return acc.sort((a: ITableColumn, b: ITableColumn) => {
+        const aIsSystem = isSystemMetric(a['key']);
+        const bIsSystem = isSystemMetric(b['key']);
+        if (aIsSystem && !bIsSystem) {
+          return -1;
+        } else if (!aIsSystem && bIsSystem) {
+          return 1;
+        }
+        const aLabel = (a['label'] as string).toUpperCase();
+        const bLabel = (b['label'] as string).toUpperCase();
+        if (aLabel < bLabel) {
+          return -1;
+        } else if (aLabel > bLabel) {
+          return 1;
+        }
+        return 0;
+      });
     }, []),
     runColumns.map((param) => ({
       key: param,
