@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useHistory } from 'react-router-dom';
 
 import { Drawer, Tooltip } from '@material-ui/core';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
 
 import logoImg from 'assets/logo.svg';
 
@@ -24,6 +26,7 @@ import './Sidebar.scss';
 
 function SideBar(): React.FunctionComponentElement<React.ReactNode> {
   const [version, setVersion] = React.useState('unknown');
+  const history = useHistory();
 
   useEffect(() => {
     fetch(`${getBaseHost()}/version`).then((response) => {
@@ -32,6 +35,19 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
       });
     });
   }, []);
+
+  const handleChange = (event: { target: { value: any } }) => {
+    const selectedNamespace = event.target.value;
+    console.log('selectedNamespace', selectedNamespace);
+    
+    // Get the current URL
+    const currentUrl = window.location.pathname;
+    
+    // Replace 'ns2' with the selected namespace
+    const newUrl = currentUrl.replace('ns2', selectedNamespace);
+    
+    history.push(newUrl);
+  };
 
   function getPathFromStorage(route: PathEnum): PathEnum | string {
     const path = getItem(`${route.slice(1)}Url`) ?? '';
@@ -68,7 +84,7 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
                       key={index}
                       to={() => getPathFromStorage(path)}
                       exact={true}
-                      isActive={(m, location) =>
+                      isActive={(m: any, location: { pathname: string }) =>
                         location.pathname.split('/')[1] === path.split('/')[1]
                       }
                       activeClassName='Sidebar__NavLink--active'
@@ -91,6 +107,17 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
             </div>
           </ul>
           <div className='Sidebar__bottom'>
+            <Tooltip title='Switch UI' placement='right'>
+              <Select
+                className='Sidebar__bottom__anchor'
+                onChange={handleChange}
+                inputProps={{ IconComponent: () => null }}
+              >
+                <MenuItem value={'ns1'}>Option 1</MenuItem>
+                <MenuItem value={'ns2'}>Option 2</MenuItem>
+                <MenuItem value={'ns3'}>Option 3</MenuItem>
+              </Select>
+            </Tooltip>
             <Tooltip title='Switch UI' placement='right'>
               <a href={getPrefix()} className='Sidebar__bottom__anchor'>
                 <Icon name='live-demo' />
