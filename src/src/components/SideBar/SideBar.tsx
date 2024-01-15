@@ -4,7 +4,6 @@ import { NavLink } from 'react-router-dom';
 import { Drawer, Tooltip } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
-import { makeStyles } from '@material-ui/core/styles';
 
 import logoImg from 'assets/logo.svg';
 
@@ -29,12 +28,18 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
   const [version, setVersion] = React.useState('unknown');
   const [namespaces, setNamespaces] = useState<string[]>([]);
   const [selectedNamespace, setSelectedNamespace] = useState<string>('');
-  const useStyles = makeStyles({
-    icon: {
-      color: 'red',
-    },
-  });
-  const classes = useStyles();
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const handleTooltipClose = () => {
+    setTooltipOpen(false);
+  };
+  const handleTooltipOpen = () => {
+    setTooltipOpen(true);
+  };
+  const style = {
+    fontSize: '0.875rem',
+    textAlign: 'right' as const,
+    paddingLeft: '5px',
+  };
 
   useEffect(() => {
     fetch(`${getBaseHost()}/version`).then((response) => {
@@ -128,13 +133,20 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
             </div>
           </ul>
           <div className='Sidebar__bottom'>
-            <Tooltip title='Namespaces' placement='right'>
+            <Tooltip
+              title='Namespaces'
+              placement='right'
+              open={tooltipOpen}
+              onClose={handleTooltipClose}
+            >
               <Select
                 className='Sidebar__bottom__anchor'
                 value={selectedNamespace}
                 onChange={selectNamespace}
-                style={{ fontSize: '0.875rem', textAlign: 'right' }}
-                classes={{ icon: classes.icon }}
+                style={style}
+                onMouseEnter={handleTooltipOpen}
+                onMouseLeave={handleTooltipClose}
+                onOpen={handleTooltipClose}
               >
                 {namespaces.map((namespace) => (
                   <MenuItem value={namespace} key={namespace}>
