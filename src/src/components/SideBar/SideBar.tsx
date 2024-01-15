@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { Drawer, Tooltip } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import { makeStyles } from '@material-ui/core/styles';
 
 import logoImg from 'assets/logo.svg';
 
@@ -28,6 +29,12 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
   const [version, setVersion] = React.useState('unknown');
   const [namespaces, setNamespaces] = useState<string[]>([]);
   const [selectedNamespace, setSelectedNamespace] = useState<string>('');
+  const useStyles = makeStyles({
+    icon: {
+      color: 'red',
+    },
+  });
+  const classes = useStyles();
 
   useEffect(() => {
     fetch(`${getBaseHost()}/version`).then((response) => {
@@ -52,16 +59,16 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
       });
   }, []);
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+  function selectNamespace(event: React.ChangeEvent<{ value: unknown }>) {
     const selectedNamespace = event.target.value as string;
-    let newUrl = `${getBaseHost()}/ns/${selectedNamespace}${
-      routes.DASHBOARD.path
-    }aim/`;
-    if (selectedNamespace === 'default') {
-      newUrl = `${getBaseHost()}${routes.DASHBOARD.path}aim/`;
-    }
+    let newUrl =
+      selectedNamespace === 'default'
+        ? `${getBaseHost()}${routes.DASHBOARD.path}aim/`
+        : `${getBaseHost()}/ns/${selectedNamespace}${
+            routes.DASHBOARD.path
+          }aim/`;
     window.location.href = newUrl;
-  };
+  }
 
   function getPathFromStorage(route: PathEnum): PathEnum | string {
     const path = getItem(`${route.slice(1)}Url`) ?? '';
@@ -125,8 +132,9 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
               <Select
                 className='Sidebar__bottom__anchor'
                 value={selectedNamespace}
-                onChange={handleChange}
+                onChange={selectNamespace}
                 style={{ fontSize: '0.875rem', textAlign: 'right' }}
+                classes={{ icon: classes.icon }}
               >
                 {namespaces.map((namespace) => (
                   <MenuItem value={namespace} key={namespace}>
