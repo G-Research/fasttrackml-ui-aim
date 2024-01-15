@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { NavLink, useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 
 import { Drawer, Tooltip } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
@@ -26,7 +26,8 @@ import './Sidebar.scss';
 
 function SideBar(): React.FunctionComponentElement<React.ReactNode> {
   const [version, setVersion] = React.useState('unknown');
-  const history = useHistory();
+  const [namespaces, setNamespaces] = useState<string[]>([]);
+  const [selectedNamespace, setSelectedNamespace] = useState<string>('');
 
   useEffect(() => {
     fetch(`${getBaseHost()}/version`).then((response) => {
@@ -36,17 +37,30 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
     });
   }, []);
 
-  const handleChange = (event: { target: { value: any } }) => {
-    const selectedNamespace = event.target.value;
-    console.log('selectedNamespace', selectedNamespace);
-    
-    // Get the current URL
-    const currentUrl = window.location.pathname;
-    
-    // Replace 'ns2' with the selected namespace
-    const newUrl = currentUrl.replace('ns2', selectedNamespace);
-    
-    history.push(newUrl);
+  useEffect(() => {
+    fetch(`${getBaseHost()}/admin/namespaces/list`)
+      .then((response) => response.json())
+      .then((data) =>
+        setNamespaces(data.map((item: { code: any }) => item.code)),
+      );
+
+    fetch(`${getBaseHost()}${getPrefix()}admin/namespaces/current`)
+      .then((response) => response.json())
+      .then((data) => {
+        const selected = data.code;
+        setSelectedNamespace(selected);
+      });
+  }, []);
+
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const selectedNamespace = event.target.value as string;
+    let newUrl = `${getBaseHost()}/ns/${selectedNamespace}${
+      routes.DASHBOARD.path
+    }aim/`;
+    if (selectedNamespace === 'default') {
+      newUrl = `${getBaseHost()}${routes.DASHBOARD.path}aim/`;
+    }
+    window.location.href = newUrl;
   };
 
   function getPathFromStorage(route: PathEnum): PathEnum | string {
@@ -107,15 +121,18 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
             </div>
           </ul>
           <div className='Sidebar__bottom'>
-            <Tooltip title='Switch UI' placement='right'>
+            <Tooltip title='Namespaces' placement='right'>
               <Select
                 className='Sidebar__bottom__anchor'
+                value={selectedNamespace}
                 onChange={handleChange}
-                inputProps={{ IconComponent: () => null }}
+                style={{ fontSize: '0.875rem', textAlign: 'right' }}
               >
-                <MenuItem value={'ns1'}>Option 1</MenuItem>
-                <MenuItem value={'ns2'}>Option 2</MenuItem>
-                <MenuItem value={'ns3'}>Option 3</MenuItem>
+                {namespaces.map((namespace) => (
+                  <MenuItem value={namespace} key={namespace}>
+                    {namespace}
+                  </MenuItem>
+                ))}
               </Select>
             </Tooltip>
             <Tooltip title='Switch UI' placement='right'>
