@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import { Drawer, Tooltip } from '@material-ui/core';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
 
 import logoImg from 'assets/logo.svg';
 
@@ -147,6 +148,7 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
                 onMouseEnter={handleTooltipOpen}
                 onMouseLeave={handleTooltipClose}
                 onOpen={handleTooltipClose}
+                renderValue={() => <AccountTreeIcon />}
               >
                 {namespaces.map((namespace) => (
                   <MenuItem value={namespace} key={namespace}>
