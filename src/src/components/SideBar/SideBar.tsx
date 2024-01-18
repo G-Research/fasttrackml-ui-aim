@@ -135,7 +135,7 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
           </ul>
           <div className='Sidebar__bottom'>
             <Tooltip
-              title='Namespaces'
+              title={`Current namespace: ${selectedNamespace}`}
               placement='right'
               open={tooltipOpen}
               onClose={handleTooltipClose}
