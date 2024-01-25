@@ -30,14 +30,13 @@ function Controls(
   }, [props.tooltip]);
 
   const paramsScaleChanged: boolean = React.useMemo(() => {
-    return (
-      // returns true if any of the params scale types are different from the default
-      props.paramsScaleType.params.some(
-        (param) =>
-          param.scale !== CONTROLS_DEFAULT_CONFIG.params.defaultParamsScaleType,
-      )
+    const changed = props.params.some(
+      (param) =>
+        param.scale !== CONTROLS_DEFAULT_CONFIG.params.defaultParamsScaleType,
     );
-  }, [props.paramsScaleType]);
+    return changed;
+  }, [props.params]);
+  // todo double check if it should be props.params or props.paramsScaleType
 
   return (
     <ErrorBoundary>
@@ -100,6 +99,7 @@ function Controls(
                 <ParamsScalePopover
                   paramsScaleType={props.paramsScaleType}
                   onParamsScaleTypeChange={props.onParamsScaleTypeChange}
+                  params={props.params}
                 />
               }
             />

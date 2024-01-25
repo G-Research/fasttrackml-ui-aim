@@ -192,6 +192,10 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       archiveRuns={paramsAppModel.archiveRuns}
       deleteRuns={paramsAppModel.deleteRuns}
       onRowsVisibilityChange={paramsAppModel.onRowsVisibilityChange}
+      // todo: Set to appropriate line
+      paramsScaleType={paramsData?.config?.chart?.paramsScaleType!}
+      onParamsScaleTypeChange={paramsAppModel.onParamsScaleTypeChange}
+      params={paramsData?.config?.select?.options!}
     />
   );
 }

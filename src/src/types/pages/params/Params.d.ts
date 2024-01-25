@@ -124,4 +124,8 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   archiveRuns: (ids: string[], archived: boolean) => void;
   deleteRuns: (ids: string[]) => void;
   onRowsVisibilityChange: (metricKeys: string[]) => void;
+  // todo move to appropiate place
+  paramsScaleType: IParamsScaleStates;
+  onParamsScaleTypeChange: (params: IParamsScaleStates) => void;
+  params: ISelectOption[];
 }

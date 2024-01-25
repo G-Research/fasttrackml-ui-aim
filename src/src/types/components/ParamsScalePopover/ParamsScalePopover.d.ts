@@ -1,3 +1,4 @@
+import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 import { ScaleEnum } from 'utils/d3';
 
 export interface IParamsScaleState {
@@ -10,6 +11,7 @@ export interface IParamsScaleStates {
 }
 
 export interface IParamsScalePopoverProps {
-  onParamsScaleTypeChange: (params: IParamsScaleStates) => void;
+  onParamsScaleTypeChange: (params: ISelectOption[]) => void;
   paramsScaleType: IParamsScaleStates;
+  params: ISelectOption[];
 }

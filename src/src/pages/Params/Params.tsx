@@ -113,6 +113,10 @@ const Params = ({
   sortOptions,
   onRunsTagsChange,
   onRowsVisibilityChange,
+  // todo put in appropiate place
+  paramsScaleType,
+  onParamsScaleTypeChange,
+  params,
 }: IParamsProps): React.FunctionComponentElement<React.ReactNode> => {
   const [isProgressBarVisible, setIsProgressBarVisible] =
     React.useState<boolean>(false);
@@ -225,11 +229,14 @@ const Params = ({
                           isVisibleColorIndicator={isVisibleColorIndicator}
                           selectOptions={groupingSelectOptions}
                           tooltip={tooltip}
+                          paramsScaleType={paramsScaleType}
                           onCurveInterpolationChange={
                             onCurveInterpolationChange
                           }
                           onColorIndicatorChange={onColorIndicatorChange}
                           onChangeTooltip={onChangeTooltip}
+                          onParamsScaleTypeChange={onParamsScaleTypeChange}
+                          params={params}
                         />
                       }
                     />
