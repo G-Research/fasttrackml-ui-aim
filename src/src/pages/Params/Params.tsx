@@ -117,6 +117,11 @@ const Params = ({
   onParamsScaleTypeChange,
   selectedParams,
 }: IParamsProps): React.FunctionComponentElement<React.ReactNode> => {
+  let scaleStates = selectedParams.reduce((acc, param) => {
+    (acc as any)[param.key] = param.scale;
+    return acc;
+  }, {});
+
   const [isProgressBarVisible, setIsProgressBarVisible] =
     React.useState<boolean>(false);
   const chartProps: any[] = React.useMemo(() => {
@@ -126,6 +131,7 @@ const Params = ({
       onAxisBrushExtentChange,
       brushExtents,
       chartTitle: chartTitleData[chartData.data[0]?.chartIndex],
+      scaleStates,
     }));
   }, [
     highPlotData,
@@ -134,6 +140,7 @@ const Params = ({
     chartTitleData,
     onAxisBrushExtentChange,
     brushExtents,
+    scaleStates,
   ]);
 
   return (
