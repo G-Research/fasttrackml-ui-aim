@@ -2271,7 +2271,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onRunsTagsChange({ runHash, tags, model, updateModelData });
       }
 
-      function getRunsDataToExport(queryString?: string): {
+      function getAllRunsData(queryString?: string): {
         call: (exceptionHandler: (detail: any) => void) => Promise<any>;
         abort: () => void;
       } {
@@ -2302,6 +2302,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
               return runsData;
             } catch (ex: Error | any) {
               if (ex.name === 'AbortError') {
+                // eslint-disable-next-line no-console
                 console.error(`${ex.name}, ${ex.message}`);
               }
             }
@@ -2938,10 +2939,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
       function onExportTableData(): void {
         // @TODO need to get data and params from state not from processData
-        const runsDataToExport = getRunsDataToExport(
+        const runsDataToExport = getAllRunsData(
           model.getState()?.config?.select?.query,
         );
         const exceptionHandler = (detail: any) => {
+          // eslint-disable-next-line no-console
           console.error('An error occurred:', detail);
         };
 
