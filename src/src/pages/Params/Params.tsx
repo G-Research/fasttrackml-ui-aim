@@ -73,6 +73,7 @@ const Params = ({
   hiddenColumns,
   liveUpdateConfig,
   selectFormData,
+  selectedParams,
   onTableRowHover,
   onTableRowClick,
   hideSystemMetrics,
@@ -113,9 +114,7 @@ const Params = ({
   sortOptions,
   onRunsTagsChange,
   onRowsVisibilityChange,
-  // todo put in appropiate place
   onParamsScaleTypeChange,
-  selectedParams,
 }: IParamsProps): React.FunctionComponentElement<React.ReactNode> => {
   let scaleStates = selectedParams.reduce((acc, param) => {
     (acc as any)[param.key] = param.scale;

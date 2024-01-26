@@ -36,7 +36,6 @@ function Controls(
     );
     return changed;
   }, [props.selectedParams]);
-  // todo double check if it should be props.params or props.paramsScaleType
 
   return (
     <ErrorBoundary>

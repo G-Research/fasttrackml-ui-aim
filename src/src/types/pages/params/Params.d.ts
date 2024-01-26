@@ -81,6 +81,7 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   };
   columnsOrder: IColumnsOrder;
   sameValueColumns: string[] | [];
+  selectedParams: ISelectOption[];
   onNotificationDelete: (id: number) => void;
   onCurveInterpolationChange: () => void;
   onActivePointChange: (
@@ -124,7 +125,5 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   archiveRuns: (ids: string[], archived: boolean) => void;
   deleteRuns: (ids: string[]) => void;
   onRowsVisibilityChange: (metricKeys: string[]) => void;
-  // todo move to appropiate place
   onParamsScaleTypeChange: (params: ISelectOption[]) => void;
-  selectedParams: ISelectOption[];
 }

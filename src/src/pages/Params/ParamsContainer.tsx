@@ -154,6 +154,7 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       tableRowHeight={paramsData?.config?.table?.rowHeight!}
       columnsWidths={paramsData?.config?.table?.columnsWidths!}
       selectFormData={paramsData?.selectFormData!}
+      selectedParams={paramsData?.config?.select?.options!}
       onColorIndicatorChange={paramsAppModel.onColorIndicatorChange}
       onCurveInterpolationChange={paramsAppModel.onCurveInterpolationChange}
       onParamsSelectChange={paramsAppModel.onParamsSelectChange}
@@ -192,9 +193,7 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       archiveRuns={paramsAppModel.archiveRuns}
       deleteRuns={paramsAppModel.deleteRuns}
       onRowsVisibilityChange={paramsAppModel.onRowsVisibilityChange}
-      // todo: Set to appropriate line
       onParamsScaleTypeChange={paramsAppModel.onParamsScaleTypeChange}
-      selectedParams={paramsData?.config?.select?.options!}
     />
   );
 }
