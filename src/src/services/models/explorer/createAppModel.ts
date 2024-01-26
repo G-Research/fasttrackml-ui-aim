@@ -2271,14 +2271,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onRunsTagsChange({ runHash, tags, model, updateModelData });
       }
 
-      function getRunsDataToExport(): {
+      function getRunsDataToExport(queryString?: string): {
         call: (exceptionHandler: (detail: any) => void) => Promise<any>;
         abort: () => void;
       } {
         if (runsRequestRef) {
           runsRequestRef.abort();
         }
-        runsRequestRef = runsService.getRunsData();
+        runsRequestRef = runsService.getRunsData(queryString);
         return {
           call: async () => {
             try {
@@ -2938,7 +2938,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
       function onExportTableData(): void {
         // @TODO need to get data and params from state not from processData
-        const runsDataToExport = getRunsDataToExport();
+        const runsDataToExport = getRunsDataToExport(
+          model.getState()?.config?.select?.query,
+        );
         const exceptionHandler = (detail: any) => {
           console.error('An error occurred:', detail);
         };
@@ -3420,9 +3422,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
           runsRequestRef.abort();
         }
         const configData = { ...model.getState()?.config };
-        if (queryString) {
-          configData.select.query = queryString;
-        }
         runsRequestRef = runsService.getRunsData(configData?.select?.query);
         setRequestProgress(model);
         return {
