@@ -3,10 +3,7 @@ import React from 'react';
 import { Text, ToggleButton } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
-import {
-  IParamsScalePopoverProps,
-  IParamsScaleStates,
-} from 'types/components/ParamsScalePopover/ParamsScalePopover';
+import { IParamsScalePopoverProps } from 'types/components/ParamsScalePopover/ParamsScalePopover';
 import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
 import { ScaleEnum } from 'utils/d3';
@@ -17,7 +14,7 @@ function ParamsScalePopover(
   props: IParamsScalePopoverProps,
 ): React.FunctionComponentElement<React.ReactNode> {
   function handleScaleChange(val: string | number, id: any) {
-    const newParams = props.params.map((param) => {
+    const newParams = props.selectedParams.map((param) => {
       if (param.key === id) {
         param.scale = val as ScaleEnum;
       }
@@ -38,7 +35,7 @@ function ParamsScalePopover(
         >
           Select Params Scale:
         </Text>
-        {props.params.map((param: ISelectOption) => (
+        {props.selectedParams.map((param: ISelectOption) => (
           <div className='ParamsScalePopover__select' key={param.key}>
             <ToggleButton
               title={param.label + ' scale:'}
