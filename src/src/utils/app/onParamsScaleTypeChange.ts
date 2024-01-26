@@ -37,6 +37,6 @@ export default function onParamsScaleTypeChange<M extends State>({
   // todo create analytics keys and change this
   analytics.trackEvent(
     // @ts-ignore
-    `${ANALYTICS_EVENT_KEYS[appName].chart.controls.changeParamsScale} to "${args.xAxis}"`,
+    `${ANALYTICS_EVENT_KEYS[appName].chart.controls.changeParamsScale} to "${args}"`,
   );
 }
