@@ -80,13 +80,13 @@ function Controls(
                 <Tooltip title='Params scale'>
                   <div
                     onClick={onAnchorClick}
-                    className={classNames('Controls__anchor', {
+                    className={classNames('Params__Controls__anchor', {
                       active: opened || paramsScaleChanged,
                       outlined: !opened && paramsScaleChanged,
                     })}
                   >
                     <Icon
-                      className={classNames('Controls__icon', {
+                      className={classNames('Params__Controls__icon', {
                         active: opened || paramsScaleChanged,
                       })}
                       name='axes-scale'
