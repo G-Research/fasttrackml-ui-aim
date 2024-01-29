@@ -1,7 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
 import { Drawer, Tooltip } from '@material-ui/core';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
 
 import logoImg from 'assets/logo.svg';
 
@@ -24,6 +27,20 @@ import './Sidebar.scss';
 
 function SideBar(): React.FunctionComponentElement<React.ReactNode> {
   const [version, setVersion] = React.useState('unknown');
+  const [namespaces, setNamespaces] = useState<string[]>([]);
+  const [selectedNamespace, setSelectedNamespace] = useState<string>('');
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const handleTooltipClose = () => {
+    setTooltipOpen(false);
+  };
+  const handleTooltipOpen = () => {
+    setTooltipOpen(true);
+  };
+  const style = {
+    fontSize: '0.875rem',
+    textAlign: 'right' as const,
+    paddingLeft: '5px',
+  };
 
   useEffect(() => {
     fetch(`${getBaseHost()}/version`).then((response) => {
@@ -32,6 +49,32 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
       });
     });
   }, []);
+
+  useEffect(() => {
+    fetch(`${getBaseHost()}/admin/namespaces/list`)
+      .then((response) => response.json())
+      .then((data) =>
+        setNamespaces(data.map((item: { code: any }) => item.code)),
+      );
+
+    fetch(`${getBaseHost()}${getPrefix()}admin/namespaces/current`)
+      .then((response) => response.json())
+      .then((data) => {
+        const selected = data.code;
+        setSelectedNamespace(selected);
+      });
+  }, []);
+
+  function selectNamespace(event: React.ChangeEvent<{ value: unknown }>) {
+    const selectedNamespace = event.target.value as string;
+    let newUrl =
+      selectedNamespace === 'default'
+        ? `${getBaseHost()}${routes.DASHBOARD.path}aim/`
+        : `${getBaseHost()}/ns/${selectedNamespace}${
+            routes.DASHBOARD.path
+          }aim/`;
+    window.location.href = newUrl;
+  }
 
   function getPathFromStorage(route: PathEnum): PathEnum | string {
     const path = getItem(`${route.slice(1)}Url`) ?? '';
@@ -68,7 +111,7 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
                       key={index}
                       to={() => getPathFromStorage(path)}
                       exact={true}
-                      isActive={(m, location) =>
+                      isActive={(m: any, location: { pathname: string }) =>
                         location.pathname.split('/')[1] === path.split('/')[1]
                       }
                       activeClassName='Sidebar__NavLink--active'
@@ -91,6 +134,29 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
             </div>
           </ul>
           <div className='Sidebar__bottom'>
+            <Tooltip
+              title={`Current namespace: ${selectedNamespace}`}
+              placement='right'
+              open={tooltipOpen}
+              onClose={handleTooltipClose}
+            >
+              <Select
+                className='Sidebar__bottom__anchor'
+                value={selectedNamespace}
+                onChange={selectNamespace}
+                style={style}
+                onMouseEnter={handleTooltipOpen}
+                onMouseLeave={handleTooltipClose}
+                onOpen={handleTooltipClose}
+                renderValue={() => <AccountTreeIcon />}
+              >
+                {namespaces.map((namespace) => (
+                  <MenuItem value={namespace} key={namespace}>
+                    {namespace}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Tooltip>
             <Tooltip title='Switch UI' placement='right'>
               <a href={getPrefix()} className='Sidebar__bottom__anchor'>
                 <Icon name='live-demo' />
