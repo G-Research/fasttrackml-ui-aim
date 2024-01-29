@@ -2937,7 +2937,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         }
       }
 
-      function onExportTableData(): void {
+      function onExportTableData(): Promise<void> {
         // @TODO need to get data and params from state not from processData
         const runsDataToExport = getAllRunsData(
           model.getState()?.config?.select?.query,
@@ -2947,7 +2947,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           console.error('An error occurred:', detail);
         };
 
-        runsDataToExport.call(exceptionHandler).then((rawData) => {
+        return runsDataToExport.call(exceptionHandler).then((rawData) => {
           const { data, params, metricsColumns } = processData(rawData);
           const tableData = getDataAsTableRows(
             data,

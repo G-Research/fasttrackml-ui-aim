@@ -6,6 +6,8 @@ import { isEmpty, isEqual, isNil } from 'lodash-es';
 import { useResizeObserver } from 'hooks';
 import _ from 'lodash-es';
 
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 import { Button, Icon, Text } from 'components/kit';
 import ControlPopover from 'components/ControlPopover/ControlPopover';
 import IllustrationBlock from 'components/IllustrationBlock/IllustrationBlock';
@@ -140,6 +142,16 @@ const Table = React.forwardRef(function Table(
     width: 0,
     availableSpace: 0,
   });
+  const [isExporting, setIsExporting] = React.useState(false);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await onExport();
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   let groups = !Array.isArray(rowData);
 
@@ -853,8 +865,15 @@ const Table = React.forwardRef(function Table(
                     fullWidth
                     variant='outlined'
                     size='small'
-                    onClick={onExport}
-                    startIcon={<Icon fontSize={14} name='download' />}
+                    onClick={handleExport}
+                    startIcon={
+                      isExporting ? (
+                        <CircularProgress size={14} />
+                      ) : (
+                        <Icon fontSize={14} name='download' />
+                      )
+                    }
+                    disabled={isExporting}
                   >
                     <Text size={14} color='inherit'>
                       Export
