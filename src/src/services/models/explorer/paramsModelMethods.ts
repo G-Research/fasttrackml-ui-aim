@@ -223,9 +223,6 @@ function getParamsModelMethods(
       runsRequestRef.abort();
     }
     const configData = { ...model.getState()?.config };
-    if (queryString) {
-      configData.select.query = queryString;
-    }
     runsRequestRef = runsService.getRunsData(configData?.select?.query);
     setRequestProgress(model);
     return {
