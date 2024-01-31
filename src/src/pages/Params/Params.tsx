@@ -116,14 +116,38 @@ const Params = ({
   onRowsVisibilityChange,
   onParamsScaleTypeChange,
 }: IParamsProps): React.FunctionComponentElement<React.ReactNode> => {
-  let scaleStates = selectedParams.reduce((acc, param) => {
-    (acc as any)[param.key] = param.scale;
-    return acc;
-  }, {});
+  let scaleStates = computeScaleStates(highPlotData);
+
+  function updateSelectedParamsScaleType() {
+    selectedParams.map((param) => {
+      param.scale = scaleStates[param.key];
+      return param;
+    });
+  }
+
+  function computeScaleStates(highPlotData: any) {
+    const dimensions: { [key: string]: { scaleType: string } } =
+      highPlotData?.[0]?.dimensions;
+
+    if (!dimensions) {
+      return {};
+    }
+    const dimensionsArray = Object.entries(dimensions).map(([key, value]) => ({
+      key,
+      ...value,
+    }));
+    const result = dimensionsArray.map((dimension) => {
+      return {
+        [dimension.key]: dimension.scaleType,
+      };
+    });
+    return _.assign({}, ...result);
+  }
 
   const [isProgressBarVisible, setIsProgressBarVisible] =
     React.useState<boolean>(false);
   const chartProps: any[] = React.useMemo(() => {
+    updateSelectedParamsScaleType();
     return (highPlotData || []).map((chartData: any) => ({
       curveInterpolation,
       isVisibleColorIndicator,

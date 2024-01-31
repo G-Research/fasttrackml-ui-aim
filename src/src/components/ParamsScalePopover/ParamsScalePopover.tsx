@@ -46,6 +46,7 @@ function ParamsScalePopover(
               leftLabel='Linear'
               rightLabel='Log'
               onChange={handleScaleChange}
+              disabled={param.scale === ScaleEnum.Point}
             />
           </div>
         ))}

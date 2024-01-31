@@ -9,4 +9,5 @@ export default interface IToggleButtonProps extends ButtonProps {
   rightValue: number | string;
   value: string | number;
   title: string;
+  disabled?: boolean;
 }

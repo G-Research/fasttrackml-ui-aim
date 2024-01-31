@@ -20,6 +20,7 @@ function ToggleButton({
   value,
   id,
   className,
+  disabled,
 }: IToggleButtonProps): React.FunctionComponentElement<React.ReactNode> {
   function handleToggle(e: any): void {
     const { id, value } = e.currentTarget;
@@ -43,6 +44,7 @@ function ToggleButton({
             size='small'
             color={value === leftValue ? 'primary' : 'inherit'}
             onClick={handleToggle}
+            disabled={disabled}
           >
             {leftLabel}
           </Button>
@@ -53,6 +55,7 @@ function ToggleButton({
             size='small'
             color={value === rightValue ? 'primary' : 'inherit'}
             onClick={handleToggle}
+            disabled={disabled}
           >
             {rightLabel}
           </Button>
