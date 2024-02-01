@@ -58,7 +58,8 @@ function drawParallelAxes({
     const last = keysOfDimensions.length - 1;
     const tmpYScale = getAxisScale({
       domainData,
-      scaleType,
+      scaleType:
+        scaleType === ScaleEnum.Point ? scaleType : scaleStates[keyOfDimension],
       rangeData: [height - margin.top - margin.bottom, 0],
     });
     yScale[keyOfDimension] = tmpYScale;
