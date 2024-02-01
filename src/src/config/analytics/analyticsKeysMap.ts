@@ -112,6 +112,8 @@ export const ANALYTICS_EVENT_KEYS = {
         },
         changeColorIndicatorMode:
           '[ParamsExplorer][Chart][Controls] Change color indicator mode', // to value
+        changeParamsScale:
+          '[ParamsExplorer][Chart][Controls] Change params scale', // to value
       },
     },
     groupings: {

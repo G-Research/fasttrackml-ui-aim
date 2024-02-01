@@ -68,6 +68,7 @@ import onGroupingReset from 'utils/app/onGroupingReset';
 import onGroupingSelectChange from 'utils/app/onGroupingSelectChange';
 import onSelectOptionsChange from 'utils/app/onSelectOptionsChange';
 import onParamVisibilityChange from 'utils/app/onParamsVisibilityChange';
+import onParamsScaleTypeChange from 'utils/app/onParamsScaleTypeChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
@@ -1593,6 +1594,9 @@ function getParamsModelMethods(
           model,
           updateModelData,
         });
+      },
+      onParamsScaleTypeChange(args: any): void {
+        onParamsScaleTypeChange({ args, model, appName, updateModelData });
       },
     });
   }

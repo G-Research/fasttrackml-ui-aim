@@ -26,4 +26,5 @@ export interface IDrawParallelAxesProps {
   axesRef: React.MutableRefObject<>;
   dimensions: IDimensionsType;
   plotBoxRef: React.MutableRefObject<>;
+  scaleStates: React.MutableRefObject<>;
 }

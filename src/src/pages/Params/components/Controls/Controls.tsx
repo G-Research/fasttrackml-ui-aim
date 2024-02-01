@@ -1,9 +1,11 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import { Tooltip } from '@material-ui/core';
 
 import ControlPopover from 'components/ControlPopover/ControlPopover';
 import TooltipContentPopover from 'components/TooltipContentPopover/TooltipContentPopover';
+import ParamsScalePopover from 'components/ParamsScalePopover/ParamsScalePopover';
 import { Icon } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
@@ -26,6 +28,15 @@ function Controls(
         CONTROLS_DEFAULT_CONFIG.params.tooltip.selectedFields.length
     );
   }, [props.tooltip]);
+
+  const paramsScaleChanged: boolean = React.useMemo(() => {
+    const changed = props.selectedParams.some(
+      (param) =>
+        param.scale !== CONTROLS_DEFAULT_CONFIG.params.defaultParamsScaleType,
+    );
+    return changed;
+  }, [props.selectedParams]);
+
   return (
     <ErrorBoundary>
       <div className='Params__Controls__container'>
@@ -61,6 +72,37 @@ function Controls(
             />
           </div>
         </Tooltip>
+        <div>
+          <ErrorBoundary>
+            <ControlPopover
+              title='Params scale'
+              anchor={({ onAnchorClick, opened }) => (
+                <Tooltip title='Params scale'>
+                  <div
+                    onClick={onAnchorClick}
+                    className={classNames('Params__Controls__anchor', {
+                      active: opened || paramsScaleChanged,
+                      outlined: !opened && paramsScaleChanged,
+                    })}
+                  >
+                    <Icon
+                      className={classNames('Params__Controls__icon', {
+                        active: opened || paramsScaleChanged,
+                      })}
+                      name='axes-scale'
+                    />
+                  </div>
+                </Tooltip>
+              )}
+              component={
+                <ParamsScalePopover
+                  onParamsScaleTypeChange={props.onParamsScaleTypeChange}
+                  selectedParams={props.selectedParams}
+                />
+              }
+            />
+          </ErrorBoundary>
+        </div>
         <div>
           <ErrorBoundary>
             <ControlPopover
