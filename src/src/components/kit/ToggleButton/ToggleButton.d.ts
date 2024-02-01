@@ -10,4 +10,5 @@ export default interface IToggleButtonProps extends ButtonProps {
   value: string | number;
   title: string;
   disabled?: boolean;
+  tooltipOverride?: string;
 }
