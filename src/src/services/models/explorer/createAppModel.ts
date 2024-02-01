@@ -2937,81 +2937,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
         }
       }
 
-      function onExportTableData(): Promise<void> {
-        // @TODO need to get data and params from state not from processData
-        const runsDataToExport = getAllRunsData(
-          model.getState()?.config?.select?.query,
-        );
-        const exceptionHandler = (detail: any) => {
-          // eslint-disable-next-line no-console
-          console.error('An error occurred:', detail);
-        };
+      async function onExportTableData(): Promise<void> {
+        const query = model.getState()?.config?.select?.query;
 
-        return runsDataToExport.call(exceptionHandler).then((rawData) => {
-          const { data, params, metricsColumns } = processData(rawData);
-          const tableData = getDataAsTableRows(
-            data,
-            metricsColumns,
-            params,
-            true,
-          );
-          const configData = model.getState()?.config;
-          const tableColumns: ITableColumn[] = getRunsTableColumns(
-            metricsColumns,
-            params,
-            configData?.table.columnsOrder!,
-            configData?.table.hiddenColumns!,
-          );
-          const excludedFields: string[] = ['#', 'actions'];
-          const filteredHeader: string[] = tableColumns.reduce(
-            (acc: string[], column: ITableColumn) =>
-              acc.concat(
-                excludedFields.indexOf(column.key) === -1 && !column.isHidden
-                  ? column.key
-                  : [],
-              ),
-            [],
-          );
-
-          let emptyRow: { [key: string]: string } = {};
-          filteredHeader.forEach((column: string) => {
-            emptyRow[column] = '--';
-          });
-
-          const groupedRows: IMetricTableRowData[][] =
-            data.length > 1
-              ? Object.keys(tableData.rows).map(
-                  (groupedRowKey: string) =>
-                    tableData.rows[groupedRowKey].items,
-                )
-              : [
-                  Array.isArray(tableData.rows)
-                    ? tableData.rows
-                    : tableData.rows[Object.keys(tableData.rows)[0]].items,
-                ];
-
-          const dataToExport: { [key: string]: string }[] = [];
-
-          groupedRows?.forEach(
-            (groupedRow: IMetricTableRowData[], groupedRowIndex: number) => {
-              groupedRow?.forEach((row: IMetricTableRowData) => {
-                const filteredRow = getFilteredRow({
-                  columnKeys: filteredHeader,
-                  row,
-                });
-                dataToExport.push(filteredRow);
-              });
-              if (groupedRows?.length - 1 !== groupedRowIndex) {
-                dataToExport.push(emptyRow);
-              }
-            },
-          );
-          const blob = new Blob([JsonToCSV(dataToExport)], {
-            type: 'text/csv;charset=utf-8;',
-          });
-          saveAs(blob, `runs-${moment().format(DATE_EXPORTING_FORMAT)}.csv`);
-          analytics.trackEvent(ANALYTICS_EVENT_KEYS[appName].table.exports.csv);
+        runsRequestRef = runsService.getRunsData(query);
+        const stream = await runsRequestRef.call((detail) => {
+          exceptionHandler({ detail, model });
         });
+
       }
 
       function onModelNotificationDelete(id: number): void {
