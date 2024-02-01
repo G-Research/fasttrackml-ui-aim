@@ -3,7 +3,7 @@ import { ResizeModeEnum } from 'config/enums/tableEnums';
 import { ISyncHoverStateArgs } from 'types/utils/d3/drawHoverAttributes';
 import { IChartTitle } from 'types/services/models/metrics/metricsAppModel';
 
-import { CurveEnum } from 'utils/d3';
+import { CurveEnum, ScaleEnum } from 'utils/d3';
 
 export interface IHighPlotProps {
   index: number;
@@ -28,4 +28,7 @@ export interface IHighPlotProps {
   onMount?: () => void;
   readOnly?: boolean;
   margin?: { top: number; right: number; bottom: number; left: number };
+  scaleStates?: {
+    [key: string]: ScaleEnum;
+  };
 }

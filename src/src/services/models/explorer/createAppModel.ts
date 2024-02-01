@@ -121,6 +121,7 @@ import onHighlightModeChange from 'utils/app/onHighlightModeChange';
 import onIgnoreOutliersChange from 'utils/app/onIgnoreOutliersChange';
 import onSelectOptionsChange from 'utils/app/onSelectOptionsChange';
 import onMetricVisibilityChange from 'utils/app/onMetricsVisibilityChange';
+import onParamsScaleTypeChange from 'utils/app/onParamsScaleTypeChange';
 import onParamVisibilityChange from 'utils/app/onParamsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
@@ -4819,6 +4820,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
               model,
               updateModelData,
             });
+          },
+          onParamsScaleTypeChange(args: any): void {
+            onParamsScaleTypeChange({ args, model, appName, updateModelData });
           },
         });
       }

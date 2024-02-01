@@ -20,6 +20,7 @@ function drawParallelAxes({
   axesRef,
   dimensions,
   plotBoxRef,
+  scaleStates,
 }: IDrawParallelAxesProps): void {
   if (!axesNodeRef?.current && !dimensions && _.isEmpty(dimensions)) {
     return;
@@ -55,10 +56,10 @@ function drawParallelAxes({
       dimensions[keyOfDimension];
     const first = 0;
     const last = keysOfDimensions.length - 1;
-
     const tmpYScale = getAxisScale({
       domainData,
-      scaleType,
+      scaleType:
+        scaleType == ScaleEnum.Point ? scaleType : scaleStates[keyOfDimension],
       rangeData: [height - margin.top - margin.bottom, 0],
     });
     yScale[keyOfDimension] = tmpYScale;

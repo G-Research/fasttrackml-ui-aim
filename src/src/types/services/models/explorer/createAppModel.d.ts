@@ -26,7 +26,7 @@ import {
   ITrendlineOptions,
 } from 'types/services/models/scatter/scatterAppModel';
 
-import { ChartTypeEnum, CurveEnum, HighlightEnum } from 'utils/d3';
+import { ChartTypeEnum, CurveEnum, HighlightEnum, ScaleEnum } from 'utils/d3';
 
 import { IImagesExploreAppModelState } from '../imagesExplore/imagesExploreAppModel';
 
@@ -102,6 +102,7 @@ export interface ISelectOption {
     option_name: string;
     context: { [key: string]: unknown } | null | any;
   };
+  scale?: ScaleEnum;
 }
 
 export interface ISelectConfig {
@@ -151,6 +152,7 @@ export interface IHighPlotConfig {
       [key: string]: [number, number] | [string, string];
     };
   };
+  // paramsScaleType: IParamsScaleStates;
 }
 
 export interface ILineChartConfig {

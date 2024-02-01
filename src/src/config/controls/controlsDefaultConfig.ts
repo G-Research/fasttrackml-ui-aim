@@ -76,6 +76,7 @@ export const CONTROLS_DEFAULT_CONFIG = {
       selectedFields: [],
     },
     sortFields: [],
+    defaultParamsScaleType: ScaleEnum.Linear,
   },
   images: {
     alignmentType: MediaItemAlignmentEnum.Height,
