@@ -2271,46 +2271,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onRunsTagsChange({ runHash, tags, model, updateModelData });
       }
 
-      function getAllRunsData(queryString?: string): {
-        call: (exceptionHandler: (detail: any) => void) => Promise<any>;
-        abort: () => void;
-      } {
-        if (runsRequestRef) {
-          runsRequestRef.abort();
-        }
-        runsRequestRef = runsService.getRunsData(queryString);
-        return {
-          call: async () => {
-            try {
-              const stream = await runsRequestRef.call((detail) => {
-                exceptionHandler({ detail, model });
-              });
-              let bufferPairs = decodeBufferPairs(
-                stream as ReadableStream<any>,
-              );
-              let decodedPairs = decodePathsVals(bufferPairs);
-              let objects = iterFoldTree(decodedPairs, 1);
-              const runsData: IRun<IMetricTrace | IParamTrace>[] = [];
-
-              for await (let [keys, val] of objects) {
-                const data = { ...(val as any), hash: keys[0] };
-                if (!data.hash.startsWith('progress')) {
-                  const runData: any = val;
-                  runsData.push({ ...runData, hash: keys[0] } as any);
-                }
-              }
-              return runsData;
-            } catch (ex: Error | any) {
-              if (ex.name === 'AbortError') {
-                // eslint-disable-next-line no-console
-                console.error(`${ex.name}, ${ex.message}`);
-              }
-            }
-          },
-          abort: runsRequestRef.abort,
-        };
-      }
-
       function getRunsData(
         shouldUrlUpdate?: boolean,
         shouldResetSelectedRows?: boolean,
@@ -2939,12 +2899,24 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
       async function onExportTableData(): Promise<void> {
         const query = model.getState()?.config?.select?.query;
-
-        runsRequestRef = runsService.getRunsData(query);
-        const stream = await runsRequestRef.call((detail) => {
+        const request = runsService.getCsvData(query);
+        const readableStream = await request.call((detail) => {
           exceptionHandler({ detail, model });
         });
-
+        const reader = readableStream.getReader();
+        const data = [];
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) {
+            break;
+          }
+          data.push(value);
+        }
+        const blob = new Blob(data, {
+          type: 'text/csv;charset=utf-8;',
+        });
+        saveAs(blob, `runs-${moment().format(DATE_EXPORTING_FORMAT)}.csv`);
+        analytics.trackEvent(ANALYTICS_EVENT_KEYS[appName].table.exports.csv);
       }
 
       function onModelNotificationDelete(id: number): void {
