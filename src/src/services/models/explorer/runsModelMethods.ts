@@ -46,7 +46,6 @@ import { ITagInfo } from 'types/pages/tags/Tags';
 import { aggregateGroupData } from 'utils/aggregateGroupData';
 import exceptionHandler from 'utils/app/exceptionHandler';
 import { getFilteredGroupingOptions } from 'utils/app/getFilteredGroupingOptions';
-import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
@@ -63,7 +62,6 @@ import {
 } from 'utils/encoder/streamEncoding';
 import { formatValue } from 'utils/formatValue';
 import getObjectPaths from 'utils/getObjectPaths';
-import JsonToCSV from 'utils/JsonToCSV';
 import { setItem } from 'utils/storage';
 import { encode } from 'utils/encoder/encoder';
 import onNotificationDelete from 'utils/app/onNotificationDelete';
@@ -181,44 +179,6 @@ function getRunsModelMethods(
 
   function onModelRunsTagsChange(runHash: string, tags: ITagInfo[]): void {
     onRunsTagsChange({ runHash, tags, model, updateModelData });
-  }
-
-  function getAllRunsData(queryString?: string): {
-    call: (exceptionHandler: (detail: any) => void) => Promise<any>;
-    abort: () => void;
-  } {
-    if (runsRequestRef) {
-      runsRequestRef.abort();
-    }
-    runsRequestRef = runsService.getRunsData(queryString);
-    return {
-      call: async () => {
-        try {
-          const stream = await runsRequestRef.call((detail) => {
-            exceptionHandler({ detail, model });
-          });
-          let bufferPairs = decodeBufferPairs(stream as ReadableStream<any>);
-          let decodedPairs = decodePathsVals(bufferPairs);
-          let objects = iterFoldTree(decodedPairs, 1);
-          const runsData: IRun<IMetricTrace | IParamTrace>[] = [];
-
-          for await (let [keys, val] of objects) {
-            const data = { ...(val as any), hash: keys[0] };
-            if (!data.hash.startsWith('progress')) {
-              const runData: any = val;
-              runsData.push({ ...runData, hash: keys[0] } as any);
-            }
-          }
-          return runsData;
-        } catch (ex: Error | any) {
-          if (ex.name === 'AbortError') {
-            // eslint-disable-next-line no-console
-            console.error(`${ex.name}, ${ex.message}`);
-          }
-        }
-      },
-      abort: runsRequestRef.abort,
-    };
   }
 
   function getRunsData(
@@ -847,75 +807,24 @@ function getRunsModelMethods(
     }
   }
 
-  function onExportTableData(): Promise<void> {
-    // @TODO need to get data and params from state not from processData
-    const runsDataToExport = getAllRunsData(
-      model.getState()?.config?.select?.query,
-    );
-    const exceptionHandler = (detail: any) => {
-      // eslint-disable-next-line no-console
-      console.error('An error occurred:', detail);
-    };
-
-    return runsDataToExport.call(exceptionHandler).then((rawData) => {
-      const { data, params, metricsColumns } = processData(rawData);
-      const tableData = getDataAsTableRows(data, metricsColumns, params, true);
-      const configData = model.getState()?.config;
-      const tableColumns: ITableColumn[] = getRunsTableColumns(
-        metricsColumns,
-        params,
-        configData?.table.columnsOrder!,
-        configData?.table.hiddenColumns!,
-      );
-      const excludedFields: string[] = ['#', 'actions'];
-      const filteredHeader: string[] = tableColumns.reduce(
-        (acc: string[], column: ITableColumn) =>
-          acc.concat(
-            excludedFields.indexOf(column.key) === -1 && !column.isHidden
-              ? column.key
-              : [],
-          ),
-        [],
-      );
-
-      let emptyRow: { [key: string]: string } = {};
-      filteredHeader.forEach((column: string) => {
-        emptyRow[column] = '--';
-      });
-
-      const groupedRows: IMetricTableRowData[][] =
-        data.length > 1
-          ? Object.keys(tableData.rows).map(
-              (groupedRowKey: string) => tableData.rows[groupedRowKey].items,
-            )
-          : [
-              Array.isArray(tableData.rows)
-                ? tableData.rows
-                : tableData.rows[Object.keys(tableData.rows)[0]].items,
-            ];
-
-      const dataToExport: { [key: string]: string }[] = [];
-
-      groupedRows?.forEach(
-        (groupedRow: IMetricTableRowData[], groupedRowIndex: number) => {
-          groupedRow?.forEach((row: IMetricTableRowData) => {
-            const filteredRow = getFilteredRow({
-              columnKeys: filteredHeader,
-              row,
-            });
-            dataToExport.push(filteredRow);
-          });
-          if (groupedRows?.length - 1 !== groupedRowIndex) {
-            dataToExport.push(emptyRow);
-          }
-        },
-      );
-      const blob = new Blob([JsonToCSV(dataToExport)], {
-        type: 'text/csv;charset=utf-8;',
-      });
-      saveAs(blob, `runs-${moment().format(DATE_EXPORTING_FORMAT)}.csv`);
-      analytics.trackEvent(ANALYTICS_EVENT_KEYS[appName].table.exports.csv);
+  async function onExportTableData(): Promise<void> {
+    const query = model.getState()?.config?.select?.query;
+    const request = runsService.getCsvData(query);
+    const readableStream = await request.call((detail) => {
+      exceptionHandler({ detail, model });
     });
+    const reader = readableStream.getReader();
+    const data = [];
+    let readResult = await reader.read();
+    while (!readResult.done) {
+      data.push(readResult.value);
+      readResult = await reader.read();
+    }
+    const blob = new Blob(data, {
+      type: 'text/csv;charset=utf-8;',
+    });
+    saveAs(blob, `runs-${moment().format(DATE_EXPORTING_FORMAT)}.csv`);
+    analytics.trackEvent(ANALYTICS_EVENT_KEYS[appName].table.exports.csv);
   }
 
   function onModelNotificationDelete(id: number): void {
