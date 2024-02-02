@@ -2905,12 +2905,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
         });
         const reader = readableStream.getReader();
         const data = [];
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) {
-            break;
-          }
-          data.push(value);
+        let readResult = await reader.read();
+        while (!readResult.done) {
+          data.push(readResult.value);
+          readResult = await reader.read();
         }
         const blob = new Blob(data, {
           type: 'text/csv;charset=utf-8;',
