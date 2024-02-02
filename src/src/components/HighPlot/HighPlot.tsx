@@ -45,6 +45,7 @@ const HighPlot = React.forwardRef(function HighPlot(
       bottom: 30,
       left: 60,
     },
+    scaleStates,
   } = props;
 
   // boxes
@@ -117,6 +118,7 @@ const HighPlot = React.forwardRef(function HighPlot(
       axesRef,
       dimensions: data.dimensions,
       plotBoxRef,
+      scaleStates,
     });
 
     if (attributesRef?.current.xScale && attributesRef.current.yScale) {
