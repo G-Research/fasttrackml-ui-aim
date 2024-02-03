@@ -28,6 +28,13 @@ function getRunsData(query?: string, limit?: number, offset?: string) {
   });
 }
 
+function getCsvData(query?: string) {
+  return API.getStream<ReadableStream>(endpoints.GET_RUNS, {
+    q: query || '',
+    action: 'export',
+  });
+}
+
 function getRunLogs(id: string, record_range?: string) {
   return API.getStream<ReadableStream>(endpoints.GET_RUN_LOGS(id), {
     record_range: record_range ?? '',
@@ -111,6 +118,7 @@ const runsService = {
   getBatch,
   getBatchByStep,
   getRunsData,
+  getCsvData,
   getRunInfo,
   getRunLogs,
   getRunMetricsBatch,
