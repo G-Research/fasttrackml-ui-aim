@@ -20,6 +20,8 @@ function ToggleButton({
   value,
   id,
   className,
+  disabled,
+  tooltipOverride,
 }: IToggleButtonProps): React.FunctionComponentElement<React.ReactNode> {
   function handleToggle(e: any): void {
     const { id, value } = e.currentTarget;
@@ -29,7 +31,7 @@ function ToggleButton({
   return (
     <ErrorBoundary>
       <div className={`ToggleButton ${className || ''}`}>
-        <Tooltip title={title}>
+        <Tooltip title={tooltipOverride || title}>
           <div>
             <span className='ToggleButton__title'>{title}</span>
           </div>
@@ -43,6 +45,7 @@ function ToggleButton({
             size='small'
             color={value === leftValue ? 'primary' : 'inherit'}
             onClick={handleToggle}
+            disabled={disabled}
           >
             {leftLabel}
           </Button>
@@ -53,6 +56,7 @@ function ToggleButton({
             size='small'
             color={value === rightValue ? 'primary' : 'inherit'}
             onClick={handleToggle}
+            disabled={disabled}
           >
             {rightLabel}
           </Button>

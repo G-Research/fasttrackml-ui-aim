@@ -32,8 +32,9 @@ import AppBar from 'pages/Metrics/components/MetricsBar/MetricsBar';
 import { AppNameEnum } from 'services/models/explorer';
 
 import { IParamsProps } from 'types/pages/params/Params';
+import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
-import { ChartTypeEnum } from 'utils/d3';
+import { ChartTypeEnum, ScaleEnum } from 'utils/d3';
 
 import SelectForm from './components/SelectForm/SelectForm';
 import Controls from './components/Controls/Controls';
@@ -116,21 +117,58 @@ const Params = ({
   onRowsVisibilityChange,
   onParamsScaleTypeChange,
 }: IParamsProps): React.FunctionComponentElement<React.ReactNode> => {
-  let scaleStates = selectedParams.reduce((acc, param) => {
-    (acc as any)[param.key] = param.scale;
-    return acc;
-  }, {});
+  let scaleStates = getDefaultScaleStates(highPlotData);
+  let newScaleStates = scaleStates;
+
+  // Updates selectedParams prop to render disabled button for point params
+  // Also updates newScaleStates to render the newly selected scales in chart
+  function updateParamsState() {
+    selectedParams.map((param) => {
+      if (scaleStates[param.key] === ScaleEnum.Point) {
+        param.scale = scaleStates[param.key];
+        return param;
+      } else {
+        return param;
+      }
+    });
+    newScaleStates = selectedParams.reduce((acc: {}, param: ISelectOption) => {
+      (acc as any)[param.key] = param.scale;
+      return acc;
+    }, {});
+  }
+
+  // Obtains the original scale for each parameter
+  // (point for string params, linear for numeric params)
+  function getDefaultScaleStates(highPlotData: any) {
+    const dimensions: { [key: string]: { scaleType: string } } =
+      highPlotData?.[0]?.dimensions;
+
+    if (!dimensions) {
+      return {};
+    }
+    const dimensionsArray = Object.entries(dimensions).map(([key, value]) => ({
+      key,
+      ...value,
+    }));
+    const result = dimensionsArray.map((dimension) => {
+      return {
+        [dimension.key]: dimension.scaleType,
+      };
+    });
+    return _.assign({}, ...result);
+  }
 
   const [isProgressBarVisible, setIsProgressBarVisible] =
     React.useState<boolean>(false);
   const chartProps: any[] = React.useMemo(() => {
+    updateParamsState();
     return (highPlotData || []).map((chartData: any) => ({
       curveInterpolation,
       isVisibleColorIndicator,
       onAxisBrushExtentChange,
       brushExtents,
       chartTitle: chartTitleData[chartData.data[0]?.chartIndex],
-      scaleStates,
+      scaleStates: newScaleStates,
     }));
   }, [
     highPlotData,
@@ -139,7 +177,8 @@ const Params = ({
     chartTitleData,
     onAxisBrushExtentChange,
     brushExtents,
-    scaleStates,
+    selectedParams,
+    updateParamsState,
   ]);
 
   return (

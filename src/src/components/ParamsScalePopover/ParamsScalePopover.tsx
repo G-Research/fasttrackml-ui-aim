@@ -38,7 +38,11 @@ function ParamsScalePopover(
         {props.selectedParams.map((param: ISelectOption) => (
           <div className='ParamsScalePopover__select' key={param.key}>
             <ToggleButton
-              title={param.label + ' scale:'}
+              title={
+                param.label.length <= 20
+                  ? param.label
+                  : param.label.substring(0, 20) + '...'
+              }
               id={param.key}
               value={param.scale ? param.scale : ScaleEnum.Linear}
               leftValue={ScaleEnum.Linear}
@@ -46,6 +50,8 @@ function ParamsScalePopover(
               leftLabel='Linear'
               rightLabel='Log'
               onChange={handleScaleChange}
+              disabled={param.scale === ScaleEnum.Point}
+              tooltipOverride={param.label}
             />
           </div>
         ))}
