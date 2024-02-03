@@ -542,9 +542,14 @@ function getParamsModelMethods(
               ({ type, label, value }: ISelectOption) => {
                 const dimension = dimensionsObject[chartIndex];
                 if (!dimension[label] && type === 'params') {
+                  const paramValue = getValue(run.run.params, label, '-');
+                  const scaleType =
+                    typeof paramValue === 'number'
+                      ? ScaleEnum.Linear
+                      : ScaleEnum.Point;
                   dimension[label] = {
                     values: new Set(),
-                    scaleType: ScaleEnum.Linear,
+                    scaleType: scaleType,
                     displayName: label,
                     dimensionType: 'param',
                   };
