@@ -63,6 +63,7 @@ function Grouping({
                           onGroupingPaletteChange,
                           paletteIndex: groupingData?.paletteIndex,
                         })}
+                        groupingSelectOptions={groupingSelectOptions}
                       />
                     )
                   }

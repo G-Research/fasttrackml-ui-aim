@@ -1,3 +1,4 @@
+import { IBaseComponentProps } from 'modules/BaseExplorer/types';
 import React from 'react';
 
 import { IGroupingConfig } from 'services/models/explorer/createAppModel';
@@ -25,4 +26,7 @@ export interface IGroupingPopoverAdvancedProps {
   onPersistenceChange: IMetricProps['onGroupingPersistenceChange'];
   onGroupingPaletteChange?: IMetricProps['onGroupingPaletteChange'];
   onShuffleChange: IMetricProps['onShuffleChange'];
+  groupingSelectOptions?: IGroupingSelectOption[];
+  onSelect?: IMetricProps['onGroupingSelectChange'];
+  inputLabel?: string;
 }
