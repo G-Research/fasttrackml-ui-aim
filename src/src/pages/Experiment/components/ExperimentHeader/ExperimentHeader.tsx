@@ -13,6 +13,7 @@ import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 import { DATE_WITH_SECONDS } from 'config/dates/dates';
 
 import ExperimentNavigationPopover from '../ExperimentNavigationPopover';
+import ExperimentNavigationPopoverCompact from '../ExperimentNavigationPopoverCompact';
 
 import { IExperimentHeaderProps } from '.';
 
@@ -25,12 +26,20 @@ function ExperimentHeader({
   experimentsData,
   experimentId,
   getExperimentsData,
+  onExperimentChange,
+  isCompact = false,
 }: IExperimentHeaderProps): React.FunctionComponentElement<React.ReactNode> {
   const { url } = useRouteMatch();
 
   return (
     <ErrorBoundary>
-      <div className='ExperimentHeader__headerContainer'>
+      <div
+        className={
+          isCompact
+            ? 'ExperimentHeader__headerContainer compact'
+            : 'ExperimentHeader__headerContainer'
+        }
+      >
         <div className='container ExperimentHeader__headerContainer__appBarBox'>
           <div className='ExperimentHeader__headerContainer__appBarBox__navigationContainer'>
             <ControlPopover
@@ -91,41 +100,55 @@ function ExperimentHeader({
                 </div>
               )}
               component={
-                <ExperimentNavigationPopover
-                  isExperimentsLoading={isExperimentsLoading}
-                  experimentsData={experimentsData}
-                  experimentId={experimentId}
-                  getExperimentsData={getExperimentsData}
-                />
+                !isCompact || !onExperimentChange ? (
+                  <ExperimentNavigationPopover
+                    isExperimentsLoading={isExperimentsLoading}
+                    experimentsData={experimentsData}
+                    experimentId={experimentId}
+                    getExperimentsData={getExperimentsData}
+                  />
+                ) : (
+                  <ExperimentNavigationPopoverCompact
+                    isExperimentsLoading={isExperimentsLoading}
+                    experimentsData={experimentsData}
+                    experimentId={experimentId}
+                    getExperimentsData={getExperimentsData}
+                    onExperimentChange={onExperimentChange}
+                  />
+                )
               }
             />
-            <div className='ExperimentHeader__headerContainer__appBarTitleBox__date'>
-              {!isExperimentLoading ? (
-                <>
-                  <Icon name='calendar' fontSize={12} />
-                  <Text size={11} tint={70} weight={400}>
-                    {`${moment(
-                      (experimentData?.creation_time || 0) * 1000,
-                    ).format(DATE_WITH_SECONDS)}`}
-                  </Text>
-                </>
-              ) : (
-                <Skeleton
-                  className='ExperimentHeader__headerContainer__appBarTitleBox__Skeleton'
-                  variant='rect'
-                  height={24}
-                  width={340}
-                />
-              )}
+            {!isCompact && (
+              <div className='ExperimentHeader__headerContainer__appBarTitleBox__date'>
+                {!isExperimentLoading ? (
+                  <>
+                    <Icon name='calendar' fontSize={12} />
+                    <Text size={11} tint={70} weight={400}>
+                      {`${moment(
+                        (experimentData?.creation_time || 0) * 1000,
+                      ).format(DATE_WITH_SECONDS)}`}
+                    </Text>
+                  </>
+                ) : (
+                  <Skeleton
+                    className='ExperimentHeader__headerContainer__appBarTitleBox__Skeleton'
+                    variant='rect'
+                    height={24}
+                    width={340}
+                  />
+                )}
+              </div>
+            )}
+          </div>
+          {!isCompact && (
+            <div className='ExperimentHeader__headerContainer__appBarBox__actionContainer'>
+              <NavLink to={`${url}/settings`}>
+                <Button withOnlyIcon size='small' color='secondary'>
+                  <Icon name='edit' />
+                </Button>
+              </NavLink>
             </div>
-          </div>
-          <div className='ExperimentHeader__headerContainer__appBarBox__actionContainer'>
-            <NavLink to={`${url}/settings`}>
-              <Button withOnlyIcon size='small' color='secondary'>
-                <Icon name='edit' />
-              </Button>
-            </NavLink>
-          </div>
+          )}
         </div>
       </div>
     </ErrorBoundary>
