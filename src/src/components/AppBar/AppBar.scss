@@ -19,10 +19,16 @@
 
   &__content {
     display: flex;
+    flex: 5;
     align-items: center;
+    justify-content: right;
     &--disabled {
       pointer-events: none;
       opacity: 0.5;
+    }
+
+    .ExperimentHeader__headerContainer {
+      margin-right: auto;
     }
   }
 }
