@@ -13,6 +13,9 @@ import ConfirmModal from 'components/ConfirmModal/ConfirmModal';
 
 import { DOCUMENTATIONS } from 'config/references';
 
+import ExperimentHeader from 'pages/Experiment/components/ExperimentHeader';
+import useExperimentState from 'pages/Experiment/useExperimentState';
+
 import { IMetricsBarProps } from 'types/pages/metrics/components/MetricsBar/MetricsBar';
 
 import './MetricsBar.scss';
@@ -27,6 +30,9 @@ function MetricsBar({
   onResetConfigData,
   onLiveUpdateConfigChange,
 }: IMetricsBarProps): React.FunctionComponentElement<React.ReactNode> {
+  // Set initial experiment id to default (id: 0)
+  const [experimentId, setExperimentId] = React.useState<string>('0');
+
   const [popover, setPopover] = React.useState<string>('');
 
   const route = useRouteMatch<any>();
@@ -44,9 +50,33 @@ function MetricsBar({
     handleClosePopover();
   }
 
+  function handleExperimentChange(id: string): void {
+    // todo: handle run filtering on experiment change
+    setExperimentId(id);
+  }
+
+  const { experimentState, experimentsState, getExperimentsData } =
+    useExperimentState(experimentId);
+
+  const { data: experimentData, loading: isExperimentLoading } =
+    experimentState;
+
+  const { data: experimentsData, loading: isExperimentsLoading } =
+    experimentsState;
+
   return (
     <ErrorBoundary>
       <AppBar title={title} disabled={disabled}>
+        <ExperimentHeader
+          experimentData={experimentData}
+          experimentsData={experimentsData}
+          isExperimentLoading={isExperimentLoading}
+          isExperimentsLoading={isExperimentsLoading}
+          experimentId={experimentId}
+          getExperimentsData={getExperimentsData}
+          onExperimentChange={handleExperimentChange}
+          isCompact
+        />
         <LiveUpdateSettings
           {...liveUpdateConfig}
           onLiveUpdateConfigChange={onLiveUpdateConfigChange}
