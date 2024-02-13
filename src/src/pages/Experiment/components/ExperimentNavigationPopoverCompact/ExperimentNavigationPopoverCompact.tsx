@@ -27,6 +27,15 @@ function ExperimentNavigationPopoverCompact({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  function shortenExperimentName(name?: string): string {
+    if (!name) {
+      return 'default';
+    } else if (name.length > 57) {
+      return `${name.slice(0, 57)}...`;
+    }
+    return name;
+  }
+
   return (
     <ErrorBoundary>
       <div className='ExperimentNavigationPopover'>
@@ -55,7 +64,7 @@ function ExperimentNavigationPopoverCompact({
                       weight={500}
                       className='experimentBox__experimentName'
                     >
-                      {experiment?.name ?? 'default'}
+                      {shortenExperimentName(experiment?.name)}
                     </Text>
                     <div className='experimentBox__date'>
                       <Icon
