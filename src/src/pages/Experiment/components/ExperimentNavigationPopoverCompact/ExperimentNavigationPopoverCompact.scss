@@ -45,6 +45,13 @@
           border-radius: 0.25rem;
           text-align: left;
 
+          .MuiButton-label {
+            align-items: flex-start;
+            flex-direction: column;
+            line-height: normal;
+            text-transform: none;
+          }
+
           &:hover {
             background: $cuddle-20;
           }
