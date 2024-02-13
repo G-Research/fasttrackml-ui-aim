@@ -74,6 +74,7 @@ export interface IScattersProps extends Partial<RouteChildrenProps> {
   sameValueColumns?: string[] | [];
   selectedRows: { [key: string]: any };
   columnsOrder: IColumnsOrder;
+  selectedExperimentId: string;
   onChangeTooltip: (tooltip: Partial<ITooltip>) => void;
   onChangeTrendlineOptions: (options: Partial<ITrendlineOptions>) => void;
   onActivePointChange?: (
@@ -93,6 +94,7 @@ export interface IScattersProps extends Partial<RouteChildrenProps> {
   onNotificationAdd: (notification: INotification) => void;
   onNotificationDelete: (id: number) => void;
   onResetConfigData: () => void;
+  onSelectExperimentIdChange: (id: string) => void;
   onSelectOptionsChange: (options: ISelectOption[]) => void;
   onSelectRunQueryChange: (query: string) => void;
   onExportTableData: (e: React.ChangeEvent<any>) => void;

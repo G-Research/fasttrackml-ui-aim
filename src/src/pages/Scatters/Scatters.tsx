@@ -62,6 +62,8 @@ function Scatters(
               onResetConfigData={props.onResetConfigData}
               liveUpdateConfig={props.liveUpdateConfig}
               onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
+              selectedExperimentId={props.selectedExperimentId}
+              onSelectExperimentIdChange={props.onSelectExperimentIdChange}
               title='Scatters explorer'
             />
             <div className='Scatters__SelectForm__Grouping__container'>

@@ -157,6 +157,9 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
         columnsOrder={scattersData?.config?.table?.columnsOrder!}
         sameValueColumns={scattersData?.sameValueColumns!}
         chartPanelOffsetHeight={chartPanelOffsetHeight}
+        selectedExperimentId={
+          scattersData?.config?.select?.selectedExperimentId!
+        }
         // methods
         onChangeTooltip={scattersAppModel.onChangeTooltip}
         onChangeTrendlineOptions={scattersAppModel.onChangeTrendlineOptions}
@@ -177,6 +180,7 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
         onNotificationAdd={scattersAppModel.onNotificationAdd}
         onNotificationDelete={scattersAppModel.onNotificationDelete}
         onResetConfigData={scattersAppModel.onResetConfigData}
+        onSelectExperimentIdChange={scattersAppModel.onSelectExperimentIdChange}
         onSelectOptionsChange={scattersAppModel.onSelectOptionsChange}
         onSelectRunQueryChange={scattersAppModel.onSelectRunQueryChange}
         onExportTableData={scattersAppModel.onExportTableData}
