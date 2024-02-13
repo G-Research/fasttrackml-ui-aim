@@ -25,17 +25,25 @@ function MetricsBar({
   explorerName = 'METRICS',
   liveUpdateConfig,
   disabled,
+  selectedExperimentId,
   onBookmarkCreate,
   onBookmarkUpdate,
   onResetConfigData,
   onLiveUpdateConfigChange,
+  onSelectExperimentIdChange,
 }: IMetricsBarProps): React.FunctionComponentElement<React.ReactNode> {
-  // Set initial experiment id to default (id: 0)
-  const [experimentId, setExperimentId] = React.useState<string>('0');
-
   const [popover, setPopover] = React.useState<string>('');
 
   const route = useRouteMatch<any>();
+
+  const { experimentState, experimentsState, getExperimentsData } =
+    useExperimentState(selectedExperimentId);
+
+  const { data: experimentData, loading: isExperimentLoading } =
+    experimentState;
+
+  const { data: experimentsData, loading: isExperimentsLoading } =
+    experimentsState;
 
   function handleBookmarkClick(value: string): void {
     setPopover(value);
@@ -51,18 +59,8 @@ function MetricsBar({
   }
 
   function handleExperimentChange(id: string): void {
-    // todo: handle run filtering on experiment change
-    setExperimentId(id);
+    onSelectExperimentIdChange(id);
   }
-
-  const { experimentState, experimentsState, getExperimentsData } =
-    useExperimentState(experimentId);
-
-  const { data: experimentData, loading: isExperimentLoading } =
-    experimentState;
-
-  const { data: experimentsData, loading: isExperimentsLoading } =
-    experimentsState;
 
   return (
     <ErrorBoundary>
@@ -72,7 +70,7 @@ function MetricsBar({
           experimentsData={experimentsData}
           isExperimentLoading={isExperimentLoading}
           isExperimentsLoading={isExperimentsLoading}
-          experimentId={experimentId}
+          experimentId={selectedExperimentId}
           getExperimentsData={getExperimentsData}
           onExperimentChange={handleExperimentChange}
           isCompact

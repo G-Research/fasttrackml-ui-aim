@@ -97,6 +97,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
     advancedError: ISyntaxErrorDetails;
   };
   columnsOrder: IColumnsOrder;
+  selectedExperimentId: string;
   onRunsTagsChange: (runHash: string, tags: ITagInfo[]) => void;
   onChangeTooltip: (tooltip: Partial<ITooltip>) => void;
   onIgnoreOutliersChange: () => void;
@@ -130,6 +131,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onAlignmentTypeChange: (type: XAlignmentEnum) => void;
   onDensityTypeChange: (type: DensityOptions) => void;
   onMetricsSelectChange: (options: ISelectOption[]) => void;
+  onSelectExperimentIdChange: (id: string) => void;
   onSelectRunQueryChange: (query: string) => void;
   onSelectAdvancedQueryChange: (query: string) => void;
   onRowsVisibilityChange: (metricKeys: string[]) => void;

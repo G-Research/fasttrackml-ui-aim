@@ -125,6 +125,7 @@ import onParamsScaleTypeChange from 'utils/app/onParamsScaleTypeChange';
 import onParamVisibilityChange from 'utils/app/onParamsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
+import onSelectExperimentIdChange from 'utils/app/onSelectExperimentIdChange';
 import onSelectAdvancedQueryChange from 'utils/app/onSelectAdvancedQueryChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
 import onSmoothingChange from 'utils/app/onSmoothingChange';
@@ -351,6 +352,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
             query: '',
             advancedMode: false,
             advancedQuery: '',
+            selectedExperimentId: '0',
           };
         }
         return config;
@@ -471,6 +473,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
             query: '',
             advancedMode: false,
             advancedQuery: '',
+            selectedExperimentId: '0',
           };
         }
         //TODO solve the problem with keeping table config after switching from Scatters explore to Params explore. But the solution is temporal
@@ -1161,6 +1164,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
         selectedRows,
       } = processData(model.getState()?.rawData as ISequence<IMetricTrace>[]);
       const sortedParams = [...new Set(params.concat(highLevelParams))].sort();
+
+      const selectedExperimentId =
+        model.getState()?.config?.select?.selectedExperimentId;
+
       const groupingSelectOptions = [
         ...getGroupingSelectOptions({
           params: sortedParams,
@@ -1220,7 +1227,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
       model.setState({
         config: configData,
         data,
-        lineChartData: getDataAsLines(data),
+        // Render charts based on the selected experiment
+        lineChartData: getDataAsLines(data, selectedExperimentId),
         chartTitleData: getChartTitleData<IMetric, IAppModelState>({
           processedData: data,
           groupingSelectOptions,
@@ -1255,6 +1263,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
         selectedRows,
       } = processData(rawData);
       const sortedParams = [...new Set(params.concat(highLevelParams))].sort();
+
+      const selectedExperimentId =
+        model.getState()?.config?.select?.selectedExperimentId;
 
       if (configData) {
         setAggregationEnabled({ model, appName });
@@ -1320,7 +1331,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
           ...modelState?.selectFormData,
           [configData.select?.advancedMode ? 'advancedError' : 'error']: null,
         },
-        lineChartData: getDataAsLines(data),
+        // Render charts based on the selected experiment
+        lineChartData: getDataAsLines(data, selectedExperimentId),
         chartTitleData: getChartTitleData<
           IMetric,
           Partial<IMetricAppModelState>
@@ -1525,6 +1537,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
     function getDataAsLines(
       processedData: IMetricsCollection<IMetric>[],
+      selectedExperimentId: string,
     ): ILine[][] {
       if (!processedData) {
         return [];
@@ -1553,6 +1566,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
             }),
         )
         .flat();
+
+      // Filter lines by selected experiment
+      if (selectedExperimentId !== '0') {
+        const filteredLines = lines.filter((line: ILine) => {
+          return line.run.props.experiment.id === selectedExperimentId;
+        });
+        return Object.values(_.groupBy(filteredLines, 'chartIndex'));
+      }
 
       return Object.values(_.groupBy(lines, 'chartIndex'));
     }
@@ -2002,6 +2023,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
       Object.assign(methods, {
         onMetricsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
           onSelectOptionsChange({ data, model });
+        },
+        onSelectExperimentIdChange(selectedExperimentId: string): void {
+          onSelectExperimentIdChange({ selectedExperimentId, model });
+          updateModelData(model.getState()?.config!, true);
         },
         onSelectRunQueryChange(query: string): void {
           onSelectRunQueryChange({ query, model });
