@@ -82,6 +82,7 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   columnsOrder: IColumnsOrder;
   sameValueColumns: string[] | [];
   selectedParams: ISelectOption[];
+  selectedExperimentId: string;
   onNotificationDelete: (id: number) => void;
   onCurveInterpolationChange: () => void;
   onActivePointChange: (
@@ -90,6 +91,7 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   ) => void;
   onColorIndicatorChange: () => void;
   onParamsSelectChange: (options: ISelectOption[]) => void;
+  onSelectExperimentIdChange: (id: string) => void;
   onSelectRunQueryChange: (query: string) => void;
   onGroupingSelectChange: (params: IOnGroupingSelectChangeParams) => void;
   onGroupingModeChange: (params: IOnGroupingModeChangeParams) => void;
