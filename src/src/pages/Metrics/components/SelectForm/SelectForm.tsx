@@ -82,7 +82,7 @@ function SelectForm({
     event: React.ChangeEvent<{}>,
     value: ISelectOption[],
   ): void {
-    if (event.type === 'click') {
+    if (event.type === 'click' || event.type === 'change') {
       const lookup = value.reduce(
         (acc: { [key: string]: number }, curr: ISelectOption) => {
           acc[curr.key] = ++acc[curr.key] || 0;
@@ -205,18 +205,37 @@ function SelectForm({
                         },
                       }}
                       renderInput={(params) => (
-                        <InputBase
-                          ref={params.InputProps.ref}
-                          inputProps={{
-                            ...params.inputProps,
-                            value: searchValue,
-                            onChange: handleSearchInputChange,
-                          }}
-                          spellCheck={false}
-                          placeholder='Search'
-                          autoFocus={true}
-                          className='Metrics__SelectForm__metric__select'
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <Checkbox
+                            color='primary'
+                            icon={<CheckBoxOutlineBlank />}
+                            checkedIcon={<CheckBoxIcon />}
+                            checked={
+                              selectedMetricsData?.options.length ===
+                              options.length
+                            }
+                            onChange={(event) => {
+                              if (event.target.checked) {
+                                onSelect(event, options);
+                              } else {
+                                onSelect(event, []);
+                              }
+                            }}
+                            size='small'
+                          />
+                          <InputBase
+                            ref={params.InputProps.ref}
+                            inputProps={{
+                              ...params.inputProps,
+                              value: searchValue,
+                              onChange: handleSearchInputChange,
+                            }}
+                            spellCheck={false}
+                            placeholder='Search'
+                            autoFocus={true}
+                            className='Metrics__SelectForm__metric__select'
+                          />
+                        </div>
                       )}
                       renderOption={(option) => {
                         let selected: boolean =

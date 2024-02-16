@@ -64,7 +64,7 @@ function SelectForm({
     event: React.ChangeEvent<{}>,
     value: ISelectOption[],
   ): void {
-    if (event.type === 'click') {
+    if (event.type === 'click' || event.type === 'change') {
       const lookup = value.reduce(
         (acc: { [key: string]: number }, curr: ISelectOption) => {
           acc[curr.key] = ++acc[curr.key] || 0;
@@ -168,17 +168,36 @@ function SelectForm({
                         },
                       }}
                       renderInput={(params) => (
-                        <InputBase
-                          ref={params.InputProps.ref}
-                          inputProps={{
-                            ...params.inputProps,
-                            value: searchValue,
-                            onChange: handleSearchInputChange,
-                          }}
-                          autoFocus={true}
-                          spellCheck={false}
-                          className='SelectForm__param__select'
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <Checkbox
+                            color='primary'
+                            icon={<CheckBoxOutlineBlank />}
+                            checkedIcon={<CheckBoxIcon />}
+                            checked={
+                              selectedParamsData?.options.length ===
+                              options.length
+                            }
+                            onChange={(event) => {
+                              if (event.target.checked) {
+                                onSelect(event, options);
+                              } else {
+                                onSelect(event, []);
+                              }
+                            }}
+                            size='small'
+                          />
+                          <InputBase
+                            ref={params.InputProps.ref}
+                            inputProps={{
+                              ...params.inputProps,
+                              value: searchValue,
+                              onChange: handleSearchInputChange,
+                            }}
+                            autoFocus={true}
+                            spellCheck={false}
+                            className='SelectForm__param__select'
+                          />
+                        </div>
                       )}
                       renderOption={(option) => {
                         let selected: boolean =
