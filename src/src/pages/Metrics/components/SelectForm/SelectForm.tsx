@@ -1,12 +1,15 @@
 import React from 'react';
 import classNames from 'classnames';
 
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import MuiAlert from '@material-ui/lab/Alert';
 import {
   Box,
   Checkbox,
   Divider,
   InputBase,
   Popper,
+  Snackbar,
   Tooltip,
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -42,6 +45,8 @@ function SelectForm({
 }: ISelectFormProps): React.FunctionComponentElement<React.ReactNode> {
   const [anchorEl, setAnchorEl] = React.useState<any>(null);
   const [searchValue, setSearchValue] = React.useState<string>('');
+  const [isRegexSearch, setIsRegexSearch] = React.useState(false);
+  const [regexError, setRegexError] = React.useState<string | null>(null);
   const searchRef: any = React.useRef<React.MutableRefObject<any>>(null);
   const autocompleteRef: any = React.useRef<React.MutableRefObject<any>>(null);
   const advancedAutocompleteRef: any =
@@ -133,12 +138,27 @@ function SelectForm({
   }
 
   const options = React.useMemo(() => {
-    return (
-      selectFormData?.options?.filter(
-        (option) => option.label.indexOf(searchValue) !== -1,
-      ) ?? []
-    );
-  }, [searchValue, selectFormData?.options]);
+    if (isRegexSearch) {
+      try {
+        const regex = new RegExp(searchValue, 'i');
+        setRegexError(null);
+        return (
+          selectFormData?.options?.filter((option) =>
+            regex.test(option.label),
+          ) ?? []
+        );
+      } catch (error) {
+        setRegexError('Invalid regex');
+        return [];
+      }
+    } else {
+      return (
+        selectFormData?.options?.filter(
+          (option) => option.label.indexOf(searchValue) !== -1,
+        ) ?? []
+      );
+    }
+  }, [searchValue, selectFormData?.options, isRegexSearch]);
 
   const open: boolean = !!anchorEl;
   const id = open ? 'select-metric' : undefined;
@@ -205,7 +225,13 @@ function SelectForm({
                         },
                       }}
                       renderInput={(params) => (
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '100%',
+                          }}
+                        >
                           <Checkbox
                             color='primary'
                             icon={<CheckBoxOutlineBlank />}
@@ -233,8 +259,39 @@ function SelectForm({
                             spellCheck={false}
                             placeholder='Search'
                             autoFocus={true}
+                            style={{ flex: 1 }}
                             className='Metrics__SelectForm__metric__select'
                           />
+                          <Snackbar
+                            open={!!regexError}
+                            autoHideDuration={6000}
+                            onClose={() => setRegexError(null)}
+                          >
+                            <MuiAlert
+                              elevation={6}
+                              variant='filled'
+                              severity='error'
+                              onClose={() => setRegexError(null)}
+                            >
+                              {regexError}
+                            </MuiAlert>
+                          </Snackbar>
+                          <Tooltip title='Use Regular Expression'>
+                            <ToggleButton
+                              value='check'
+                              selected={isRegexSearch}
+                              onChange={() => {
+                                setIsRegexSearch(!isRegexSearch);
+                              }}
+                              style={{
+                                border: 'none',
+                                height: 35,
+                                margin: 10,
+                              }}
+                            >
+                              .*
+                            </ToggleButton>
+                          </Tooltip>
                         </div>
                       )}
                       renderOption={(option) => {
