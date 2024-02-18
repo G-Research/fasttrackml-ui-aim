@@ -155,7 +155,9 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       columnsWidths={paramsData?.config?.table?.columnsWidths!}
       selectFormData={paramsData?.selectFormData!}
       selectedParams={paramsData?.config?.select?.options!}
-      selectedExperimentId={paramsData?.config?.select?.selectedExperimentId!}
+      selectedExperimentNames={
+        paramsData?.config?.select?.selectedExperimentNames!
+      }
       onColorIndicatorChange={paramsAppModel.onColorIndicatorChange}
       onCurveInterpolationChange={paramsAppModel.onCurveInterpolationChange}
       onParamsSelectChange={paramsAppModel.onParamsSelectChange}
@@ -166,7 +168,9 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       onActivePointChange={paramsAppModel.onActivePointChange}
       onGroupingApplyChange={paramsAppModel.onGroupingApplyChange}
       onGroupingPersistenceChange={paramsAppModel.onGroupingPersistenceChange}
-      onSelectExperimentIdChange={paramsAppModel.onSelectExperimentIdChange}
+      onSelectExperimentNamesChange={
+        paramsAppModel.onSelectExperimentNamesChange
+      }
       onSelectRunQueryChange={paramsAppModel.onSelectRunQueryChange}
       onBookmarkCreate={paramsAppModel.onBookmarkCreate}
       onBookmarkUpdate={paramsAppModel.onBookmarkUpdate}

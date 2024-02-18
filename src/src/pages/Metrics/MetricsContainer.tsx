@@ -161,8 +161,8 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         requestProgress={metricsData?.requestProgress!}
         selectFormData={metricsData?.selectFormData!}
         columnsOrder={metricsData?.config?.table?.columnsOrder!}
-        selectedExperimentId={
-          metricsData?.config?.select?.selectedExperimentId!
+        selectedExperimentNames={
+          metricsData?.config?.select?.selectedExperimentNames!
         }
         // methods
         onChangeTooltip={metricAppModel.onChangeTooltip}
@@ -194,7 +194,9 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onAlignmentTypeChange={metricAppModel.onAlignmentTypeChange}
         onDensityTypeChange={metricAppModel.onDensityTypeChange}
         onMetricsSelectChange={metricAppModel.onMetricsSelectChange}
-        onSelectExperimentIdChange={metricAppModel.onSelectExperimentIdChange}
+        onSelectExperimentNamesChange={
+          metricAppModel.onSelectExperimentNamesChange
+        }
         onSelectRunQueryChange={metricAppModel.onSelectRunQueryChange}
         onSelectAdvancedQueryChange={metricAppModel.onSelectAdvancedQueryChange}
         toggleSelectAdvancedMode={metricAppModel.toggleSelectAdvancedMode}

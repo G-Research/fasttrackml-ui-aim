@@ -13,7 +13,7 @@ import ConfirmModal from 'components/ConfirmModal/ConfirmModal';
 
 import { DOCUMENTATIONS } from 'config/references';
 
-import ExperimentHeader from 'pages/Experiment/components/ExperimentHeader';
+import ExperimentBar from 'pages/Experiment/components/ExperimentBar';
 import useExperimentState from 'pages/Experiment/useExperimentState';
 
 import { IMetricsBarProps } from 'types/pages/metrics/components/MetricsBar/MetricsBar';
@@ -25,19 +25,20 @@ function MetricsBar({
   explorerName = 'METRICS',
   liveUpdateConfig,
   disabled,
-  selectedExperimentId,
+  selectedExperimentNames,
   onBookmarkCreate,
   onBookmarkUpdate,
   onResetConfigData,
   onLiveUpdateConfigChange,
-  onSelectExperimentIdChange,
+  onSelectExperimentNamesChange,
 }: IMetricsBarProps): React.FunctionComponentElement<React.ReactNode> {
   const [popover, setPopover] = React.useState<string>('');
 
   const route = useRouteMatch<any>();
 
+  // Fetch all experiments along with default
   const { experimentState, experimentsState, getExperimentsData } =
-    useExperimentState(selectedExperimentId);
+    useExperimentState('0');
 
   const { data: experimentData, loading: isExperimentLoading } =
     experimentState;
@@ -58,22 +59,21 @@ function MetricsBar({
     handleClosePopover();
   }
 
-  function handleExperimentChange(id: string): void {
-    onSelectExperimentIdChange(id);
+  function handleExperimentNamesChange(experimentName: string): void {
+    onSelectExperimentNamesChange(experimentName);
   }
 
   return (
     <ErrorBoundary>
       <AppBar title={title} disabled={disabled}>
-        <ExperimentHeader
+        <ExperimentBar
           experimentData={experimentData}
           experimentsData={experimentsData}
           isExperimentLoading={isExperimentLoading}
           isExperimentsLoading={isExperimentsLoading}
-          experimentId={selectedExperimentId}
+          selectedExperimentNames={selectedExperimentNames}
           getExperimentsData={getExperimentsData}
-          onExperimentChange={handleExperimentChange}
-          isCompact
+          onSelectExperimentNamesChange={handleExperimentNamesChange}
         />
         <LiveUpdateSettings
           {...liveUpdateConfig}
