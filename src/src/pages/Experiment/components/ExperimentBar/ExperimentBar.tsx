@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { Skeleton } from '@material-ui/lab';
 import { Chip, Tooltip } from '@material-ui/core';
 
-import { Button, Icon } from 'components/kit';
+import { Button, Icon, Text } from 'components/kit';
 import ControlPopover from 'components/ControlPopover/ControlPopover';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
@@ -16,7 +16,6 @@ import './ExperimentBar.scss';
 
 function ExperimentBar({
   isExperimentLoading,
-  experimentData,
   isExperimentsLoading,
   experimentsData,
   selectedExperimentNames,
@@ -66,6 +65,12 @@ function ExperimentBar({
                         >
                           <Icon name={opened ? 'arrow-up' : 'arrow-down'} />
                         </Button>
+
+                        {selectedExperimentNames.length === 0 ? (
+                          <Text className='ExperimentBar__headerContainer__appBarTitleBox__text'>
+                            Select Experiments
+                          </Text>
+                        ) : null}
 
                         <div className='ExperimentBar__headerContainer__appBarTitleBox__chipContainer'>
                           {selectedExperimentNames.map((experimentName) => (
