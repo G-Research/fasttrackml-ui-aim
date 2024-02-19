@@ -1,18 +1,16 @@
 @use 'src/styles/abstracts' as *;
 
-.ExperimentHeader {
+.ExperimentBar {
   &__headerContainer {
-    height: 4.375rem;
-    background: $white;
+    height: fit-content;
     display: flex;
     align-items: center;
     &__appBarBox {
       display: flex;
-      padding-top: $space-unit;
+      // padding-top: $space-unit;
       justify-content: space-between;
       &__navigationContainer {
-        max-width: 50%;
-        width: 50%;
+        width: 100%;
       }
       &__actionContainer {
         width: 4.5rem;
@@ -41,7 +39,26 @@
       width: auto;
       &__appBarTitleBoxWrapper {
         display: flex;
+        align-items: center;
+        flex-direction: row;
+        max-width: 100%;
         width: 100%;
+      }
+      &__chipContainer {
+        display: flex;
+        align-items: baseline;
+        // align-content: flex-start;
+        // Make any extra chips appear below without centering the lines
+        flex-wrap: wrap;
+        &__chip {
+          margin-left: $space-xxs;
+          font-size: smaller;
+          font-weight: $font-600;
+          border-color: $cuddle-50;
+          background-color: $cuddle-10;
+          color: $pico-80;
+          // margin-top: 0.5rem;
+        }
       }
       &__title {
         margin-bottom: $space-xxs;
@@ -59,7 +76,6 @@
       &__buttonSelectToggler {
         width: 1.5rem;
         height: 1.5rem;
-        top: -$space-xxxxs;
         &.opened {
           background: $primary-color-10;
         }
@@ -97,18 +113,4 @@
       margin-left: $space-xs;
     }
   }
-}
-
-.compact {
-  .ExperimentHeader__headerContainer {
-    &__appBarBox {
-      &__navigationContainer {
-        max-width: 100%;
-        width: 100%;
-      }
-    }
-  }
-  min-width: 30rem;
-  background-color: transparent;
-  padding-top: 0.5rem;
 }

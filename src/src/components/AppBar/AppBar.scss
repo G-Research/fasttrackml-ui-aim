@@ -4,11 +4,12 @@
   display: flex;
   align-items: center;
   min-height: 2.5rem;
-  max-height: 2.5rem;
   border-bottom: $border-main;
   border-left: $border-main;
   border-right: $border-main;
   padding-left: 1.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
   background: $white;
   z-index: 1;
   &__title {
@@ -19,7 +20,7 @@
 
   &__content {
     display: flex;
-    flex: 5;
+    flex: 6;
     align-items: center;
     justify-content: right;
     &--disabled {
@@ -27,7 +28,7 @@
       opacity: 0.5;
     }
 
-    .ExperimentHeader__headerContainer {
+    .ExperimentBar__headerContainer {
       margin-right: auto;
     }
   }
