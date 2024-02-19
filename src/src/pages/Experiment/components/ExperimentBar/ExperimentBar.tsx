@@ -25,7 +25,7 @@ function ExperimentBar({
   function shortenExperimentName(name?: string): string {
     if (!name) {
       return 'default';
-    } else if (name.length > 16) {
+    } else if (name.length > 18) {
       return `${name.slice(0, 8)}...${name.slice(-8)}`;
     }
     return name;
