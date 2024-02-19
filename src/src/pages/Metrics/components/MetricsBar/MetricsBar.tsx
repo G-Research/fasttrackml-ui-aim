@@ -67,7 +67,6 @@ function MetricsBar({
     <ErrorBoundary>
       <AppBar title={title} disabled={disabled}>
         <ExperimentBar
-          experimentData={experimentData}
           experimentsData={experimentsData}
           isExperimentLoading={isExperimentLoading}
           isExperimentsLoading={isExperimentsLoading}

@@ -7,7 +7,6 @@
     align-items: center;
     &__appBarBox {
       display: flex;
-      // padding-top: $space-unit;
       justify-content: space-between;
       &__navigationContainer {
         width: 100%;
@@ -47,8 +46,6 @@
       &__chipContainer {
         display: flex;
         align-items: baseline;
-        // align-content: flex-start;
-        // Make any extra chips appear below without centering the lines
         flex-wrap: wrap;
         &__chip {
           margin-left: $space-xxs;
@@ -57,11 +54,14 @@
           border-color: $cuddle-50;
           background-color: $cuddle-10;
           color: $pico-80;
-          // margin-top: 0.5rem;
         }
       }
       &__title {
         margin-bottom: $space-xxs;
+      }
+      &__text {
+        margin-left: $space-xxs;
+        font-size: $text-md;
       }
       &__date {
         display: flex;
