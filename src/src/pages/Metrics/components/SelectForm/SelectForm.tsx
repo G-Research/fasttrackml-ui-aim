@@ -156,7 +156,7 @@ function SelectForm({
           ) ?? []
         );
       } catch (error) {
-        setRegexError('Invalid regex');
+        setRegexError('Invalid Regular Expression');
         return [];
       }
     } else {
