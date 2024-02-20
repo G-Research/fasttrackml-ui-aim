@@ -1,12 +1,23 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { Box, Checkbox, Divider, InputBase, Popper } from '@material-ui/core';
+import ToggleButton from '@material-ui/lab/ToggleButton';
+import MuiAlert from '@material-ui/lab/Alert';
+import {
+  Box,
+  Checkbox,
+  Divider,
+  InputBase,
+  Popper,
+  Snackbar,
+  Tooltip,
+} from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import {
   CheckBox as CheckBoxIcon,
   CheckBoxOutlineBlank,
 } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { Badge, Button, Icon, Text } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
@@ -22,6 +33,12 @@ import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
 import './SelectForm.scss';
 
+const useStyles = makeStyles({
+  popper: {
+    width: '100% !important',
+  },
+});
+
 function SelectForm({
   requestIsPending,
   isDisabled = false,
@@ -32,8 +49,11 @@ function SelectForm({
 }: ISelectFormProps): React.FunctionComponentElement<React.ReactNode> {
   const [anchorEl, setAnchorEl] = React.useState<any>(null);
   const [searchValue, setSearchValue] = React.useState<string>('');
+  const [isRegexSearch, setIsRegexSearch] = React.useState(false);
+  const [regexError, setRegexError] = React.useState<string | null>(null);
   const searchRef = React.useRef<any>(null);
   const autocompleteRef: any = React.useRef<React.MutableRefObject<any>>(null);
+  const classes = useStyles();
   React.useEffect(() => {
     return () => {
       searchRef.current?.abort();
@@ -109,11 +129,26 @@ function SelectForm({
   }
 
   const options = React.useMemo(() => {
-    return (
-      selectFormData?.options?.filter(
-        (option) => option.label.indexOf(searchValue) !== -1,
-      ) ?? []
-    );
+    if (isRegexSearch) {
+      try {
+        const regex = new RegExp(searchValue, 'i');
+        setRegexError(null);
+        return (
+          selectFormData?.options?.filter((option) =>
+            regex.test(option.label),
+          ) ?? []
+        );
+      } catch (error) {
+        setRegexError('Invalid Regual Expression');
+        return [];
+      }
+    } else {
+      return (
+        selectFormData?.options?.filter(
+          (option) => option.label.indexOf(searchValue) !== -1,
+        ) ?? []
+      );
+    }
   }, [searchValue, selectFormData?.options]);
 
   const open: boolean = !!anchorEl;
@@ -158,6 +193,9 @@ function SelectForm({
                       options={options}
                       value={selectedParamsData?.options}
                       onChange={onSelect}
+                      classes={{
+                        popper: classes.popper,
+                      }}
                       groupBy={(option) => option.group}
                       getOptionLabel={(option) => option.label}
                       renderTags={() => null}
@@ -194,9 +232,40 @@ function SelectForm({
                               onChange: handleSearchInputChange,
                             }}
                             autoFocus={true}
+                            style={{ flex: 1 }}
                             spellCheck={false}
                             className='SelectForm__param__select'
                           />
+                          <Snackbar
+                            open={!!regexError}
+                            autoHideDuration={6000}
+                            onClose={() => setRegexError(null)}
+                          >
+                            <MuiAlert
+                              elevation={6}
+                              variant='filled'
+                              severity='error'
+                              onClose={() => setRegexError(null)}
+                            >
+                              {regexError}
+                            </MuiAlert>
+                          </Snackbar>
+                          <Tooltip title='Use Regular Expression'>
+                            <ToggleButton
+                              value='check'
+                              selected={isRegexSearch}
+                              onChange={() => {
+                                setIsRegexSearch(!isRegexSearch);
+                              }}
+                              style={{
+                                border: 'none',
+                                height: 35,
+                                margin: 10,
+                              }}
+                            >
+                              .*
+                            </ToggleButton>
+                          </Tooltip>
                         </div>
                       )}
                       renderOption={(option) => {

@@ -17,6 +17,7 @@ import {
   CheckBox as CheckBoxIcon,
   CheckBoxOutlineBlank,
 } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { Button, Icon, Badge, Text } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
@@ -31,6 +32,12 @@ import { ISelectFormProps } from 'types/pages/metrics/components/SelectForm/Sele
 import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
 import './SelectForm.scss';
+
+const useStyles = makeStyles({
+  popper: {
+    width: '100% !important',
+  },
+});
 
 function SelectForm({
   requestIsPending,
@@ -56,6 +63,7 @@ function SelectForm({
       searchRef.current?.abort();
     };
   }, []);
+  const classes = useStyles();
 
   function handleMetricSearch(): void {
     if (requestIsPending) {
@@ -215,6 +223,9 @@ function SelectForm({
                       options={options}
                       value={selectedMetricsData?.options}
                       onChange={onSelect}
+                      classes={{
+                        popper: classes.popper,
+                      }}
                       groupBy={(option) => option.group}
                       getOptionLabel={(option) => option.label}
                       renderTags={() => null}
@@ -225,13 +236,7 @@ function SelectForm({
                         },
                       }}
                       renderInput={(params) => (
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            width: '100%',
-                          }}
-                        >
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
                           <Checkbox
                             color='primary'
                             icon={<CheckBoxOutlineBlank />}
