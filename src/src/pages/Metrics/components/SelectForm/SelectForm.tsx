@@ -288,11 +288,7 @@ function SelectForm({
                               onChange={() => {
                                 setIsRegexSearch(!isRegexSearch);
                               }}
-                              style={{
-                                border: 'none',
-                                height: 35,
-                                margin: 10,
-                              }}
+                              className='RegexToggle'
                             >
                               .*
                             </ToggleButton>
