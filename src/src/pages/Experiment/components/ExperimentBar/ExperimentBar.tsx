@@ -98,9 +98,8 @@ function ExperimentBar({
                         className='ExperimentBar__headerContainer__appBarTitleBox__Skeleton'
                         variant='rect'
                         height={24}
-                        width={340}
+                        width={160}
                       />
-                      <Skeleton variant='rect' height={24} width={70} />
                     </div>
                   )}
                 </div>

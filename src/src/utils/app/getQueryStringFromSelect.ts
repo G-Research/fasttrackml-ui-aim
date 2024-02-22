@@ -52,11 +52,11 @@ export default function getQueryStringFromSelect(
         : '';
     }
 
-    const experimentNames = selectData.selectedExperimentNames?.length
-      ? `run.experiment in ["${selectData.selectedExperimentNames.join(
-          '", "',
-        )}"]`
-      : '';
+    const selectedExperiments = selectData.selectedExperimentNames ?? [];
+
+    const experimentNames = `run.experiment in ["${selectedExperiments.join(
+      '", "',
+    )}"]`;
 
     if (simpleInput && selections) {
       query = `${simpleInput} and ${selections}`;
@@ -64,9 +64,7 @@ export default function getQueryStringFromSelect(
       query = `${simpleInput}${selections}`;
     }
 
-    if (experimentNames) {
-      query = query ? `${query} and ${experimentNames}` : experimentNames;
-    }
+    query = query ? `${query} and ${experimentNames}` : experimentNames;
   }
   return excludeMetrics ? query.trim() || '' : query.trim() || '()';
 }
