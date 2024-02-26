@@ -19,6 +19,7 @@ import {
 } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 
+import SelectFormPopper from 'components/SelectFormPopper/SelectFormPopper';
 import { Badge, Button, Icon, Text } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 import AutocompleteInput from 'components/AutocompleteInput';
@@ -176,118 +177,23 @@ function SelectForm({
                     <Icon name='plus' style={{ marginRight: '0.5rem' }} /> Run
                     Params
                   </Button>
-                  <Popper
+                  <SelectFormPopper
                     id={id}
                     open={open}
                     anchorEl={anchorEl}
-                    placement='bottom-start'
-                    className='SelectForm__Popper'
-                  >
-                    <Autocomplete
-                      open
-                      onClose={handleClose}
-                      multiple
-                      size='small'
-                      disablePortal
-                      disableCloseOnSelect
-                      options={options}
-                      value={selectedParamsData?.options}
-                      onChange={onSelect}
-                      classes={{
-                        popper: classes.popper,
-                      }}
-                      groupBy={(option) => option.group}
-                      getOptionLabel={(option) => option.label}
-                      renderTags={() => null}
-                      disableClearable={true}
-                      ListboxProps={{
-                        style: {
-                          height: 400,
-                        },
-                      }}
-                      renderInput={(params) => (
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <Checkbox
-                            color='primary'
-                            icon={<CheckBoxOutlineBlank />}
-                            checkedIcon={<CheckBoxIcon />}
-                            checked={
-                              selectedParamsData?.options.length ===
-                              options.length
-                            }
-                            onChange={(event) => {
-                              if (event.target.checked) {
-                                onSelect(event, options);
-                              } else {
-                                onSelect(event, []);
-                              }
-                            }}
-                            size='small'
-                          />
-                          <InputBase
-                            ref={params.InputProps.ref}
-                            inputProps={{
-                              ...params.inputProps,
-                              value: searchValue,
-                              onChange: handleSearchInputChange,
-                            }}
-                            autoFocus={true}
-                            style={{ flex: 1 }}
-                            spellCheck={false}
-                            className='SelectForm__param__select'
-                          />
-                          <Snackbar
-                            open={!!regexError}
-                            autoHideDuration={6000}
-                            onClose={() => setRegexError(null)}
-                          >
-                            <MuiAlert
-                              elevation={6}
-                              variant='filled'
-                              severity='error'
-                              onClose={() => setRegexError(null)}
-                            >
-                              {regexError}
-                            </MuiAlert>
-                          </Snackbar>
-                          <Tooltip title='Use Regular Expression'>
-                            <ToggleButton
-                              value='check'
-                              selected={isRegexSearch}
-                              onChange={() => {
-                                setIsRegexSearch(!isRegexSearch);
-                              }}
-                              className='RegexToggle'
-                            >
-                              .*
-                            </ToggleButton>
-                          </Tooltip>
-                        </div>
-                      )}
-                      renderOption={(option) => {
-                        let selected: boolean =
-                          !!selectedParamsData?.options.find(
-                            (item: ISelectOption) => item.key === option.key,
-                          )?.key;
-                        return (
-                          <div className='SelectForm__option'>
-                            <Checkbox
-                              color='primary'
-                              icon={<CheckBoxOutlineBlank />}
-                              checkedIcon={<CheckBoxIcon />}
-                              checked={selected}
-                            />
-                            <Text
-                              className='SelectForm__option__label'
-                              size={14}
-                            >
-                              {option.label}
-                            </Text>
-                          </div>
-                        );
-                      }}
-                    />
-                  </Popper>
+                    options={options}
+                    selectedData={selectedParamsData}
+                    onSelect={onSelect}
+                    searchValue={searchValue}
+                    handleSearchInputChange={handleSearchInputChange}
+                    handleClose={handleClose}
+                    regexError={regexError}
+                    setRegexError={setRegexError}
+                    isRegexSearch={isRegexSearch}
+                    setIsRegexSearch={setIsRegexSearch}
+                    classes={classes}
+                    disablePortal={false}
+                  />
                   <Divider
                     style={{ margin: '0 1em' }}
                     orientation='vertical'

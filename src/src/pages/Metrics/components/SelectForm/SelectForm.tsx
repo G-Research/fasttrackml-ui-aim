@@ -1,27 +1,13 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import MuiAlert from '@material-ui/lab/Alert';
-import {
-  Box,
-  Checkbox,
-  Divider,
-  InputBase,
-  Popper,
-  Snackbar,
-  Tooltip,
-} from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import {
-  CheckBox as CheckBoxIcon,
-  CheckBoxOutlineBlank,
-} from '@material-ui/icons';
+import { Box, Divider, Tooltip } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { Button, Icon, Badge, Text } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 import AutocompleteInput from 'components/AutocompleteInput';
+import SelectFormPopper from 'components/SelectFormPopper/SelectFormPopper';
 
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 
@@ -205,121 +191,23 @@ function SelectForm({
                     <Icon name='plus' style={{ marginRight: '0.5rem' }} />
                     Metrics
                   </Button>
-                  <Popper
+                  <SelectFormPopper
                     id={id}
                     open={open}
                     anchorEl={anchorEl}
-                    placement='bottom-start'
-                    className='Metrics__SelectForm__Popper'
-                  >
-                    <Autocomplete
-                      open
-                      onClose={handleClose}
-                      multiple
-                      className='Autocomplete__container'
-                      size='small'
-                      disablePortal={true}
-                      disableCloseOnSelect
-                      options={options}
-                      value={selectedMetricsData?.options}
-                      onChange={onSelect}
-                      classes={{
-                        popper: classes.popper,
-                      }}
-                      groupBy={(option) => option.group}
-                      getOptionLabel={(option) => option.label}
-                      renderTags={() => null}
-                      disableClearable={true}
-                      ListboxProps={{
-                        style: {
-                          height: 400,
-                        },
-                      }}
-                      renderInput={(params) => (
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <Checkbox
-                            color='primary'
-                            icon={<CheckBoxOutlineBlank />}
-                            checkedIcon={<CheckBoxIcon />}
-                            checked={
-                              selectedMetricsData?.options.length ===
-                              options.length
-                            }
-                            onChange={(event) => {
-                              if (event.target.checked) {
-                                onSelect(event, options);
-                              } else {
-                                onSelect(event, []);
-                              }
-                            }}
-                            size='small'
-                          />
-                          <InputBase
-                            ref={params.InputProps.ref}
-                            inputProps={{
-                              ...params.inputProps,
-                              value: searchValue,
-                              onChange: handleSearchInputChange,
-                            }}
-                            spellCheck={false}
-                            placeholder='Search'
-                            autoFocus={true}
-                            style={{ flex: 1 }}
-                            className='Metrics__SelectForm__metric__select'
-                          />
-                          <Snackbar
-                            open={!!regexError}
-                            autoHideDuration={6000}
-                            onClose={() => setRegexError(null)}
-                          >
-                            <MuiAlert
-                              elevation={6}
-                              variant='filled'
-                              severity='error'
-                              onClose={() => setRegexError(null)}
-                            >
-                              {regexError}
-                            </MuiAlert>
-                          </Snackbar>
-                          <Tooltip title='Use Regular Expression'>
-                            <ToggleButton
-                              value='check'
-                              selected={isRegexSearch}
-                              onChange={() => {
-                                setIsRegexSearch(!isRegexSearch);
-                              }}
-                              className='RegexToggle'
-                            >
-                              .*
-                            </ToggleButton>
-                          </Tooltip>
-                        </div>
-                      )}
-                      renderOption={(option) => {
-                        let selected: boolean =
-                          !!selectedMetricsData?.options.find(
-                            (item: ISelectOption) => item.key === option.key,
-                          )?.key;
-                        return (
-                          <div className='Metrics__SelectForm__option'>
-                            <Checkbox
-                              color='primary'
-                              icon={<CheckBoxOutlineBlank />}
-                              checkedIcon={<CheckBoxIcon />}
-                              checked={selected}
-                              size='small'
-                            />
-                            <Text
-                              className='Metrics__SelectForm__option__label'
-                              size={14}
-                            >
-                              {option.label}
-                            </Text>
-                          </div>
-                        );
-                      }}
-                    />
-                  </Popper>
+                    options={options}
+                    selectedData={selectedMetricsData}
+                    onSelect={onSelect}
+                    searchValue={searchValue}
+                    handleSearchInputChange={handleSearchInputChange}
+                    handleClose={handleClose}
+                    regexError={regexError}
+                    setRegexError={setRegexError}
+                    isRegexSearch={isRegexSearch}
+                    setIsRegexSearch={setIsRegexSearch}
+                    classes={classes}
+                    disablePortal={false}
+                  />
                   <Divider
                     style={{ margin: '0 1rem' }}
                     orientation='vertical'
