@@ -1,22 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import MuiAlert from '@material-ui/lab/Alert';
-import {
-  Box,
-  Checkbox,
-  Divider,
-  InputBase,
-  Popper,
-  Snackbar,
-  Tooltip,
-} from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import {
-  CheckBox as CheckBoxIcon,
-  CheckBoxOutlineBlank,
-} from '@material-ui/icons';
+import { Box, Divider } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import SelectFormPopper from 'components/SelectFormPopper/SelectFormPopper';
@@ -179,6 +164,7 @@ function SelectForm({
                   </Button>
                   <SelectFormPopper
                     id={id}
+                    type='params'
                     open={open}
                     anchorEl={anchorEl}
                     options={options}

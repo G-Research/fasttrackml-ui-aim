@@ -193,6 +193,7 @@ function SelectForm({
                   </Button>
                   <SelectFormPopper
                     id={id}
+                    type='metrics'
                     open={open}
                     anchorEl={anchorEl}
                     options={options}

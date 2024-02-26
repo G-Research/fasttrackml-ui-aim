@@ -24,6 +24,7 @@ import {
 
 interface ISelectFormPopperProps {
   id: string | undefined;
+  type: 'metrics' | 'params';
   open: boolean;
   disablePortal: boolean;
   anchorEl: HTMLElement | null;
@@ -42,6 +43,7 @@ interface ISelectFormPopperProps {
 
 const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
   id,
+  type,
   open,
   disablePortal = true,
   anchorEl,
@@ -63,14 +65,18 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
       open={open}
       anchorEl={anchorEl}
       placement='bottom-start'
-      className='Metrics__SelectForm__Popper'
+      className={
+        type === 'metrics'
+          ? 'Metrics__SelectForm__Popper'
+          : 'SelectForm__Popper'
+      }
     >
       <Autocomplete
         open
         onClose={handleClose}
         multiple
         size='small'
-        disablePortal
+        disablePortal={disablePortal}
         disableCloseOnSelect
         options={options}
         value={selectedData?.options}
@@ -116,7 +122,11 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
               placeholder='Search'
               autoFocus={true}
               style={{ flex: 1 }}
-              className='Metrics__SelectForm__metric__select'
+              className={
+                type === 'metrics'
+                  ? 'Metrics__SelectForm__metric__select'
+                  : 'SelectForm__param__select'
+              }
             />
             <Snackbar
               open={!!regexError}
@@ -136,8 +146,9 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
               <ToggleButton
                 value='check'
                 selected={isRegexSearch}
-                onChange={() => {
+                onChange={(event) => {
                   setIsRegexSearch(!isRegexSearch);
+                  onSelect(event, selectedData?.options);
                 }}
                 className='RegexToggle'
               >
@@ -151,7 +162,13 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
             (item: ISelectOption) => item.key === option.key,
           )?.key;
           return (
-            <div className='SelectForm__option'>
+            <div
+              className={
+                type === 'metrics'
+                  ? 'Metrics__SelectForm__option'
+                  : 'SelectForm__option'
+              }
+            >
               <Checkbox
                 color='primary'
                 icon={<CheckBoxOutlineBlank />}
@@ -159,7 +176,14 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
                 checked={selected}
                 size='small'
               />
-              <Text className='Metrics__SelectForm__option__label' size={14}>
+              <Text
+                className={
+                  type === 'metrics'
+                    ? 'Metrics__SelectForm__option__label'
+                    : 'SelectForm__option__label'
+                }
+                size={14}
+              >
                 {option.label}
               </Text>
             </div>
