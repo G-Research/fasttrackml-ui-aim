@@ -142,7 +142,7 @@ function SelectForm({
           ) ?? []
         );
       } catch (error) {
-        setRegexError('Invalid Regular Expression');
+        setRegexError('Invalid Regex');
         return [];
       }
     } else {

@@ -140,7 +140,7 @@ function SelectForm({
           ) ?? []
         );
       } catch (error) {
-        setRegexError('Invalid Regual Expression');
+        setRegexError('Invalid Regex');
         return [];
       }
     } else {
