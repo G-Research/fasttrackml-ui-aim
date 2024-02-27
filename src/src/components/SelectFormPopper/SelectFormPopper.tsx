@@ -72,7 +72,7 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
         }}
         renderInput={(params) => (
           <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Tooltip title='Select all'>
+            <Tooltip title='Select all visible'>
               <Checkbox
                 color='primary'
                 icon={<CheckBoxOutlineBlank />}
