@@ -207,7 +207,6 @@ function SelectForm({
                     isRegexSearch={isRegexSearch}
                     setIsRegexSearch={setIsRegexSearch}
                     classes={classes}
-                    disablePortal={false}
                   />
                   <Divider
                     style={{ margin: '0 1rem' }}

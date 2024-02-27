@@ -164,7 +164,7 @@ function SelectForm({
                   </Button>
                   <SelectFormPopper
                     id={id}
-                    type='params'
+                    type=''
                     open={open}
                     anchorEl={anchorEl}
                     options={options}
@@ -178,7 +178,6 @@ function SelectForm({
                     isRegexSearch={isRegexSearch}
                     setIsRegexSearch={setIsRegexSearch}
                     classes={classes}
-                    disablePortal={false}
                   />
                   <Divider
                     style={{ margin: '0 1em' }}

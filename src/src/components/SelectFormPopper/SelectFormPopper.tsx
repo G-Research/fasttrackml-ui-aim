@@ -17,35 +17,12 @@ import CheckBoxIcon from '@material-ui/icons/CheckBox';
 
 import { Text } from 'components/kit';
 
-import {
-  ISelectConfig,
-  ISelectOption,
-} from 'types/services/models/explorer/createAppModel';
-
-interface ISelectFormPopperProps {
-  id: string | undefined;
-  type: 'metrics' | 'params';
-  open: boolean;
-  disablePortal: boolean;
-  anchorEl: HTMLElement | null;
-  options: ISelectOption[];
-  selectedData?: ISelectConfig;
-  onSelect: (event: React.ChangeEvent<{}>, value: ISelectOption[]) => void;
-  searchValue: string;
-  handleSearchInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleClose(event: any, reason: any): void;
-  regexError: string | null;
-  setRegexError: (value: string | null) => void;
-  isRegexSearch: boolean;
-  setIsRegexSearch: (value: boolean) => void;
-  classes: { [key: string]: string };
-}
+import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
 const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
   id,
   type,
   open,
-  disablePortal = true,
   anchorEl,
   options,
   selectedData,
@@ -76,7 +53,7 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
         onClose={handleClose}
         multiple
         size='small'
-        disablePortal={disablePortal}
+        disablePortal
         disableCloseOnSelect
         options={options}
         value={selectedData?.options}
@@ -146,9 +123,8 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
               <ToggleButton
                 value='check'
                 selected={isRegexSearch}
-                onChange={(event) => {
+                onChange={() => {
                   setIsRegexSearch(!isRegexSearch);
-                  onSelect(event, selectedData?.options);
                 }}
                 className='RegexToggle'
               >
