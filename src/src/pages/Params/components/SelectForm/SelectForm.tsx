@@ -177,6 +177,7 @@ function SelectForm({
                     setRegexError={setRegexError}
                     isRegexSearch={isRegexSearch}
                     setIsRegexSearch={setIsRegexSearch}
+                    className='SelectForm__Popper'
                     classes={classes}
                   />
                   <Divider

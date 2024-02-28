@@ -21,7 +21,6 @@ import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
 const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
   id,
-  type,
   open,
   anchorEl,
   options,
@@ -34,6 +33,7 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
   setRegexError,
   isRegexSearch,
   setIsRegexSearch,
+  className,
   classes,
 }) => {
   return (
@@ -42,11 +42,7 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
       open={open}
       anchorEl={anchorEl}
       placement='bottom-start'
-      className={
-        type === 'metrics'
-          ? 'Metrics__SelectForm__Popper'
-          : 'SelectForm__Popper'
-      }
+      className={className}
     >
       <Autocomplete
         open
@@ -99,11 +95,7 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
               placeholder='Search'
               autoFocus={true}
               style={{ flex: 1 }}
-              className={
-                type === 'metrics'
-                  ? 'Metrics__SelectForm__metric__select'
-                  : 'SelectForm__param__select'
-              }
+              className='Popper__SelectForm__select'
             />
             <Snackbar
               open={!!regexError}
@@ -138,13 +130,7 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
             (item: ISelectOption) => item.key === option.key,
           )?.key;
           return (
-            <div
-              className={
-                type === 'metrics'
-                  ? 'Metrics__SelectForm__option'
-                  : 'SelectForm__option'
-              }
-            >
+            <div className='Popper__SelectForm__option'>
               <Checkbox
                 color='primary'
                 icon={<CheckBoxOutlineBlank />}
@@ -152,14 +138,7 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
                 checked={selected}
                 size='small'
               />
-              <Text
-                className={
-                  type === 'metrics'
-                    ? 'Metrics__SelectForm__option__label'
-                    : 'SelectForm__option__label'
-                }
-                size={14}
-              >
+              <Text className='Popper__SelectForm__option__label' size={14}>
                 {option.label}
               </Text>
             </div>

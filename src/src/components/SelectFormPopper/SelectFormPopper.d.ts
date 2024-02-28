@@ -22,5 +22,6 @@ export interface ISelectFormPopperProps {
   setRegexError: (value: string | null) => void;
   isRegexSearch: boolean;
   setIsRegexSearch: (value: boolean) => void;
+  className: string;
   classes: { [key: string]: string };
 }
