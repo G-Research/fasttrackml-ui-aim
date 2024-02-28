@@ -91,7 +91,6 @@ function Metrics(
               liveUpdateConfig={props.liveUpdateConfig}
               onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
               title={pageTitlesEnum.METRICS_EXPLORER}
-              selectedExperimentNames={props.selectedExperimentNames}
               onSelectExperimentNamesChange={
                 props.onSelectExperimentNamesChange
               }

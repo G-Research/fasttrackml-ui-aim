@@ -161,9 +161,6 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         requestProgress={metricsData?.requestProgress!}
         selectFormData={metricsData?.selectFormData!}
         columnsOrder={metricsData?.config?.table?.columnsOrder!}
-        selectedExperimentNames={
-          metricsData?.config?.select?.selectedExperimentNames!
-        }
         // methods
         onChangeTooltip={metricAppModel.onChangeTooltip}
         onRunsTagsChange={metricAppModel.onRunsTagsChange}

@@ -82,7 +82,6 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   columnsOrder: IColumnsOrder;
   sameValueColumns: string[] | [];
   selectedParams: ISelectOption[];
-  selectedExperimentNames: string[];
   onNotificationDelete: (id: number) => void;
   onCurveInterpolationChange: () => void;
   onActivePointChange: (

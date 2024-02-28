@@ -18,6 +18,8 @@ import useExperimentState from 'pages/Experiment/useExperimentState';
 
 import { IMetricsBarProps } from 'types/pages/metrics/components/MetricsBar/MetricsBar';
 
+import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
+
 import './MetricsBar.scss';
 
 function MetricsBar({
@@ -25,7 +27,6 @@ function MetricsBar({
   explorerName = 'METRICS',
   liveUpdateConfig,
   disabled,
-  selectedExperimentNames,
   onBookmarkCreate,
   onBookmarkUpdate,
   onResetConfigData,
@@ -45,6 +46,8 @@ function MetricsBar({
 
   const { data: experimentsData, loading: isExperimentsLoading } =
     experimentsState;
+
+  const selectedExperimentNames = getSelectedExperimentNames();
 
   function handleBookmarkClick(value: string): void {
     setPopover(value);

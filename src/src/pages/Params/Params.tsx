@@ -116,7 +116,6 @@ const Params = ({
   onRunsTagsChange,
   onRowsVisibilityChange,
   onParamsScaleTypeChange,
-  selectedExperimentNames,
   onSelectExperimentNamesChange,
 }: IParamsProps): React.FunctionComponentElement<React.ReactNode> => {
   let scaleStates = getDefaultScaleStates(highPlotData);
@@ -197,7 +196,6 @@ const Params = ({
               onResetConfigData={onResetConfigData}
               liveUpdateConfig={liveUpdateConfig}
               onLiveUpdateConfigChange={onLiveUpdateConfigChange}
-              selectedExperimentNames={selectedExperimentNames}
               onSelectExperimentNamesChange={onSelectExperimentNamesChange}
               title={pageTitlesEnum.PARAMS_EXPLORER}
             />

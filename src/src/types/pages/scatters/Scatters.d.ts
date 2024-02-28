@@ -74,7 +74,6 @@ export interface IScattersProps extends Partial<RouteChildrenProps> {
   sameValueColumns?: string[] | [];
   selectedRows: { [key: string]: any };
   columnsOrder: IColumnsOrder;
-  selectedExperimentNames: string[];
   onChangeTooltip: (tooltip: Partial<ITooltip>) => void;
   onChangeTrendlineOptions: (options: Partial<ITrendlineOptions>) => void;
   onActivePointChange?: (

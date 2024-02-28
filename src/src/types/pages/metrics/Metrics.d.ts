@@ -97,7 +97,6 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
     advancedError: ISyntaxErrorDetails;
   };
   columnsOrder: IColumnsOrder;
-  selectedExperimentNames: string[];
   onRunsTagsChange: (runHash: string, tags: ITagInfo[]) => void;
   onChangeTooltip: (tooltip: Partial<ITooltip>) => void;
   onIgnoreOutliersChange: () => void;

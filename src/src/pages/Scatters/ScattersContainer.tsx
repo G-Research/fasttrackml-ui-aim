@@ -157,9 +157,6 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
         columnsOrder={scattersData?.config?.table?.columnsOrder!}
         sameValueColumns={scattersData?.sameValueColumns!}
         chartPanelOffsetHeight={chartPanelOffsetHeight}
-        selectedExperimentNames={
-          scattersData?.config?.select?.selectedExperimentNames!
-        }
         // methods
         onChangeTooltip={scattersAppModel.onChangeTooltip}
         onChangeTrendlineOptions={scattersAppModel.onChangeTrendlineOptions}

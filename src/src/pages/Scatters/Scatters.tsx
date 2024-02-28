@@ -62,7 +62,6 @@ function Scatters(
               onResetConfigData={props.onResetConfigData}
               liveUpdateConfig={props.liveUpdateConfig}
               onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
-              selectedExperimentNames={props.selectedExperimentNames}
               onSelectExperimentNamesChange={
                 props.onSelectExperimentNamesChange
               }
