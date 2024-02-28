@@ -109,3 +109,22 @@
     font-size: 10px;
   }
 }
+
+.RegexToggle {
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  margin: 10px;
+}
+
+.Popper__SelectForm__select{
+  @extend .SelectForm__param__select;
+}
+
+.Popper__SelectForm__option{
+  @extend .SelectForm__option !optional;
+}
+
+.Popper__SelectForm__option__label{
+  @extend .SelectForm__option__label !optional;
+}
