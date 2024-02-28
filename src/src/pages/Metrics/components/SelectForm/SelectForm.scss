@@ -123,3 +123,22 @@
     }
   }
 }
+
+.RegexToggle {
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  margin: 10px;
+}
+
+.Popper__SelectForm__select{
+  @extend .Metrics__SelectForm__metric__select;
+}
+
+.Popper__SelectForm__option{
+  @extend .Metrics__SelectForm__option !optional;
+}
+
+.Popper__SelectForm__option__label{
+  @extend .Metrics__SelectForm__option__label !optional;
+}
