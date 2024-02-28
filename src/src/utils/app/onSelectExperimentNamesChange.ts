@@ -1,5 +1,9 @@
 import { IModel, State } from 'types/services/models/model';
 
+import { setItem } from 'utils/storage';
+
+import { getSelectedExperimentNames } from './getSelectedExperimentNames';
+
 export default function onSelectExperimentNamesChange<M extends State>({
   experimentName,
   model,
@@ -8,8 +12,7 @@ export default function onSelectExperimentNamesChange<M extends State>({
   model: IModel<M>;
 }) {
   const configData = model.getState()?.config;
-  const selectedExperimentNames =
-    configData?.select?.selectedExperimentNames || [];
+  const selectedExperimentNames = getSelectedExperimentNames();
 
   // If the experiment is already selected, remove it from the list
   // Otherwise, add it
@@ -19,6 +22,12 @@ export default function onSelectExperimentNamesChange<M extends State>({
     selectedExperimentNames.splice(index, 1);
   } else {
     selectedExperimentNames.push(experimentName);
+  }
+
+  if (selectedExperimentNames.length === 0) {
+    setItem('selectedExperimentNames', '');
+  } else {
+    setItem('selectedExperimentNames', selectedExperimentNames);
   }
 
   if (configData?.select) {
