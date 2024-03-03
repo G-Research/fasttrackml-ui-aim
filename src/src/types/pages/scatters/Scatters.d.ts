@@ -1,7 +1,7 @@
 import React from 'react';
 import { RouteChildrenProps } from 'react-router-dom';
 
-import { RowHeightSize } from 'config/table/tableConfigs';
+import { RowHeightSize, UnselectedColumnState } from 'config/table/tableConfigs';
 import { ResizeModeEnum } from 'config/enums/tableEnums';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 
@@ -58,6 +58,7 @@ export interface IScattersProps extends Partial<RouteChildrenProps> {
   sortFields: [string, 'asc' | 'desc' | boolean][];
   hiddenMetrics: string[];
   hiddenColumns: string[];
+  unselectedColumnState: UnselectedColumnState;
   hideSystemMetrics: boolean;
   groupingSelectOptions: IGroupingSelectOption[];
   sortOptions: IGroupingSelectOption[];
@@ -102,6 +103,7 @@ export interface IScattersProps extends Partial<RouteChildrenProps> {
   onParamVisibilityChange: (metricKeys: string[]) => void;
   onColumnsOrderChange: (order: any) => void;
   onColumnsVisibilityChange: (hiddenColumns: string[] | string) => void;
+  onDefaultColumnsVisibilityChange: (state: UnselectedColumnState) => void;
   onTableDiffShow: () => void;
   onTableResizeModeChange: (mode: ResizeModeEnum) => void;
   updateColumnsWidths: (key: string, width: number, isReset: boolean) => void;

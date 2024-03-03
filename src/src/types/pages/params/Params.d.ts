@@ -3,6 +3,7 @@ import { RouteChildrenProps } from 'react-router-dom';
 
 import { ITableRef } from 'components/Table/Table';
 
+import { UnselectedColumnState } from 'config/table/tableConfigs';
 import { ResizeModeEnum } from 'config/enums/tableEnums';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 
@@ -50,6 +51,7 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   sortOptions: IGroupingSelectOption[];
   hiddenMetrics: string[];
   hideSystemMetrics: boolean;
+  unselectedColumnState: UnselectedColumnState;
   sortFields: [string, 'asc' | 'desc' | boolean][];
   focusedState: IFocusedState;
   isVisibleColorIndicator: boolean;
@@ -104,6 +106,7 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   onChangeTooltip: (tooltip: Partial<ITooltip>) => void;
   onExportTableData: (e: React.ChangeEvent<any>) => void;
   onColumnsVisibilityChange: (order: any) => void;
+  onDefaultColumnsVisibilityChange: (state: UnselectedColumnState) => void;
   onTableDiffShow: () => void;
   onTableResizeModeChange: (mode: ResizeModeEnum) => void;
   onSortReset: () => void;
