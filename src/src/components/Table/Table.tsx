@@ -2,7 +2,7 @@
 /* eslint-disable react/prop-types */
 
 import React from 'react';
-import { isEmpty, isEqual, isNil } from 'lodash-es';
+import { isEmpty, isEqual, isNil, debounce } from 'lodash-es';
 import { useResizeObserver } from 'hooks';
 import _ from 'lodash-es';
 
@@ -26,6 +26,7 @@ import ManageColumnsPopover from 'pages/Metrics/components/Table/ManageColumnsPo
 import HideRowsPopover from 'pages/Metrics/components/Table/HideRowsPopover/HideRowsPopover';
 import RowHeightPopover from 'pages/Metrics/components/Table/RowHeightPopover/RowHeightPopover';
 import CompareSelectedRunsPopover from 'pages/Metrics/components/Table/CompareSelectedRunsPopover';
+import HideColumnsPopover from 'pages/Metrics/components/Table/HideColumnsPopover/HideColumnsPopover';
 
 import { ITableProps } from 'types/components/Table/Table';
 
@@ -51,6 +52,7 @@ const Table = React.forwardRef(function Table(
     onRowHover = () => {},
     onRowClick = () => {},
     onTableResizeModeChange,
+    onDefaultColumnsVisibilityChange,
     custom,
     data,
     columns,
@@ -71,6 +73,7 @@ const Table = React.forwardRef(function Table(
     updateColumnsWidths,
     sortFields,
     hiddenRows,
+    unselectedColumnState,
     isLoading,
     showRowClickBehaviour = true,
     showResizeContainerActionBar = true,
@@ -791,6 +794,15 @@ const Table = React.forwardRef(function Table(
                     toggleRowsVisibility={onRowsChange}
                     visualizationElementType={visualizationElementType}
                     data={dataRef.current}
+                  />
+                )}
+                {onDefaultColumnsVisibilityChange && (
+                  <HideColumnsPopover
+                    unselectedColumnState={unselectedColumnState}
+                    onDefaultColumnsVisibilityChange={
+                      onDefaultColumnsVisibilityChange
+                    }
+                    appName={appName}
                   />
                 )}
                 {onSort && (

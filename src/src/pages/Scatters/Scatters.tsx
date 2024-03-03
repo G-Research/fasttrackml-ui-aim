@@ -195,6 +195,7 @@ function Scatters(
                           hiddenRows={props.hiddenMetrics}
                           hiddenColumns={props.hiddenColumns}
                           hideSystemMetrics={props.hideSystemMetrics}
+                          unselectedColumnState={props.unselectedColumnState}
                           resizeMode={props.resizeMode}
                           columnsWidths={props.columnsWidths}
                           selectedRows={props.selectedRows}
@@ -211,6 +212,9 @@ function Scatters(
                           onManageColumns={props.onColumnsOrderChange}
                           onColumnsVisibilityChange={
                             props.onColumnsVisibilityChange
+                          }
+                          onDefaultColumnsVisibilityChange={
+                            props.onDefaultColumnsVisibilityChange
                           }
                           onTableDiffShow={props.onTableDiffShow}
                           onRowHeightChange={props.onRowHeightChange}

@@ -146,6 +146,9 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
         hiddenMetrics={scattersData?.config?.table?.hiddenMetrics!}
         hideSystemMetrics={scattersData?.config?.table?.hideSystemMetrics!}
         hiddenColumns={scattersData?.config?.table?.hiddenColumns!}
+        unselectedColumnState={
+          scattersData?.config?.table?.unselectedColumnState!
+        }
         groupingSelectOptions={scattersData?.groupingSelectOptions!}
         sortOptions={scattersData?.sortOptions!}
         projectsDataMetrics={projectsData?.metrics!}
@@ -186,6 +189,9 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
         onParamVisibilityChange={scattersAppModel.onParamVisibilityChange}
         onColumnsOrderChange={scattersAppModel.onColumnsOrderChange}
         onColumnsVisibilityChange={scattersAppModel.onColumnsVisibilityChange}
+        onDefaultColumnsVisibilityChange={
+          scattersAppModel.onDefaultColumnsVisibilityChange
+        }
         onTableDiffShow={scattersAppModel.onTableDiffShow}
         onTableResizeModeChange={scattersAppModel.onTableResizeModeChange}
         onRunsTagsChange={scattersAppModel.onRunsTagsChange}

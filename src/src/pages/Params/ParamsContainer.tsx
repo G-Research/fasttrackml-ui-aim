@@ -147,6 +147,7 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       sortOptions={paramsData?.sortOptions!}
       hiddenColumns={paramsData?.config?.table?.hiddenColumns!}
       hideSystemMetrics={paramsData?.config?.table?.hideSystemMetrics!}
+      unselectedColumnState={paramsData?.config?.table?.unselectedColumnState!}
       columnsOrder={paramsData?.config?.table?.columnsOrder!}
       resizeMode={paramsData?.config?.table?.resizeMode!}
       hiddenMetrics={paramsData?.config?.table?.hiddenMetrics!}
@@ -181,6 +182,9 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       onRunsTagsChange={paramsAppModel.onRunsTagsChange}
       onColumnsOrderChange={paramsAppModel.onColumnsOrderChange}
       onColumnsVisibilityChange={paramsAppModel.onColumnsVisibilityChange}
+      onDefaultColumnsVisibilityChange={
+        paramsAppModel.onDefaultColumnsVisibilityChange
+      }
       onTableResizeModeChange={paramsAppModel.onTableResizeModeChange}
       onTableDiffShow={paramsAppModel.onTableDiffShow}
       onSortReset={paramsAppModel.onSortReset}
