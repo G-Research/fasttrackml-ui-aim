@@ -36,6 +36,11 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
   className,
   classes,
 }) => {
+  const handleKeyDown = (event) => {
+    if (event.key === 'ArrowLeft') {
+      event.stopPropagation();
+    }
+  };
   return (
     <Popper
       id={id}
@@ -90,6 +95,7 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
                 ...params.inputProps,
                 value: searchValue,
                 onChange: handleSearchInputChange,
+                onKeyDown: handleKeyDown,
               }}
               spellCheck={false}
               placeholder='Search'
