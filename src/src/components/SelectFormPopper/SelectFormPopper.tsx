@@ -37,7 +37,7 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
   classes,
 }) => {
   const handleKeyDown = (event) => {
-    if (event.keyCode === 37) {
+    if (event.key === 'ArrowLeft') {
       event.stopPropagation();
     }
   };
