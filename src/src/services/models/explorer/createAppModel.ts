@@ -101,6 +101,8 @@ import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import getGroupingSelectOptions from 'utils/app/getGroupingSelectOptions';
 import getQueryStringFromSelect from 'utils/app/getQueryStringFromSelect';
+import getInputQueryStringFromSelect from 'utils/app/getInputQueryStringFromSelect';
+import getMetricsListFromSelect from 'utils/app/getMetricsListFromSelect';
 import getRunData from 'utils/app/getRunData';
 import onAggregationConfigChange from 'utils/app/onAggregationConfigChange';
 import onAlignmentMetricChange from 'utils/app/onAlignmentMetricChange';
@@ -538,11 +540,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
       if (!appId) {
         setModelDefaultAppConfigData();
       }
-
       projectsService
         .getProjectParams(['metric'])
         .call()
         .then((data) => {
+          console.log('DEBUG', data);
           const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
             data.metric,
           );
@@ -614,19 +616,28 @@ function createAppModel(appConfig: IAppInitialConfig) {
           configData.select.query = queryString;
         }
       }
-      let query = getQueryStringFromSelect(configData?.select);
-      metricsRequestRef = metricsService.getMetricsData({
-        q: query,
+
+      let metrics = getMetricsListFromSelect(configData?.select);
+      let met = metrics.map((metric) => metric[0]);
+      let metricsParams = metrics.map((metric) => `m[]=${metric[0]}`).join('&');
+      console.log('queryparams', metricsParams);
+
+      let query = getInputQueryStringFromSelect(configData?.select);
+      console.log(query);
+
+      let params = {
+        m: met,
+        q: getInputQueryStringFromSelect(configData?.select),
         p: configData?.chart?.densityType,
         ...(metric ? { x_axis: metric } : {}),
-      });
+      };
+
+      metricsRequestRef = metricsService.getMetricsData(params);
 
       setRequestProgress(model);
       return {
         call: async () => {
           if (query === '()') {
-            resetModelState(configData, shouldResetSelectedRows!);
-          } else {
             model.setState({
               requestStatus: RequestStatusEnum.Pending,
               queryIsEmpty: false,
