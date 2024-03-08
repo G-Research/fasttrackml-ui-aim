@@ -544,7 +544,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         .getProjectParams(['metric'])
         .call()
         .then((data) => {
-          console.log('DEBUG', data);
           const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
             data.metric,
           );
@@ -638,7 +637,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
       });
 
       metricsRequestRef = metricsService.getMetricsData(params);
-
       setRequestProgress(model);
       return {
         call: async () => {
