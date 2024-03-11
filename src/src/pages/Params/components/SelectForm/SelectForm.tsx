@@ -135,7 +135,7 @@ function SelectForm({
         ) ?? []
       );
     }
-  }, [searchValue, selectFormData?.options]);
+  }, [searchValue, selectFormData?.options, isRegexSearch]);
 
   const open: boolean = !!anchorEl;
   const id = open ? 'select-metric' : undefined;
