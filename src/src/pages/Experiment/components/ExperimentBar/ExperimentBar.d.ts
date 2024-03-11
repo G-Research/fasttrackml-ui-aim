@@ -7,4 +7,5 @@ export interface IExperimentBarProps {
   selectedExperimentNames: string[];
   getExperimentsData: () => void;
   onSelectExperimentNamesChange: (experimentName: string) => void;
+  onToggleAllExperiments: (experimentNames: string[]) => void;
 }

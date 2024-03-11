@@ -32,6 +32,7 @@ function MetricsBar({
   onResetConfigData,
   onLiveUpdateConfigChange,
   onSelectExperimentNamesChange,
+  onToggleAllExperiments,
 }: IMetricsBarProps): React.FunctionComponentElement<React.ReactNode> {
   const [popover, setPopover] = React.useState<string>('');
 
@@ -76,6 +77,7 @@ function MetricsBar({
           selectedExperimentNames={selectedExperimentNames}
           getExperimentsData={getExperimentsData}
           onSelectExperimentNamesChange={handleExperimentNamesChange}
+          onToggleAllExperiments={onToggleAllExperiments}
         />
         <LiveUpdateSettings
           {...liveUpdateConfig}
