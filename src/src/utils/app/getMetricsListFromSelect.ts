@@ -8,8 +8,8 @@ import { formatValue } from '../formatValue';
 export default function getMetricsListFromSelect(
   selectData: ISelectConfig,
   error?: ISyntaxErrorDetails,
-): Array<[string, string]> {
-  const metricsList: Array<[string, string]> = [];
+): Array<[string, string | null]> {
+  const metricsList: Array<[string, string | null]> = [];
 
   if (selectData === undefined) {
     return metricsList;
@@ -17,9 +17,9 @@ export default function getMetricsListFromSelect(
 
   selectData.options?.forEach((option) => {
     const metricName = option.value?.option_name.replaceAll('"', '\\"') ?? '';
-    const context: string =
+    const context: string | null =
       option.value?.context === null
-        ? ''
+        ? null
         : Object.keys(option.value?.context)
             .map((item) => {
               const contextKey = !jsValidVariableRegex.test(item)

@@ -633,50 +633,50 @@ function createAppModel(appConfig: IAppInitialConfig) {
       metrics.forEach((tuple, index) => {
         const [metric, context] = tuple;
         params[`m[${index}][metric]`] = metric;
-        params[`m[${index}][context]`] = context;
+        if (context) {
+          params[`m[${index}][context]`] = context;
+        }
       });
 
       metricsRequestRef = metricsService.getMetricsData(params);
       setRequestProgress(model);
       return {
         call: async () => {
-          if (query === '()') {
-            model.setState({
-              requestStatus: RequestStatusEnum.Pending,
-              queryIsEmpty: false,
-              selectedRows: shouldResetSelectedRows
-                ? {}
-                : model.getState()?.selectedRows,
+          model.setState({
+            requestStatus: RequestStatusEnum.Pending,
+            queryIsEmpty: false,
+            selectedRows: shouldResetSelectedRows
+              ? {}
+              : model.getState()?.selectedRows,
+          });
+          liveUpdateInstance?.stop().then();
+          try {
+            const stream = await metricsRequestRef.call((detail) => {
+              exceptionHandler({ detail, model });
+              resetModelState(configData, shouldResetSelectedRows!);
             });
-            liveUpdateInstance?.stop().then();
-            try {
-              const stream = await metricsRequestRef.call((detail) => {
-                exceptionHandler({ detail, model });
-                resetModelState(configData, shouldResetSelectedRows!);
-              });
-              const runData = await getRunData(stream, (progress) =>
-                setRequestProgress(model, progress),
-              );
-              if (shouldUrlUpdate) {
-                updateURL({ configData, appName });
-              }
-              saveRecentSearches(appName, query);
-              updateData(runData);
-            } catch (ex: Error | any) {
-              if (ex.name === 'AbortError') {
-                // Abort Error
-              } else {
-                // eslint-disable-next-line no-console
-                console.log('Unhandled error: ', ex);
-              }
+            const runData = await getRunData(stream, (progress) =>
+              setRequestProgress(model, progress),
+            );
+            if (shouldUrlUpdate) {
+              updateURL({ configData, appName });
             }
-
-            liveUpdateInstance?.start({
-              q: query,
-              p: configData?.chart?.densityType,
-              ...(metric && { x_axis: metric }),
-            });
+            saveRecentSearches(appName, query);
+            updateData(runData);
+          } catch (ex: Error | any) {
+            if (ex.name === 'AbortError') {
+              // Abort Error
+            } else {
+              // eslint-disable-next-line no-console
+              console.log('Unhandled error: ', ex);
+            }
           }
+
+          liveUpdateInstance?.start({
+            q: query,
+            p: configData?.chart?.densityType,
+            ...(metric && { x_axis: metric }),
+          });
         },
         abort: metricsRequestRef.abort,
       };
@@ -1260,6 +1260,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
     ): void {
       const modelState: IAppModelState = model.getState();
       const sortFields = modelState?.config?.table?.sortFields;
+      console.log(rawData);
       const {
         data,
         runProps,
