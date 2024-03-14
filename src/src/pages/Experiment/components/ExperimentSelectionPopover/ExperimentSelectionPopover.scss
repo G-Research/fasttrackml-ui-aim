@@ -34,26 +34,28 @@
           width: 100%;
           text-decoration: none;
           height: auto;
-          padding: $space-xs;
+          padding-left: 0;
           display: flex;
           align-items: flex-start;
           cursor: pointer;
           text-decoration: unset;
           margin-bottom: $space-xxxxs;
           position: relative;
-          flex-direction: column;
           border-radius: 0.25rem;
           text-align: left;
-
           .MuiButton-label {
             align-items: flex-start;
-            flex-direction: column;
+            flex-direction: row;
             line-height: normal;
             text-transform: none;
+            justify-content: flex-start;
           }
-
           &:hover {
             background: $cuddle-20;
+          }
+          &__rightContainer {
+            display: flex;
+            flex-direction: column;
           }
           &__experimentName {
             width: 100%;
@@ -149,7 +151,6 @@
     flex-direction: row;
     justify-content: space-between;
     &__inputBase {
-      padding-left: 0.5rem;
       margin: 0;
       font-size: $text-md;
       width: 100%;
@@ -158,22 +159,10 @@
       border: none;
       width: 2rem;
       height: 2rem;
-      margin: 0;
+      margin: $space-xxxs;
     }
   }
   .error {
     border: 1px solid red;
   }
 }
-
-// .Popper__SelectForm__select{
-//   @extend .Metrics__SelectForm__metric__select;
-// }
-
-// .Popper__SelectForm__option{
-//   @extend .Metrics__SelectForm__option !optional;
-// }
-
-// .Popper__SelectForm__option__label{
-//   @extend .Metrics__SelectForm__option__label !optional;
-// }
