@@ -13,7 +13,6 @@ import { Icon, Spinner, Text } from 'components/kit';
 import { DATE_WITH_SECONDS } from 'config/dates/dates';
 
 import { IExperimentData } from 'modules/core/api/experimentsApi';
-
 import { IExperimentSelectionPopoverProps } from '.';
 
 import './ExperimentSelectionPopover.scss';
