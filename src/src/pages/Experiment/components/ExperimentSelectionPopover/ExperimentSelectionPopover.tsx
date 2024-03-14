@@ -140,17 +140,26 @@ function ExperimentSelectionPopover({
                     : 'ExperimentSelectionPopover__searchContainer'
                 }
               >
-                <Checkbox
-                  color='primary'
-                  icon={<CheckBoxOutlineBlank />}
-                  checkedIcon={<CheckBoxIcon />}
-                  checked={allExperimentsSelected()}
-                  onChange={() => {
-                    const checked = allExperimentsSelected();
-                    toggleAllExperiments(checked);
-                  }}
-                  size='small'
-                />
+                <Tooltip
+                  title={
+                    allExperimentsSelected()
+                      ? 'Deselect all visible'
+                      : 'Select all visible'
+                  }
+                >
+                  <Checkbox
+                    color='primary'
+                    icon={<CheckBoxOutlineBlank />}
+                    checkedIcon={<CheckBoxIcon />}
+                    checked={allExperimentsSelected()}
+                    onChange={() => {
+                      const checked = allExperimentsSelected();
+                      toggleAllExperiments(checked);
+                    }}
+                    size='small'
+                  />
+                </Tooltip>
+
                 <InputBase
                   placeholder='Search'
                   value={searchValue}
