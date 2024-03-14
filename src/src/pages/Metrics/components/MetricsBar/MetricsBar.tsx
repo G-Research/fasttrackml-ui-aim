@@ -13,7 +13,12 @@ import ConfirmModal from 'components/ConfirmModal/ConfirmModal';
 
 import { DOCUMENTATIONS } from 'config/references';
 
+import ExperimentBar from 'pages/Experiment/components/ExperimentBar';
+import useExperimentState from 'pages/Experiment/useExperimentState';
+
 import { IMetricsBarProps } from 'types/pages/metrics/components/MetricsBar/MetricsBar';
+
+import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
 
 import './MetricsBar.scss';
 
@@ -26,10 +31,23 @@ function MetricsBar({
   onBookmarkUpdate,
   onResetConfigData,
   onLiveUpdateConfigChange,
+  onSelectExperimentNamesChange,
 }: IMetricsBarProps): React.FunctionComponentElement<React.ReactNode> {
   const [popover, setPopover] = React.useState<string>('');
 
   const route = useRouteMatch<any>();
+
+  // Fetch all experiments along with default
+  const { experimentState, experimentsState, getExperimentsData } =
+    useExperimentState('0');
+
+  const { data: experimentData, loading: isExperimentLoading } =
+    experimentState;
+
+  const { data: experimentsData, loading: isExperimentsLoading } =
+    experimentsState;
+
+  const selectedExperimentNames = getSelectedExperimentNames();
 
   function handleBookmarkClick(value: string): void {
     setPopover(value);
@@ -44,9 +62,21 @@ function MetricsBar({
     handleClosePopover();
   }
 
+  function handleExperimentNamesChange(experimentName: string): void {
+    onSelectExperimentNamesChange(experimentName);
+  }
+
   return (
     <ErrorBoundary>
       <AppBar title={title} disabled={disabled}>
+        <ExperimentBar
+          experimentsData={experimentsData}
+          isExperimentLoading={isExperimentLoading}
+          isExperimentsLoading={isExperimentsLoading}
+          selectedExperimentNames={selectedExperimentNames}
+          getExperimentsData={getExperimentsData}
+          onSelectExperimentNamesChange={handleExperimentNamesChange}
+        />
         <LiveUpdateSettings
           {...liveUpdateConfig}
           onLiveUpdateConfigChange={onLiveUpdateConfigChange}
