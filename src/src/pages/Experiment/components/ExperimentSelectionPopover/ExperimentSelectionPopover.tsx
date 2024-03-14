@@ -48,12 +48,12 @@ function ExperimentSelectionPopover({
     setVisibleExperiments(experimentsData || []);
   }, [experimentsData]);
 
-  // TODO: Add shortening in the middle rather than at the end
   function shortenExperimentName(name?: string): string {
     if (!name) {
       return 'default';
     } else if (name.length > 56) {
-      return `${name.slice(0, 53)}...`;
+      // Slice the name in the middle
+      return `${name.slice(0, 27)}...${name.slice(-26)}`;
     }
     return name;
   }
