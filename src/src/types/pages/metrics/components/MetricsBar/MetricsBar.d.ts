@@ -12,4 +12,5 @@ export interface IMetricsBarProps {
     enabled?: boolean;
   }) => void;
   title: string;
+  onSelectExperimentNamesChange: (experimentName: string) => void;
 }

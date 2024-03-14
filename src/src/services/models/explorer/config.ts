@@ -160,6 +160,7 @@ function initializeAppModel(appConfig: IAppInitialConfig): InitialAppModelType {
             query: '',
             advancedMode: false,
             advancedQuery: '',
+            selectedExperimentNames: [],
           };
         }
         return config;
@@ -281,6 +282,7 @@ function initializeAppModel(appConfig: IAppInitialConfig): InitialAppModelType {
             query: '',
             advancedMode: false,
             advancedQuery: '',
+            selectedExperimentNames: [],
           };
         }
         //TODO solve the problem with keeping table config after switching from Scatters explore to Params explore. But the solution is temporal

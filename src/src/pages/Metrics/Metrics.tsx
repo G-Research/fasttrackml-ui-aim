@@ -91,6 +91,9 @@ function Metrics(
               liveUpdateConfig={props.liveUpdateConfig}
               onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
               title={pageTitlesEnum.METRICS_EXPLORER}
+              onSelectExperimentNamesChange={
+                props.onSelectExperimentNamesChange
+              }
             />
             <div className='Metrics__SelectForm__Grouping__container'>
               <SelectForm

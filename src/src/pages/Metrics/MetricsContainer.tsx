@@ -191,6 +191,9 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onAlignmentTypeChange={metricAppModel.onAlignmentTypeChange}
         onDensityTypeChange={metricAppModel.onDensityTypeChange}
         onMetricsSelectChange={metricAppModel.onMetricsSelectChange}
+        onSelectExperimentNamesChange={
+          metricAppModel.onSelectExperimentNamesChange
+        }
         onSelectRunQueryChange={metricAppModel.onSelectRunQueryChange}
         onSelectAdvancedQueryChange={metricAppModel.onSelectAdvancedQueryChange}
         toggleSelectAdvancedMode={metricAppModel.toggleSelectAdvancedMode}

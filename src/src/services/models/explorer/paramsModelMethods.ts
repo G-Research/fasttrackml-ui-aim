@@ -54,6 +54,7 @@ import { getFilteredGroupingOptions } from 'utils/app/getFilteredGroupingOptions
 import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import getGroupingSelectOptions from 'utils/app/getGroupingSelectOptions';
+import getQueryStringFromSelect from 'utils/app/getQueryStringFromSelect';
 import getRunData from 'utils/app/getRunData';
 import onChangeTooltip from 'utils/app/onChangeTooltip';
 import onColorIndicatorChange from 'utils/app/onColorIndicatorChange';
@@ -72,6 +73,7 @@ import onParamsScaleTypeChange from 'utils/app/onParamsScaleTypeChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
+import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
 import onSortFieldsChange from 'utils/app/onSortFieldsChange';
 import { onTableDiffShow } from 'utils/app/onTableDiffShow';
 import { onTableResizeEnd } from 'utils/app/onTableResizeEnd';
@@ -224,7 +226,8 @@ function getParamsModelMethods(
       runsRequestRef.abort();
     }
     const configData = { ...model.getState()?.config };
-    runsRequestRef = runsService.getRunsData(configData?.select?.query);
+    const query = getQueryStringFromSelect(configData?.select, true);
+    runsRequestRef = runsService.getRunsData(query);
     setRequestProgress(model);
     return {
       call: async () => {
@@ -1561,6 +1564,11 @@ function getParamsModelMethods(
     Object.assign(methods, {
       onParamsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
         onSelectOptionsChange({ data, model });
+      },
+      onSelectExperimentNamesChange(experimentName: string): void {
+        // Handle experiment change, then re-fetch params data
+        onSelectExperimentNamesChange({ experimentName, model });
+        getParamsData(true, true).call();
       },
       onSelectRunQueryChange(query: string): void {
         onSelectRunQueryChange({ query, model });

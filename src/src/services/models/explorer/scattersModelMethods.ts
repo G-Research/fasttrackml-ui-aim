@@ -61,6 +61,7 @@ import { getFilteredGroupingOptions } from 'utils/app/getFilteredGroupingOptions
 import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import getGroupingSelectOptions from 'utils/app/getGroupingSelectOptions';
+import getQueryStringFromSelect from 'utils/app/getQueryStringFromSelect';
 import getRunData from 'utils/app/getRunData';
 import onChangeTooltip from 'utils/app/onChangeTooltip';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
@@ -83,6 +84,7 @@ import onTableResizeModeChange from 'utils/app/onTableResizeModeChange';
 import onTableRowClick from 'utils/app/onTableRowClick';
 import onTableRowHover from 'utils/app/onTableRowHover';
 import onTableSortChange from 'utils/app/onTableSortChange';
+import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
 import updateSortFields from 'utils/app/updateTableSortFields';
 import contextToString from 'utils/contextToString';
@@ -999,7 +1001,8 @@ function getScattersModelMethods(
     }
     const configData = { ...model.getState()?.config };
 
-    runsRequestRef = runsService.getRunsData(configData?.select?.query);
+    const query = getQueryStringFromSelect(configData?.select, true);
+    runsRequestRef = runsService.getRunsData(query);
     setRequestProgress(model);
     return {
       call: async () => {
@@ -1492,6 +1495,11 @@ function getScattersModelMethods(
     Object.assign(methods, {
       onSelectOptionsChange<D>(data: D & Partial<ISelectOption[]>): void {
         onSelectOptionsChange({ data, model });
+      },
+      onSelectExperimentNamesChange(experimentName: string): void {
+        // Handle experiment change, then re-fetch scatters data
+        onSelectExperimentNamesChange({ experimentName, model });
+        getScattersData(true, true).call();
       },
       onSelectRunQueryChange(query: string): void {
         onSelectRunQueryChange({ query, model });

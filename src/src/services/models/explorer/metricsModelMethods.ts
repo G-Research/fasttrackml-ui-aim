@@ -91,6 +91,7 @@ import onGroupingSelectChange from 'utils/app/onGroupingSelectChange';
 import onHighlightModeChange from 'utils/app/onHighlightModeChange';
 import onIgnoreOutliersChange from 'utils/app/onIgnoreOutliersChange';
 import onSelectOptionsChange from 'utils/app/onSelectOptionsChange';
+import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
 import onMetricVisibilityChange from 'utils/app/onMetricsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
@@ -1637,6 +1638,11 @@ function getMetricsAppModelMethods(
     Object.assign(methods, {
       onMetricsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
         onSelectOptionsChange({ data, model });
+      },
+      onSelectExperimentNamesChange(experimentName: string): void {
+        // Handle experiment change, then re-fetch metrics data
+        onSelectExperimentNamesChange({ experimentName, model });
+        getMetricsData(true, true).call();
       },
       onSelectRunQueryChange(query: string): void {
         onSelectRunQueryChange({ query, model });
