@@ -3,7 +3,9 @@ import classNames from 'classnames';
 import moment from 'moment';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
-import { Button, InputBase, Tooltip } from '@material-ui/core';
+import { Button, Checkbox, InputBase, Tooltip } from '@material-ui/core';
+import CheckBoxOutlineBlank from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
 
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 import { Icon, Spinner, Text } from 'components/kit';
@@ -50,8 +52,8 @@ function ExperimentSelectionPopover({
   function shortenExperimentName(name?: string): string {
     if (!name) {
       return 'default';
-    } else if (name.length > 57) {
-      return `${name.slice(0, 57)}...`;
+    } else if (name.length > 56) {
+      return `${name.slice(0, 53)}...`;
     }
     return name;
   }
@@ -93,15 +95,29 @@ function ExperimentSelectionPopover({
     }
   }
 
-  function selectAllExperiments() {
-    const allExperimentNames = experimentsData?.map(
+  function toggleAllExperiments(checked: boolean): void {
+    const visibleExperimentNames = visibleExperiments?.map(
       (experiment) => experiment.name,
     );
-    onToggleAllExperiments(allExperimentNames || []);
+    // If all experiments are selected, deselect all
+    // otherwise, select all that are unselected
+    if (checked) {
+      onToggleAllExperiments(visibleExperimentNames);
+    } else {
+      const unselectedExperiments = visibleExperimentNames?.filter(
+        (experimentName) => !selectedExperimentNames.includes(experimentName),
+      );
+      onToggleAllExperiments(unselectedExperiments);
+    }
   }
 
-  function removeAllExperiments() {
-    onToggleAllExperiments([]);
+  function allExperimentsSelected(): boolean {
+    return (
+      visibleExperiments.length > 0 &&
+      visibleExperiments.every((experiment) =>
+        selectedExperimentNames.includes(experiment.name),
+      )
+    );
   }
 
   return (
@@ -112,25 +128,6 @@ function ExperimentSelectionPopover({
             <Text size={14} tint={100} weight={700}>
               Experiments
             </Text>
-            <div className='ExperimentSelectionPopover__headerContainer__buttons'>
-              <Button
-                onClick={selectAllExperiments}
-                className='ExperimentSelectionPopover__headerContainer__selectAllButton'
-              >
-                <Text size={12} tint={5} weight={500}>
-                  Select All
-                </Text>
-              </Button>
-              <Button
-                onClick={removeAllExperiments}
-                className='ExperimentSelectionPopover__headerContainer__removeAllButton'
-                size='small'
-              >
-                <Text size={12} tint={5} weight={500}>
-                  Remove All
-                </Text>
-              </Button>
-            </div>
           </div>
         </div>
         <div className='ExperimentSelectionPopover__contentContainer'>
@@ -143,6 +140,17 @@ function ExperimentSelectionPopover({
                     : 'ExperimentSelectionPopover__searchContainer'
                 }
               >
+                <Checkbox
+                  color='primary'
+                  icon={<CheckBoxOutlineBlank />}
+                  checkedIcon={<CheckBoxIcon />}
+                  checked={allExperimentsSelected()}
+                  onChange={() => {
+                    const checked = allExperimentsSelected();
+                    toggleAllExperiments(checked);
+                  }}
+                  size='small'
+                />
                 <InputBase
                   placeholder='Search'
                   value={searchValue}
@@ -175,50 +183,65 @@ function ExperimentSelectionPopover({
                       ),
                     })}
                   >
-                    <Text
-                      size={16}
-                      tint={
-                        experimentInList(
+                    <div className='experimentBox__leftContainer'>
+                      <Checkbox
+                        color='primary'
+                        icon={<CheckBoxOutlineBlank />}
+                        checkedIcon={<CheckBoxIcon />}
+                        checked={experimentInList(
                           experiment.name,
                           selectedExperimentNames,
-                        )
-                          ? 100
-                          : 80
-                      }
-                      weight={500}
-                      className='experimentBox__experimentName'
-                    >
-                      {shortenExperimentName(experiment?.name)}
-                    </Text>
-                    <div className='experimentBox__date'>
-                      <Icon
-                        name='calendar'
-                        color={
-                          experimentInList(
-                            experiment.name,
-                            selectedExperimentNames,
-                          )
-                            ? '#414B6D'
-                            : '#606986'
-                        }
-                        fontSize={12}
+                        )}
+                        size='small'
+                        className='experimentBox__checkbox'
                       />
+                    </div>
+                    <div className='experimentBox__rightContainer'>
                       <Text
-                        size={14}
+                        size={16}
                         tint={
                           experimentInList(
                             experiment.name,
                             selectedExperimentNames,
                           )
-                            ? 80
-                            : 70
+                            ? 100
+                            : 80
                         }
                         weight={500}
+                        className='experimentBox__experimentName'
                       >
-                        {`${moment(experiment.creation_time * 1000).format(
-                          DATE_WITH_SECONDS,
-                        )}`}
+                        {shortenExperimentName(experiment?.name)}
                       </Text>
+                      <div className='experimentBox__date'>
+                        <Icon
+                          name='calendar'
+                          color={
+                            experimentInList(
+                              experiment.name,
+                              selectedExperimentNames,
+                            )
+                              ? '#414B6D'
+                              : '#606986'
+                          }
+                          fontSize={12}
+                        />
+                        <Text
+                          size={14}
+                          tint={
+                            experimentInList(
+                              experiment.name,
+                              selectedExperimentNames,
+                            )
+                              ? 80
+                              : 70
+                          }
+                          weight={500}
+                        >
+                          {`${moment(experiment.creation_time * 1000).format(
+                            DATE_WITH_SECONDS,
+                          )}`}
+                        </Text>
+                      </div>
                     </div>
                   </Button>
                 ))
