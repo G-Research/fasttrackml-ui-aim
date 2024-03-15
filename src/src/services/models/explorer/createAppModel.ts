@@ -549,7 +549,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           );
           model.setState({
             selectFormData: {
-              options: getSelectOptions(data, true),
+              options: getSelectOptions(data),
               suggestions: getSuggestionsByExplorer(appName, data),
               advancedSuggestions: {
                 ...getSuggestionsByExplorer(appName, data),
@@ -620,23 +620,17 @@ function createAppModel(appConfig: IAppInitialConfig) {
       let query = getInputQueryStringFromSelect(configData?.select);
 
       let params: {
+        m: string[];
         q: string;
         p?: any;
         x_axis?: any;
         [key: string]: any;
       } = {
+        m: metrics,
         q: query,
         p: configData?.chart?.densityType,
         ...(metric ? { x_axis: metric } : {}),
       };
-
-      metrics.forEach((tuple, index) => {
-        const [metric, context] = tuple;
-        params[`m[${index}][metric]`] = metric;
-        if (context) {
-          params[`m[${index}][context]`] = context;
-        }
-      });
 
       metricsRequestRef = metricsService.getMetricsData(params);
       setRequestProgress(model);
