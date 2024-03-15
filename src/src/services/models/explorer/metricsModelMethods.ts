@@ -101,6 +101,7 @@ import onSmoothingChange from 'utils/app/onSmoothingChange';
 import { onTableDiffShow } from 'utils/app/onTableDiffShow';
 import { onTableResizeEnd } from 'utils/app/onTableResizeEnd';
 import onTableResizeModeChange from 'utils/app/onTableResizeModeChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import onTableRowClick from 'utils/app/onTableRowClick';
 import onTableRowHover from 'utils/app/onTableRowHover';
 import onTableSortChange from 'utils/app/onTableSortChange';
@@ -1642,6 +1643,10 @@ function getMetricsAppModelMethods(
       onSelectExperimentNamesChange(experimentName: string): void {
         // Handle experiment change, then re-fetch metrics data
         onSelectExperimentNamesChange({ experimentName, model });
+        getMetricsData(true, true).call();
+      },
+      onToggleAllExperiments(experimentNames: string[]): void {
+        onToggleAllExperiments({ experimentNames, model });
         getMetricsData(true, true).call();
       },
       onSelectRunQueryChange(query: string): void {

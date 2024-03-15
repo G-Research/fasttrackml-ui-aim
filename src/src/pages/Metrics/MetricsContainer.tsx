@@ -194,6 +194,7 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onSelectExperimentNamesChange={
           metricAppModel.onSelectExperimentNamesChange
         }
+        onToggleAllExperiments={metricAppModel.onToggleAllExperiments}
         onSelectRunQueryChange={metricAppModel.onSelectRunQueryChange}
         onSelectAdvancedQueryChange={metricAppModel.onSelectAdvancedQueryChange}
         toggleSelectAdvancedMode={metricAppModel.toggleSelectAdvancedMode}

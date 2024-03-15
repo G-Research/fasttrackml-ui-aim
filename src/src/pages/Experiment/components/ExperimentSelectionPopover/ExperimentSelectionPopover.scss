@@ -34,26 +34,28 @@
           width: 100%;
           text-decoration: none;
           height: auto;
-          padding: $space-xs;
+          padding-left: 0;
           display: flex;
           align-items: flex-start;
           cursor: pointer;
           text-decoration: unset;
           margin-bottom: $space-xxxxs;
           position: relative;
-          flex-direction: column;
           border-radius: 0.25rem;
           text-align: left;
-
           .MuiButton-label {
             align-items: flex-start;
-            flex-direction: column;
+            flex-direction: row;
             line-height: normal;
             text-transform: none;
+            justify-content: flex-start;
           }
-
           &:hover {
             background: $cuddle-20;
+          }
+          &__rightContainer {
+            display: flex;
+            flex-direction: column;
           }
           &__experimentName {
             width: 100%;
@@ -98,9 +100,26 @@
       height: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
       &:first-child {
         border-right: $border-main;
+        justify-self: start;
+        padding-left: $space-sm;
+      }
+    }
+    &__buttons {
+      justify-self: end;
+      padding: $space-xxs;
+    }
+    &__selectAllButton, &__removeAllButton {
+      background-color: $primary-color;
+      color: white;
+      margin-right: $space-xxxxs;
+      border-radius: 0.25rem;
+      padding: 0.25rem;
+      height: 1.5rem;
+      &:hover {
+        background-color: $primary-dark;
       }
     }
   }
@@ -120,5 +139,30 @@
     box-shadow: 0 0.25rem 0.375rem rgba(144, 175, 218, 0.2);
     border-radius: 0.3125rem 0.3125rem 0 0;
     height: 20rem;
+  }
+  &__searchContainer {
+    border: $border-main;
+    width: 100%;
+    border-radius: $radius-main;
+    color: #586069;
+    background-color: #ffffff;
+    margin-bottom: $space-xxxxs;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    &__inputBase {
+      margin: 0;
+      font-size: $text-md;
+      width: 100%;
+    }
+    .RegexToggle {
+      border: none;
+      width: 2rem;
+      height: 2rem;
+      margin: $space-xxxs;
+    }
+  }
+  .error {
+    border: 1px solid red;
   }
 }

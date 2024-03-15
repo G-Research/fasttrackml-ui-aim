@@ -84,6 +84,7 @@ import onTableResizeModeChange from 'utils/app/onTableResizeModeChange';
 import onTableRowClick from 'utils/app/onTableRowClick';
 import onTableRowHover from 'utils/app/onTableRowHover';
 import onTableSortChange from 'utils/app/onTableSortChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
 import updateSortFields from 'utils/app/updateTableSortFields';
@@ -1499,6 +1500,10 @@ function getScattersModelMethods(
       onSelectExperimentNamesChange(experimentName: string): void {
         // Handle experiment change, then re-fetch scatters data
         onSelectExperimentNamesChange({ experimentName, model });
+        getScattersData(true, true).call();
+      },
+      onToggleAllExperiments(experimentNames: string[]): void {
+        onToggleAllExperiments({ experimentNames, model });
         getScattersData(true, true).call();
       },
       onSelectRunQueryChange(query: string): void {

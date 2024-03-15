@@ -180,6 +180,7 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
         onSelectExperimentNamesChange={
           scattersAppModel.onSelectExperimentNamesChange
         }
+        onToggleAllExperiments={scattersAppModel.onToggleAllExperiments}
         onSelectOptionsChange={scattersAppModel.onSelectOptionsChange}
         onSelectRunQueryChange={scattersAppModel.onSelectRunQueryChange}
         onExportTableData={scattersAppModel.onExportTableData}
