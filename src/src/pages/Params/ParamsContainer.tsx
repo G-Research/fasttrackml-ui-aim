@@ -168,6 +168,7 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       onSelectExperimentNamesChange={
         paramsAppModel.onSelectExperimentNamesChange
       }
+      onToggleAllExperiments={paramsAppModel.onToggleAllExperiments}
       onSelectRunQueryChange={paramsAppModel.onSelectRunQueryChange}
       onBookmarkCreate={paramsAppModel.onBookmarkCreate}
       onBookmarkUpdate={paramsAppModel.onBookmarkUpdate}

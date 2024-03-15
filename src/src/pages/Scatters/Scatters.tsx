@@ -65,6 +65,7 @@ function Scatters(
               onSelectExperimentNamesChange={
                 props.onSelectExperimentNamesChange
               }
+              onToggleAllExperiments={props.onToggleAllExperiments}
               title='Scatters explorer'
             />
             <div className='Scatters__SelectForm__Grouping__container'>

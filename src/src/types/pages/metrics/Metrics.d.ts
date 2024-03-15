@@ -131,6 +131,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onDensityTypeChange: (type: DensityOptions) => void;
   onMetricsSelectChange: (options: ISelectOption[]) => void;
   onSelectExperimentNamesChange: (experimentName: string) => void;
+  onToggleAllExperiments: (experimentNames: string[]) => void;
   onSelectRunQueryChange: (query: string) => void;
   onSelectAdvancedQueryChange: (query: string) => void;
   onRowsVisibilityChange: (metricKeys: string[]) => void;

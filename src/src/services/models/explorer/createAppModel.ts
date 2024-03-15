@@ -126,6 +126,7 @@ import onParamVisibilityChange from 'utils/app/onParamsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
 import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import onSelectAdvancedQueryChange from 'utils/app/onSelectAdvancedQueryChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
 import onSmoothingChange from 'utils/app/onSmoothingChange';
@@ -2009,6 +2010,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onSelectExperimentNamesChange(experimentName: string): void {
           // Handle experiment change, then re-fetch metrics data
           onSelectExperimentNamesChange({ experimentName, model });
+          getMetricsData(true, true).call();
+        },
+        onToggleAllExperiments(experimentNames: string[]): void {
+          onToggleAllExperiments({ experimentNames, model });
           getMetricsData(true, true).call();
         },
         onSelectRunQueryChange(query: string): void {
@@ -4707,6 +4712,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
             onSelectExperimentNamesChange({ experimentName, model });
             getParamsData(true, true).call();
           },
+          onToggleAllExperiments(experimentNames: string[]): void {
+            onToggleAllExperiments({ experimentNames, model });
+            getParamsData(true, true).call();
+          },
           onSelectRunQueryChange(query: string): void {
             onSelectRunQueryChange({ query, model });
           },
@@ -6224,6 +6233,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onSelectExperimentNamesChange(experimentName: string): void {
             // Handle experiment change, then re-fetch scatters data
             onSelectExperimentNamesChange({ experimentName, model });
+            getScattersData(true, true).call();
+          },
+          onToggleAllExperiments(experimentNames: string[]): void {
+            onToggleAllExperiments({ experimentNames, model });
             getScattersData(true, true).call();
           },
           onSelectRunQueryChange(query: string): void {

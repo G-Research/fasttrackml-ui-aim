@@ -6,4 +6,5 @@ export interface IExperimentSelectionPopoverProps {
   isExperimentsLoading: boolean;
   getExperimentsData: () => void;
   onSelectExperimentNamesChange: (experimentName: string) => void;
+  onToggleAllExperiments: (experimentNames: string[]) => void;
 }

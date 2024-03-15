@@ -21,6 +21,7 @@ function ExperimentBar({
   selectedExperimentNames,
   getExperimentsData,
   onSelectExperimentNamesChange,
+  onToggleAllExperiments,
 }: IExperimentBarProps): React.FunctionComponentElement<React.ReactNode> {
   function shortenExperimentName(name?: string): string {
     if (!name) {
@@ -111,6 +112,7 @@ function ExperimentBar({
                   selectedExperimentNames={selectedExperimentNames}
                   getExperimentsData={getExperimentsData}
                   onSelectExperimentNamesChange={onSelectExperimentNamesChange}
+                  onToggleAllExperiments={onToggleAllExperiments}
                 />
               }
             />
