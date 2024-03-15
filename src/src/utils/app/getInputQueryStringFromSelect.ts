@@ -5,7 +5,7 @@ export default function getInputQueryStringFromSelect(
   selectData: ISelectConfig,
   error?: ISyntaxErrorDetails,
 ) {
-  let query = '()';
+  let query = '';
   if (selectData === undefined) {
     return query;
   }
@@ -13,5 +13,5 @@ export default function getInputQueryStringFromSelect(
     selectData.query?.trim() && !error?.message
       ? `(${selectData.query.trim()})`
       : '';
-  return query.trim() || '()';
+  return query.trim();
 }
