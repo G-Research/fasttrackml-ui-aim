@@ -14,6 +14,7 @@ export interface ILiveUpdateSettingsProp {
 function LiveUpdateSettings(
   props: ILiveUpdateSettingsProp,
 ): React.FunctionComponentElement<React.ReactNode> {
+  //@ts-ignore
   if (window.live_updates_enabled == 1) {
     return (
       <ErrorBoundary>
