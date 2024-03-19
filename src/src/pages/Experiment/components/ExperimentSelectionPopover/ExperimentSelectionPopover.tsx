@@ -77,22 +77,31 @@ function ExperimentSelectionPopover({
     setSearchValue(e.target.value);
 
     if (isRegexSearch) {
-      try {
-        const regex = new RegExp(e.target.value, 'i');
-        setInvalidRegex(false);
-        const options = experimentsData?.filter((experiment) =>
-          regex.test(experiment.name),
-        );
-        setVisibleExperiments(options || []);
-      } catch (error) {
-        setInvalidRegex(true);
-      }
+      handleRegexSearch(e.target.value);
     } else {
+      handleSimpleSearch(e.target.value);
+    }
+  }
+
+  function handleRegexSearch(search: string): void {
+    try {
+      const regex = new RegExp(search, 'i');
+      setInvalidRegex(false);
       const options = experimentsData?.filter((experiment) =>
-        experiment.name.toLowerCase().includes(e.target.value.toLowerCase()),
+        regex.test(experiment.name),
       );
       setVisibleExperiments(options || []);
+    } catch (error) {
+      setInvalidRegex(true);
     }
+  }
+
+  function handleSimpleSearch(search: string): void {
+    setInvalidRegex(false);
+    const options = experimentsData?.filter((experiment) =>
+      experiment.name.toLowerCase().includes(search.toLowerCase()),
+    );
+    setVisibleExperiments(options || []);
   }
 
   function toggleAllExperiments(checked: boolean): void {
