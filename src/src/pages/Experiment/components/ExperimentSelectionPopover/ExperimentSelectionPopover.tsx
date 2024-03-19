@@ -182,6 +182,12 @@ function ExperimentSelectionPopover({
                     selected={isRegexSearch}
                     onChange={() => {
                       setIsRegexSearch(!isRegexSearch);
+
+                      if (!isRegexSearch) {
+                        handleRegexSearch(searchValue);
+                      } else {
+                        handleSimpleSearch(searchValue);
+                      }
                     }}
                     className='RegexToggle'
                   >
