@@ -8,6 +8,7 @@ import './LiveUpdateSettings.scss';
 export interface ILiveUpdateSettingsProp {
   delay: number;
   enabled: boolean;
+  onLiveUpdateConfigChange: ({ enabled }: { enabled: boolean }) => void;
 }
 
 function LiveUpdateSettings(
