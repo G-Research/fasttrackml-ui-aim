@@ -13,7 +13,7 @@ export interface ILiveUpdateSettingsProp {
 
 function LiveUpdateSettings(
   props: ILiveUpdateSettingsProp,
-): React.FunctionComponentElement<React.ReactNode> {
+): React.FunctionComponentElement<React.ReactNode> | null {
   //@ts-ignore
   if (window.live_updates_enabled == 1) {
     return (
