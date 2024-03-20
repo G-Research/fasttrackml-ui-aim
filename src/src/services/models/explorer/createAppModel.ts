@@ -618,19 +618,24 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
       let metrics = getMetricsListFromSelect(configData?.select);
       let query = getInputQueryStringFromSelect(configData?.select);
+      console.log(metrics);
 
       let params: {
-        m: string[];
         q: string;
         p?: any;
         x_axis?: any;
         [key: string]: any;
       } = {
-        m: metrics,
         q: query,
         p: configData?.chart?.densityType,
         ...(metric ? { x_axis: metric } : {}),
       };
+
+      metrics.forEach((tuple, index) => {
+        const [metric, context] = tuple;
+        params[`m[${index}][metric]`] = metric;
+        params[`m[${index}][context]`] = context;
+      });
 
       metricsRequestRef = metricsService.getMetricsData(params);
       setRequestProgress(model);
