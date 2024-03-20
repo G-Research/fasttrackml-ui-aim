@@ -127,7 +127,6 @@ import onParamsScaleTypeChange from 'utils/app/onParamsScaleTypeChange';
 import onParamVisibilityChange from 'utils/app/onParamsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
-import onSelectAdvancedQueryChange from 'utils/app/onSelectAdvancedQueryChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
 import onSmoothingChange from 'utils/app/onSmoothingChange';
 import onSortFieldsChange from 'utils/app/onSortFieldsChange';
@@ -139,7 +138,6 @@ import onTableRowHover from 'utils/app/onTableRowHover';
 import onTableSortChange from 'utils/app/onTableSortChange';
 import onZoomChange from 'utils/app/onZoomChange';
 import setAggregationEnabled from 'utils/app/setAggregationEnabled';
-import toggleSelectAdvancedMode from 'utils/app/toggleSelectAdvancedMode';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
 import updateSortFields from 'utils/app/updateTableSortFields';
 import contextToString from 'utils/contextToString';
@@ -609,16 +607,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
       const metric = configData?.chart?.alignmentConfig?.metric;
 
       if (queryString) {
-        if (configData.select.advancedMode) {
-          configData.select.advancedQuery = queryString;
-        } else {
-          configData.select.query = queryString;
-        }
+        configData.select.query = queryString;
       }
 
       let metrics = getMetricsListFromSelect(configData?.select);
       let query = getInputQueryStringFromSelect(configData?.select);
-      console.log(metrics);
 
       let params: {
         q: string;
@@ -1259,7 +1252,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
     ): void {
       const modelState: IAppModelState = model.getState();
       const sortFields = modelState?.config?.table?.sortFields;
-      console.log(rawData);
       const {
         data,
         runProps,
@@ -1332,7 +1324,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         data,
         selectFormData: {
           ...modelState?.selectFormData,
-          [configData.select?.advancedMode ? 'advancedError' : 'error']: null,
         },
         lineChartData: getDataAsLines(data),
         chartTitleData: getChartTitleData<
@@ -1526,6 +1517,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
     function onSearchQueryCopy(): void {
       const selectedMetricsData = model.getState()?.config?.select;
+      selectedMetricsData.advancedMode = false;
       let query = getQueryStringFromSelect(selectedMetricsData);
       onCopyToClipBoard(query, false, () => onNotificationAdd, {
         notification: {
@@ -2019,12 +2011,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         },
         onSelectRunQueryChange(query: string): void {
           onSelectRunQueryChange({ query, model });
-        },
-        onSelectAdvancedQueryChange(query: string): void {
-          onSelectAdvancedQueryChange({ query, model });
-        },
-        toggleSelectAdvancedMode(): void {
-          toggleSelectAdvancedMode({ model, appName });
         },
       });
     }

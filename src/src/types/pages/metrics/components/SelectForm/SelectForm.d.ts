@@ -16,7 +16,5 @@ export interface ISelectFormProps {
   };
   onMetricsSelectChange: (options: ISelectOption[]) => void;
   onSelectRunQueryChange: (query: string) => void;
-  onSelectAdvancedQueryChange: (query: string) => void;
-  toggleSelectAdvancedMode: () => void;
   onSearchQueryCopy: () => void;
 }

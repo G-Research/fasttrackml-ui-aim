@@ -44,6 +44,7 @@ export default function getQueryStringFromSelect(
           .join(' or ')})`
       : '';
 
+    console.log('AAA', simpleInput, selections);
     if (simpleInput && selections) {
       query = `${simpleInput} and ${selections}`;
     } else {
