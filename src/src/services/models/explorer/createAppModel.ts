@@ -618,7 +618,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
       let metrics = getMetricsListFromSelect(configData?.select);
       let query = getInputQueryStringFromSelect(configData?.select);
-      console.log(metrics);
 
       let params: {
         q: string;
@@ -1259,7 +1258,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
     ): void {
       const modelState: IAppModelState = model.getState();
       const sortFields = modelState?.config?.table?.sortFields;
-      console.log(rawData);
       const {
         data,
         runProps,
