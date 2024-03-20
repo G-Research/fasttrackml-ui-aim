@@ -20,6 +20,15 @@ function ExperimentNavigationPopover({
 }: IExperimentNavigationPopoverProps): React.FunctionComponentElement<React.ReactNode> {
   const { pathname } = useLocation();
 
+  function shortenExperimentName(name?: string): string {
+    if (!name) {
+      return 'default';
+    } else if (name.length > 57) {
+      return `${name.slice(0, 57)}...`;
+    }
+    return name;
+  }
+
   React.useEffect(() => {
     if (!experimentsData) {
       getExperimentsData();
@@ -55,7 +64,7 @@ function ExperimentNavigationPopover({
                       weight={500}
                       className='experimentBox__experimentName'
                     >
-                      {experiment?.name ?? 'default'}
+                      {shortenExperimentName(experiment?.name)}
                     </Text>
                     <div className='experimentBox__date'>
                       <Icon

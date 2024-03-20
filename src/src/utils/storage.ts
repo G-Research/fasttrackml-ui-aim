@@ -2,7 +2,8 @@ import { getPrefix } from 'config/config';
 
 export function setItem(key: string, value: any) {
   try {
-    localStorage.setItem(getNamespacedKey(key), value);
+    let namespacedKey = getNamespacedKey(key);
+    localStorage.setItem(namespacedKey, value);
   } catch (error) {}
 }
 

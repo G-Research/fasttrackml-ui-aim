@@ -127,6 +127,8 @@ import onParamsScaleTypeChange from 'utils/app/onParamsScaleTypeChange';
 import onParamVisibilityChange from 'utils/app/onParamsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
+import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import onSelectAdvancedQueryChange from 'utils/app/onSelectAdvancedQueryChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
 import onSmoothingChange from 'utils/app/onSmoothingChange';
@@ -353,6 +355,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
             query: '',
             advancedMode: false,
             advancedQuery: '',
+            selectedExperimentNames: [],
           };
         }
         return config;
@@ -473,6 +476,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
             query: '',
             advancedMode: false,
             advancedQuery: '',
+            selectedExperimentNames: [],
           };
         }
         //TODO solve the problem with keeping table config after switching from Scatters explore to Params explore. But the solution is temporal
@@ -1173,6 +1177,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         selectedRows,
       } = processData(model.getState()?.rawData as ISequence<IMetricTrace>[]);
       const sortedParams = [...new Set(params.concat(highLevelParams))].sort();
+
       const groupingSelectOptions = [
         ...getGroupingSelectOptions({
           params: sortedParams,
@@ -1565,7 +1570,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
             }),
         )
         .flat();
-
       return Object.values(_.groupBy(lines, 'chartIndex'));
     }
 
@@ -2014,6 +2018,15 @@ function createAppModel(appConfig: IAppInitialConfig) {
       Object.assign(methods, {
         onMetricsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
           onSelectOptionsChange({ data, model });
+        },
+        onSelectExperimentNamesChange(experimentName: string): void {
+          // Handle experiment change, then re-fetch metrics data
+          onSelectExperimentNamesChange({ experimentName, model });
+          getMetricsData(true, true).call();
+        },
+        onToggleAllExperiments(experimentNames: string[]): void {
+          onToggleAllExperiments({ experimentNames, model });
+          getMetricsData(true, true).call();
         },
         onSelectRunQueryChange(query: string): void {
           onSelectRunQueryChange({ query, model });
@@ -3339,8 +3352,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
         if (runsRequestRef) {
           runsRequestRef.abort();
         }
+
         const configData = { ...model.getState()?.config };
-        runsRequestRef = runsService.getRunsData(configData?.select?.query);
+        const query = getQueryStringFromSelect(configData?.select, true);
+        runsRequestRef = runsService.getRunsData(query);
         setRequestProgress(model);
         return {
           call: async () => {
@@ -3654,6 +3669,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           return [];
         }
         const dimensionsObject: any = {};
+
         const lines = processedData.map(
           ({
             chartIndex,
@@ -4703,6 +4719,15 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onParamsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
             onSelectOptionsChange({ data, model });
           },
+          onSelectExperimentNamesChange(experimentName: string): void {
+            // Handle experiment change, then re-fetch params data
+            onSelectExperimentNamesChange({ experimentName, model });
+            getParamsData(true, true).call();
+          },
+          onToggleAllExperiments(experimentNames: string[]): void {
+            onToggleAllExperiments({ experimentNames, model });
+            getParamsData(true, true).call();
+          },
           onSelectRunQueryChange(query: string): void {
             onSelectRunQueryChange({ query, model });
           },
@@ -5716,9 +5741,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
         if (runsRequestRef) {
           runsRequestRef.abort();
         }
-        const configData = { ...model.getState()?.config };
 
-        runsRequestRef = runsService.getRunsData(configData?.select?.query);
+        const configData = { ...model.getState()?.config };
+        const query = getQueryStringFromSelect(configData?.select, true);
+        runsRequestRef = runsService.getRunsData(query);
         setRequestProgress(model);
         return {
           call: async () => {
@@ -6215,6 +6241,15 @@ function createAppModel(appConfig: IAppInitialConfig) {
         Object.assign(methods, {
           onSelectOptionsChange<D>(data: D & Partial<ISelectOption[]>): void {
             onSelectOptionsChange({ data, model });
+          },
+          onSelectExperimentNamesChange(experimentName: string): void {
+            // Handle experiment change, then re-fetch scatters data
+            onSelectExperimentNamesChange({ experimentName, model });
+            getScattersData(true, true).call();
+          },
+          onToggleAllExperiments(experimentNames: string[]): void {
+            onToggleAllExperiments({ experimentNames, model });
+            getScattersData(true, true).call();
           },
           onSelectRunQueryChange(query: string): void {
             onSelectRunQueryChange({ query, model });
