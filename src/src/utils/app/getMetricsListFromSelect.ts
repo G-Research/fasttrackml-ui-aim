@@ -26,7 +26,7 @@ export default function getMetricsListFromSelect(
                 ? `['${item}']`
                 : `${item}`;
               const contextValue = (option.value?.context as any)[item];
-              return `"${contextKey}": ${formatValue(contextValue)}`;
+              return `"${contextKey}":${formatValue(contextValue)}`;
             })
             .join(', ');
 
