@@ -101,7 +101,6 @@ import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import getGroupingSelectOptions from 'utils/app/getGroupingSelectOptions';
 import getQueryStringFromSelect from 'utils/app/getQueryStringFromSelect';
-import getInputQueryStringFromSelect from 'utils/app/getInputQueryStringFromSelect';
 import getMetricsListFromSelect from 'utils/app/getMetricsListFromSelect';
 import getRunData from 'utils/app/getRunData';
 import onAggregationConfigChange from 'utils/app/onAggregationConfigChange';
@@ -621,7 +620,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
       }
 
       let metrics = getMetricsListFromSelect(configData?.select);
-      let query = getInputQueryStringFromSelect(configData?.select);
+      let query = getQueryStringFromSelect(configData?.select, true);
 
       let params: {
         q: string;
