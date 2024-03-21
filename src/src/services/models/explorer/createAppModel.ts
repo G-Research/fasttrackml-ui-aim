@@ -1517,7 +1517,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
     function onSearchQueryCopy(): void {
       const selectedMetricsData = model.getState()?.config?.select;
-      selectedMetricsData.advancedMode = false;
       let query = getQueryStringFromSelect(selectedMetricsData);
       onCopyToClipBoard(query, false, () => onNotificationAdd, {
         notification: {

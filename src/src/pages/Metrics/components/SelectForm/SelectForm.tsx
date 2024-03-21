@@ -259,6 +259,7 @@ function SelectForm({
                   onClick={handleResetSelectForm}
                   withOnlyIcon={true}
                   disabled={isDisabled}
+                  style={{ width: '3rem' }}
                 >
                   <Icon name='reset' />
                 </Button>
@@ -270,6 +271,7 @@ function SelectForm({
                   onClick={onSearchQueryCopy}
                   withOnlyIcon={true}
                   disabled={isDisabled}
+                  style={{ width: '3rem' }}
                 >
                   <Icon name='copy' />
                 </Button>
