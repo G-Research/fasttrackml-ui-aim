@@ -1,12 +1,11 @@
 import { IExperimentData } from 'modules/core/api/experimentsApi/types';
 
-export interface IExperimentHeaderProps {
+export interface IExperimentBarProps {
   isExperimentLoading: boolean;
-  experimentData: IExperimentData | null;
   isExperimentsLoading: boolean;
   experimentsData: IExperimentData[] | null;
-  experimentId: string;
+  selectedExperimentNames: string[];
   getExperimentsData: () => void;
-  isCompact?: boolean;
-  onExperimentChange?: (experimentId: string) => void;
+  onSelectExperimentNamesChange: (experimentName: string) => void;
+  onToggleAllExperiments: (experimentNames: string[]) => void;
 }

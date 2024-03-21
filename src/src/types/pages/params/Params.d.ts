@@ -90,6 +90,8 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   ) => void;
   onColorIndicatorChange: () => void;
   onParamsSelectChange: (options: ISelectOption[]) => void;
+  onSelectExperimentNamesChange: (experimentName: string) => void;
+  onToggleAllExperiments: (experimentNames: string[]) => void;
   onSelectRunQueryChange: (query: string) => void;
   onGroupingSelectChange: (params: IOnGroupingSelectChangeParams) => void;
   onGroupingModeChange: (params: IOnGroupingModeChangeParams) => void;

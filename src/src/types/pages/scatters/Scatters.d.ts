@@ -93,6 +93,8 @@ export interface IScattersProps extends Partial<RouteChildrenProps> {
   onNotificationAdd: (notification: INotification) => void;
   onNotificationDelete: (id: number) => void;
   onResetConfigData: () => void;
+  onSelectExperimentNamesChange: (experimentName: string) => void;
+  onToggleAllExperiments: (experimentNames: string[]) => void;
   onSelectOptionsChange: (options: ISelectOption[]) => void;
   onSelectRunQueryChange: (query: string) => void;
   onExportTableData: (e: React.ChangeEvent<any>) => void;
