@@ -15,6 +15,7 @@ import { getMetricLabel } from './getMetricLabel';
 export default function getSelectOptions(
   projectsData: IProjectParamsMetrics,
   addHighLevelMetrics: boolean = false,
+  includeParams: boolean = true,
 ): ISelectOption[] {
   const comparator = alphabeticalSortComparator<ISelectOption>({
     orderBy: 'label',
@@ -72,7 +73,7 @@ export default function getSelectOptions(
       }
     }
   }
-  if (projectsData?.params && !addHighLevelMetrics) {
+  if (projectsData?.params && !addHighLevelMetrics && includeParams) {
     const paramPaths = getObjectPaths(projectsData.params, projectsData.params);
     paramPaths.forEach((paramPath, index) => {
       const indexOf =

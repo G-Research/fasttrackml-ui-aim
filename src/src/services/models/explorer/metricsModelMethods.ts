@@ -74,6 +74,7 @@ import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import getGroupingSelectOptions from 'utils/app/getGroupingSelectOptions';
 import getQueryStringFromSelect from 'utils/app/getQueryStringFromSelect';
+import getMetricsListFromSelect from 'utils/app/getMetricsListFromSelect';
 import getRunData from 'utils/app/getRunData';
 import onAggregationConfigChange from 'utils/app/onAggregationConfigChange';
 import onAlignmentMetricChange from 'utils/app/onAlignmentMetricChange';
@@ -217,7 +218,7 @@ function getMetricsAppModelMethods(
         );
         model.setState({
           selectFormData: {
-            options: getSelectOptions(data, true),
+            options: getSelectOptions(data, false, false),
             suggestions: getSuggestionsByExplorer(appName, data),
             advancedSuggestions: {
               ...getSuggestionsByExplorer(appName, data),
@@ -283,55 +284,65 @@ function getMetricsAppModelMethods(
         configData.select.query = queryString;
       }
     }
-    let query = getQueryStringFromSelect(configData?.select);
-    metricsRequestRef = metricsService.getMetricsData({
+    let metrics = getMetricsListFromSelect(configData?.select);
+    let query = getQueryStringFromSelect(configData?.select, true);
+
+    let params: {
+      q: string;
+      p?: any;
+      x_axis?: any;
+      [key: string]: any;
+    } = {
       q: query,
       p: configData?.chart?.densityType,
       ...(metric ? { x_axis: metric } : {}),
+    };
+
+    metrics.forEach((tuple, index) => {
+      const [metric, context] = tuple;
+      params[`m[${index}][metric]`] = metric;
+      params[`m[${index}][context]`] = context;
     });
 
+    metricsRequestRef = metricsService.getMetricsData(params);
     setRequestProgress(model);
     return {
       call: async () => {
-        if (query === '()') {
-          resetModelState(configData, shouldResetSelectedRows!);
-        } else {
-          model.setState({
-            requestStatus: RequestStatusEnum.Pending,
-            queryIsEmpty: false,
-            selectedRows: shouldResetSelectedRows
-              ? {}
-              : model.getState()?.selectedRows,
+        model.setState({
+          requestStatus: RequestStatusEnum.Pending,
+          queryIsEmpty: false,
+          selectedRows: shouldResetSelectedRows
+            ? {}
+            : model.getState()?.selectedRows,
+        });
+        liveUpdateInstance?.stop().then();
+        try {
+          const stream = await metricsRequestRef.call((detail) => {
+            exceptionHandler({ detail, model });
+            resetModelState(configData, shouldResetSelectedRows!);
           });
-          liveUpdateInstance?.stop().then();
-          try {
-            const stream = await metricsRequestRef.call((detail) => {
-              exceptionHandler({ detail, model });
-              resetModelState(configData, shouldResetSelectedRows!);
-            });
-            const runData = await getRunData(stream, (progress) =>
-              setRequestProgress(model, progress),
-            );
-            if (shouldUrlUpdate) {
-              updateURL({ configData, appName });
-            }
-            saveRecentSearches(appName, query);
-            updateData(runData);
-          } catch (ex: Error | any) {
-            if (ex.name === 'AbortError') {
-              // Abort Error
-            } else {
-              // eslint-disable-next-line no-console
-              console.log('Unhandled error: ', ex);
-            }
+          const runData = await getRunData(stream, (progress) =>
+            setRequestProgress(model, progress),
+          );
+          if (shouldUrlUpdate) {
+            updateURL({ configData, appName });
           }
-
-          liveUpdateInstance?.start({
-            q: query,
-            p: configData?.chart?.densityType,
-            ...(metric && { x_axis: metric }),
-          });
+          saveRecentSearches(appName, query);
+          updateData(runData);
+        } catch (ex: Error | any) {
+          if (ex.name === 'AbortError') {
+            // Abort Error
+          } else {
+            // eslint-disable-next-line no-console
+            console.log('Unhandled error: ', ex);
+          }
         }
+
+        liveUpdateInstance?.start({
+          q: query,
+          p: configData?.chart?.densityType,
+          ...(metric && { x_axis: metric }),
+        });
       },
       abort: metricsRequestRef.abort,
     };

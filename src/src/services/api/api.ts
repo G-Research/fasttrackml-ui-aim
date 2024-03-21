@@ -96,13 +96,19 @@ function getStream<ResponseDataType>(
   options?: RequestInit,
   apiHost: string = getAPIHost(),
 ) {
+  const queryString = Object.entries(params || {})
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return value.map((v) => `${key}=${v}`).join('&');
+      } else {
+        return `${key}=${value}`;
+      }
+    })
+    .join('&');
+
   return createAPIRequestWrapper<ResponseDataType>(
     `${url}${
-      options?.method === 'POST'
-        ? ''
-        : params
-        ? '?' + new URLSearchParams(params).toString()
-        : ''
+      options?.method === 'POST' ? '' : queryString ? '?' + queryString : ''
     }`,
     {
       method: 'GET',
