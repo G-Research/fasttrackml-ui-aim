@@ -108,7 +108,6 @@ import onTableRowHover from 'utils/app/onTableRowHover';
 import onTableSortChange from 'utils/app/onTableSortChange';
 import onZoomChange from 'utils/app/onZoomChange';
 import setAggregationEnabled from 'utils/app/setAggregationEnabled';
-import toggleSelectAdvancedMode from 'utils/app/toggleSelectAdvancedMode';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
 import updateSortFields from 'utils/app/updateTableSortFields';
 import contextToString from 'utils/contextToString';
@@ -278,12 +277,9 @@ function getMetricsAppModelMethods(
     const metric = configData?.chart?.alignmentConfig?.metric;
 
     if (queryString) {
-      if (configData.select.advancedMode) {
-        configData.select.advancedQuery = queryString;
-      } else {
-        configData.select.query = queryString;
-      }
+      configData.select.query = queryString;
     }
+
     let metrics = getMetricsListFromSelect(configData?.select);
     let query = getQueryStringFromSelect(configData?.select, true);
 
@@ -972,7 +968,6 @@ function getMetricsAppModelMethods(
       data,
       selectFormData: {
         ...modelState?.selectFormData,
-        [configData.select?.advancedMode ? 'advancedError' : 'error']: null,
       },
       lineChartData: getDataAsLines(data),
       chartTitleData: getChartTitleData<IMetric, Partial<IMetricAppModelState>>(
@@ -1662,12 +1657,6 @@ function getMetricsAppModelMethods(
       },
       onSelectRunQueryChange(query: string): void {
         onSelectRunQueryChange({ query, model });
-      },
-      onSelectAdvancedQueryChange(query: string): void {
-        onSelectAdvancedQueryChange({ query, model });
-      },
-      toggleSelectAdvancedMode(): void {
-        toggleSelectAdvancedMode({ model, appName });
       },
     });
   }
