@@ -101,6 +101,7 @@ import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import getGroupingSelectOptions from 'utils/app/getGroupingSelectOptions';
 import getQueryStringFromSelect from 'utils/app/getQueryStringFromSelect';
+import getMetricsListFromSelect from 'utils/app/getMetricsListFromSelect';
 import getRunData from 'utils/app/getRunData';
 import onAggregationConfigChange from 'utils/app/onAggregationConfigChange';
 import onAlignmentMetricChange from 'utils/app/onAlignmentMetricChange';
@@ -139,7 +140,6 @@ import onTableRowHover from 'utils/app/onTableRowHover';
 import onTableSortChange from 'utils/app/onTableSortChange';
 import onZoomChange from 'utils/app/onZoomChange';
 import setAggregationEnabled from 'utils/app/setAggregationEnabled';
-import toggleSelectAdvancedMode from 'utils/app/toggleSelectAdvancedMode';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
 import updateSortFields from 'utils/app/updateTableSortFields';
 import contextToString from 'utils/contextToString';
@@ -542,7 +542,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
       if (!appId) {
         setModelDefaultAppConfigData();
       }
-
       projectsService
         .getProjectParams(['metric'])
         .call()
@@ -552,7 +551,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           );
           model.setState({
             selectFormData: {
-              options: getSelectOptions(data, true),
+              options: getSelectOptions(data, false, false),
               suggestions: getSuggestionsByExplorer(appName, data),
               advancedSuggestions: {
                 ...getSuggestionsByExplorer(appName, data),
@@ -612,19 +611,30 @@ function createAppModel(appConfig: IAppInitialConfig) {
       const metric = configData?.chart?.alignmentConfig?.metric;
 
       if (queryString) {
-        if (configData.select.advancedMode) {
-          configData.select.advancedQuery = queryString;
-        } else {
-          configData.select.query = queryString;
-        }
+        configData.select.query = queryString;
       }
-      let query = getQueryStringFromSelect(configData?.select);
-      metricsRequestRef = metricsService.getMetricsData({
+
+      let metrics = getMetricsListFromSelect(configData?.select);
+      let query = getQueryStringFromSelect(configData?.select, true);
+
+      let params: {
+        q: string;
+        p?: any;
+        x_axis?: any;
+        [key: string]: any;
+      } = {
         q: query,
         p: configData?.chart?.densityType,
         ...(metric ? { x_axis: metric } : {}),
+      };
+
+      metrics.forEach((tuple, index) => {
+        const [metric, context] = tuple;
+        params[`m[${index}][metric]`] = metric;
+        params[`m[${index}][context]`] = context;
       });
 
+      metricsRequestRef = metricsService.getMetricsData(params);
       setRequestProgress(model);
       return {
         call: async () => {
@@ -637,36 +647,35 @@ function createAppModel(appConfig: IAppInitialConfig) {
               selectedRows: shouldResetSelectedRows
                 ? {}
                 : model.getState()?.selectedRows,
+          });
+          liveUpdateInstance?.stop().then();
+          try {
+            const stream = await metricsRequestRef.call((detail) => {
+              exceptionHandler({ detail, model });
+              resetModelState(configData, shouldResetSelectedRows!);
             });
-            liveUpdateInstance?.stop().then();
-            try {
-              const stream = await metricsRequestRef.call((detail) => {
-                exceptionHandler({ detail, model });
-                resetModelState(configData, shouldResetSelectedRows!);
-              });
-              const runData = await getRunData(stream, (progress) =>
-                setRequestProgress(model, progress),
-              );
-              if (shouldUrlUpdate) {
-                updateURL({ configData, appName });
-              }
-              saveRecentSearches(appName, query);
-              updateData(runData);
-            } catch (ex: Error | any) {
-              if (ex.name === 'AbortError') {
-                // Abort Error
-              } else {
-                // eslint-disable-next-line no-console
-                console.log('Unhandled error: ', ex);
-              }
+            const runData = await getRunData(stream, (progress) =>
+              setRequestProgress(model, progress),
+            );
+            if (shouldUrlUpdate) {
+              updateURL({ configData, appName });
             }
-
-            liveUpdateInstance?.start({
-              q: query,
-              p: configData?.chart?.densityType,
-              ...(metric && { x_axis: metric }),
-            });
+            saveRecentSearches(appName, query);
+            updateData(runData);
+          } catch (ex: Error | any) {
+            if (ex.name === 'AbortError') {
+              // Abort Error
+            } else {
+              // eslint-disable-next-line no-console
+              console.log('Unhandled error: ', ex);
+            }
           }
+
+          liveUpdateInstance?.start({
+            q: query,
+            p: configData?.chart?.densityType,
+            ...(metric && { x_axis: metric }),
+          });
         },
         abort: metricsRequestRef.abort,
       };
@@ -1323,7 +1332,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         data,
         selectFormData: {
           ...modelState?.selectFormData,
-          [configData.select?.advancedMode ? 'advancedError' : 'error']: null,
         },
         lineChartData: getDataAsLines(data),
         chartTitleData: getChartTitleData<
@@ -2018,12 +2026,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         },
         onSelectRunQueryChange(query: string): void {
           onSelectRunQueryChange({ query, model });
-        },
-        onSelectAdvancedQueryChange(query: string): void {
-          onSelectAdvancedQueryChange({ query, model });
-        },
-        toggleSelectAdvancedMode(): void {
-          toggleSelectAdvancedMode({ model, appName });
         },
       });
     }
