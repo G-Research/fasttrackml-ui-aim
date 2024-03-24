@@ -628,7 +628,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
       setRequestProgress(model);
       return {
         call: async () => {
-          if (query === '()') {
+          if (_.isEmpty(configData?.select?.options)) {
             resetModelState(configData, shouldResetSelectedRows!);
           } else {
             model.setState({
