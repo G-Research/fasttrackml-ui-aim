@@ -17,6 +17,12 @@ export enum VisualizationElementEnum {
   IMAGE = 'image',
 }
 
+export enum UnselectedColumnState {
+  FORCE_HIDE = 'hide',
+  FORCE_SHOW = 'show',
+  DEFAULT = 'default',
+}
+
 export const ROW_CELL_SIZE_CONFIG = {
   22: {
     groupMargin: 2,
@@ -42,6 +48,7 @@ export const TABLE_DEFAULT_CONFIG: Record<string, any> = {
     resizeMode: ResizeModeEnum.Resizable,
     rowHeight: RowHeightSize.md,
     sortFields: [],
+    unselectedColumnState: UnselectedColumnState.FORCE_HIDE,
     hideSystemMetrics: true,
     hiddenMetrics: [],
     hiddenColumns: ['hash', 'description'],
@@ -58,6 +65,7 @@ export const TABLE_DEFAULT_CONFIG: Record<string, any> = {
     resizeMode: ResizeModeEnum.Resizable,
     rowHeight: RowHeightSize.md,
     sortFields: [],
+    unselectedColumnState: UnselectedColumnState.FORCE_HIDE,
     hiddenMetrics: [],
     hiddenColumns: ['hash', 'description'],
     nonHidableColumns: new Set(['#', 'run', 'actions']),
@@ -73,6 +81,7 @@ export const TABLE_DEFAULT_CONFIG: Record<string, any> = {
     resizeMode: ResizeModeEnum.Resizable,
     rowHeight: RowHeightSize.md,
     sortFields: [],
+    unselectedColumnState: UnselectedColumnState.FORCE_HIDE,
     hiddenMetrics: [],
     hiddenColumns: ['hash', 'description'],
     nonHidableColumns: new Set(['#', 'run', 'actions']),
@@ -89,6 +98,7 @@ export const TABLE_DEFAULT_CONFIG: Record<string, any> = {
     resizeMode: ResizeModeEnum.Resizable,
     rowHeight: RowHeightSize.md,
     sortFields: [],
+    unselectedColumnState: UnselectedColumnState.FORCE_HIDE,
     hiddenMetrics: [],
     hiddenColumns: ['hash', 'description'],
     nonHidableColumns: new Set(['#', 'run', 'actions']),

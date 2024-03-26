@@ -21,6 +21,8 @@ export const ANALYTICS_EVENT_KEYS = {
       metricVisibilityChange:
         '[MetricsExplorer][Table] Change metric visibility',
       compareSelectedRuns: '[MetricsExplorer][Table] Compare selected runs',
+      changeDefaultColumnsVisibility:
+        '[MetricsExplorer][Table] Change default columns visibility',
     },
     chart: {
       controls: {
@@ -97,6 +99,8 @@ export const ANALYTICS_EVENT_KEYS = {
       metricVisibilityChange:
         '[ParamsExplorer][Table] Change metric visibility',
       compareSelectedRuns: '[ParamsExplorer][Table] Compare selected runs',
+      changeDefaultColumnsVisibility:
+        '[ParamsExplorer][Table] Change default columns visibility',
     },
     chart: {
       controls: {
@@ -153,6 +157,8 @@ export const ANALYTICS_EVENT_KEYS = {
       changeSorting: '[RunsExplorer][Table] Change sorting',
       metricVisibilityChange: '[RunsExplorer][Table] Change metric visibility',
       compareSelectedRuns: '[RunsExplorer][Table] Compare selected runs',
+      changeDefaultColumnsVisibility:
+        '[RunsExplorer][Table] Change default columns visibility',
     },
   },
   scatters: {
@@ -177,6 +183,8 @@ export const ANALYTICS_EVENT_KEYS = {
       metricVisibilityChange:
         '[ScattersExplorer][Table] Change metric visibility',
       compareSelectedRuns: '[ScattersExplorer][Table] Compare selected runs',
+      changeDefaultColumnsVisibility:
+        '[ScattersExplorer][Table] Change default columns visibility',
     },
     chart: {
       controls: {

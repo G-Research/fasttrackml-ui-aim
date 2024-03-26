@@ -261,6 +261,7 @@ function Metrics(
                           resizeMode={props.resizeMode}
                           columnsWidths={props.columnsWidths}
                           selectedRows={props.selectedRows}
+                          unselectedColumnState={props.unselectedColumnState}
                           hideSystemMetrics={props.hideSystemMetrics}
                           appName={AppNameEnum.METRICS}
                           hiddenChartRows={props.lineChartData?.length === 0}
@@ -273,6 +274,9 @@ function Metrics(
                           onManageColumns={props.onColumnsOrderChange}
                           onColumnsVisibilityChange={
                             props.onColumnsVisibilityChange
+                          }
+                          onDefaultColumnsVisibilityChange={
+                            props.onDefaultColumnsVisibilityChange
                           }
                           onTableDiffShow={props.onTableDiffShow}
                           onRowHeightChange={props.onRowHeightChange}
