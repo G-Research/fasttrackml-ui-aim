@@ -21,16 +21,24 @@ function HideColumnsPopover({
   onDefaultColumnsVisibilityChange: (value: UnselectedColumnState) => void;
   appName: AppNameEnum;
 }) {
-  console.log('HideColumnsPopover - ', unselectedColumnState);
   const columnStateChanged: boolean = React.useMemo(() => {
     return unselectedColumnState !== UnselectedColumnState.DEFAULT;
-  }, [appName, unselectedColumnState]);
-
-  // Force rerender on unselectedColumnState change
-  React.useEffect(() => {
-    console.log('appName - ', appName);
-    console.log('HideColumnsPopover - unselectedColumnState changed');
   }, [unselectedColumnState]);
+
+  const [unselectedColumnLocal, setUnselectedColumnLocal] =
+    React.useState<UnselectedColumnState>(unselectedColumnState);
+
+  // Triggers re-rendering on unselectedColumnState change
+  React.useEffect(() => {
+    setUnselectedColumnLocal(unselectedColumnState);
+  }, [unselectedColumnState]);
+
+  function handleDefaultColumnsVisibilityChange(
+    value: UnselectedColumnState,
+  ): void {
+    onDefaultColumnsVisibilityChange(value);
+    setUnselectedColumnLocal(value);
+  }
 
   return (
     <ErrorBoundary>
@@ -72,10 +80,10 @@ function HideColumnsPopover({
               <MenuItem
                 className='HideColumnsPopover__item'
                 selected={
-                  unselectedColumnState === UnselectedColumnState.FORCE_HIDE
+                  unselectedColumnLocal === UnselectedColumnState.FORCE_HIDE
                 }
                 onClick={() =>
-                  onDefaultColumnsVisibilityChange(
+                  handleDefaultColumnsVisibilityChange(
                     UnselectedColumnState.FORCE_HIDE,
                   )
                 }
@@ -87,10 +95,10 @@ function HideColumnsPopover({
               <MenuItem
                 className='HideColumnsPopover__item'
                 selected={
-                  unselectedColumnState === UnselectedColumnState.FORCE_SHOW
+                  unselectedColumnLocal === UnselectedColumnState.FORCE_SHOW
                 }
                 onClick={() =>
-                  onDefaultColumnsVisibilityChange(
+                  handleDefaultColumnsVisibilityChange(
                     UnselectedColumnState.FORCE_SHOW,
                   )
                 }
@@ -102,10 +110,10 @@ function HideColumnsPopover({
               <MenuItem
                 className='HideColumnsPopover__item'
                 selected={
-                  unselectedColumnState === UnselectedColumnState.DEFAULT
+                  unselectedColumnLocal === UnselectedColumnState.DEFAULT
                 }
                 onClick={() =>
-                  onDefaultColumnsVisibilityChange(
+                  handleDefaultColumnsVisibilityChange(
                     UnselectedColumnState.DEFAULT,
                   )
                 }
