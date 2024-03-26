@@ -24,6 +24,8 @@ function getProjectsData() {
       }).then((data: IProject) => {
         //@ts-ignore
         window.telemetry_enabled = data.telemetry_enabled;
+        //@ts-ignore
+        window.live_updates_enabled = data.live_updates_enabled;
         model.setState({
           project: data,
         });

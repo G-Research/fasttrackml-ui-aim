@@ -166,6 +166,10 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       onActivePointChange={paramsAppModel.onActivePointChange}
       onGroupingApplyChange={paramsAppModel.onGroupingApplyChange}
       onGroupingPersistenceChange={paramsAppModel.onGroupingPersistenceChange}
+      onSelectExperimentNamesChange={
+        paramsAppModel.onSelectExperimentNamesChange
+      }
+      onToggleAllExperiments={paramsAppModel.onToggleAllExperiments}
       onSelectRunQueryChange={paramsAppModel.onSelectRunQueryChange}
       onBookmarkCreate={paramsAppModel.onBookmarkCreate}
       onBookmarkUpdate={paramsAppModel.onBookmarkUpdate}
