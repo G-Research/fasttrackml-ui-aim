@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
+import { Link as RouteLink } from 'react-router-dom';
 import { NavLink, useRouteMatch } from 'react-router-dom';
 import moment from 'moment';
 
 import { Skeleton } from '@material-ui/lab';
-import { Tooltip } from '@material-ui/core';
+import { Link, Tooltip } from '@material-ui/core';
 
 import { Button, Icon, Text } from 'components/kit';
 import ControlPopover from 'components/ControlPopover/ControlPopover';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
 import { DATE_WITH_SECONDS } from 'config/dates/dates';
+import { getBaseHost } from 'config/config';
+
+import namespacesService from 'services/api/namespaces/namespacesService';
 
 import ExperimentNavigationPopover from '../ExperimentNavigationPopover';
 
@@ -27,6 +31,12 @@ function ExperimentHeader({
   getExperimentsData,
 }: IExperimentHeaderProps): React.FunctionComponentElement<React.ReactNode> {
   const { url } = useRouteMatch();
+  const [selectedNamespace, setSelectedNamespace] = useState<string>('');
+  useEffect(() => {
+    namespacesService.fetchCurrentNamespacePath().then((data) => {
+      setSelectedNamespace(data);
+    });
+  }, []);
 
   return (
     <ErrorBoundary>
@@ -108,6 +118,18 @@ function ExperimentHeader({
                       (experimentData?.creation_time || 0) * 1000,
                     ).format(DATE_WITH_SECONDS)}`}
                   </Text>
+                  <Link
+                    href={
+                      getBaseHost() +
+                      selectedNamespace +
+                      '/mlflow/#/experiments/' +
+                      experimentId
+                    }
+                    target='_blank'
+                    style={{ marginLeft: '2rem' }}
+                  >
+                    <div style={{ fontSize: '0.8rem' }}>Open in Classic UI</div>
+                  </Link>
                 </>
               ) : (
                 <Skeleton

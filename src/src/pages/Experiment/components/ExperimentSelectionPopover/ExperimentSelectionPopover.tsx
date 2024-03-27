@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import moment from 'moment';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
-import { Button, Checkbox, InputBase, Tooltip } from '@material-ui/core';
+import { Button, Checkbox, InputBase, Link, Tooltip } from '@material-ui/core';
 import CheckBoxOutlineBlank from '@material-ui/icons/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@material-ui/icons/CheckBox';
 
@@ -11,8 +11,11 @@ import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 import { Icon, Spinner, Text } from 'components/kit';
 
 import { DATE_WITH_SECONDS } from 'config/dates/dates';
+import { getBaseHost } from 'config/config';
 
 import { IExperimentData } from 'modules/core/api/experimentsApi';
+
+import namespacesService from 'services/api/namespaces/namespacesService';
 
 import { IExperimentSelectionPopoverProps } from '.';
 
@@ -43,6 +46,12 @@ function ExperimentSelectionPopover({
   const [visibleExperiments, setVisibleExperiments] = React.useState<
     IExperimentData[]
   >([]);
+  const [selectedNamespace, setSelectedNamespace] = React.useState<string>('');
+  React.useEffect(() => {
+    namespacesService.fetchCurrentNamespacePath().then((data) => {
+      setSelectedNamespace(data);
+    });
+  }, []);
 
   React.useEffect(() => {
     setVisibleExperiments(experimentsData || []);
@@ -236,35 +245,60 @@ function ExperimentSelectionPopover({
                       >
                         {shortenExperimentName(experiment?.name)}
                       </Text>
-                      <div className='experimentBox__date'>
-                        <Icon
-                          name='calendar'
-                          color={
-                            experimentInList(
-                              experiment.name,
-                              selectedExperimentNames,
-                            )
-                              ? '#414B6D'
-                              : '#606986'
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          width: '100%',
+                        }}
+                      >
+                        <div className='experimentBox__date'>
+                          <Icon
+                            name='calendar'
+                            color={
+                              experimentInList(
+                                experiment.name,
+                                selectedExperimentNames,
+                              )
+                                ? '#414B6D'
+                                : '#606986'
+                            }
+                            fontSize={12}
+                          />
+                          <Text
+                            size={14}
+                            tint={
+                              experimentInList(
+                                experiment.name,
+                                selectedExperimentNames,
+                              )
+                                ? 80
+                                : 70
+                            }
+                            weight={500}
+                          >
+                            {`${moment(experiment.creation_time * 1000).format(
+                              DATE_WITH_SECONDS,
+                            )}`}
+                          </Text>
+                        </div>
+                        <Link
+                          href={
+                            getBaseHost() +
+                            selectedNamespace +
+                            '/mlflow/#/experiments/' +
+                            experiment.id
                           }
-                          fontSize={12}
-                        />
-                        <Text
-                          size={14}
-                          tint={
-                            experimentInList(
-                              experiment.name,
-                              selectedExperimentNames,
-                            )
-                              ? 80
-                              : 70
-                          }
-                          weight={500}
+                          target='_blank'
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ marginLeft: '1rem' }}
                         >
-                          {`${moment(experiment.creation_time * 1000).format(
-                            DATE_WITH_SECONDS,
-                          )}`}
-                        </Text>
+                          <div style={{ fontSize: '0.8rem' }}>
+                            Open in Classic UI
+                          </div>
+                        </Link>
                       </div>
                     </div>
                   </Button>
