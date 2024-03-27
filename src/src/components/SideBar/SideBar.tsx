@@ -19,6 +19,7 @@ import { DOCUMENTATIONS } from 'config/references';
 
 import routes, { IRoute } from 'routes/routes';
 
+import namespacesService from 'services/api/namespaces/namespacesService';
 import { trackEvent } from 'services/analytics';
 
 import { getItem } from 'utils/storage';
@@ -51,18 +52,20 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
   }, []);
 
   useEffect(() => {
-    fetch(`${getBaseHost()}/admin/namespaces/list`)
-      .then((response) => response.json())
-      .then((data) =>
-        setNamespaces(data.map((item: { code: any }) => item.code)),
-      );
-
-    fetch(`${getBaseHost()}${getPrefix()}admin/namespaces/current`)
-      .then((response) => response.json())
+    namespacesService
+      .fetchCurrentNamespace()
+      .call()
       .then((data) => {
         const selected = data.code;
         setSelectedNamespace(selected);
       });
+
+    namespacesService
+      .fetchNamespacesList()
+      .call()
+      .then((data) =>
+        setNamespaces(data.map((item: { code: any }) => item.code)),
+      );
   }, []);
 
   function selectNamespace(event: React.ChangeEvent<{ value: unknown }>) {
