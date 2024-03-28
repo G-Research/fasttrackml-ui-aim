@@ -35,6 +35,9 @@ function MetricsBar({
   onToggleAllExperiments,
 }: IMetricsBarProps): React.FunctionComponentElement<React.ReactNode> {
   const [popover, setPopover] = React.useState<string>('');
+  const [selectedExperimentNames, setSelectedExperimentNames] = React.useState<
+    string[]
+  >(getSelectedExperimentNames());
 
   const route = useRouteMatch<any>();
 
@@ -47,8 +50,6 @@ function MetricsBar({
 
   const { data: experimentsData, loading: isExperimentsLoading } =
     experimentsState;
-
-  const selectedExperimentNames = getSelectedExperimentNames();
 
   function handleBookmarkClick(value: string): void {
     setPopover(value);
@@ -65,6 +66,7 @@ function MetricsBar({
 
   function handleExperimentNamesChange(experimentName: string): void {
     onSelectExperimentNamesChange(experimentName);
+    setSelectedExperimentNames(getSelectedExperimentNames());
   }
 
   return (
