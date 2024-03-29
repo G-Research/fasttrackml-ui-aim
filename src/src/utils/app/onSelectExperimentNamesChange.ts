@@ -33,7 +33,10 @@ export default function onSelectExperimentNamesChange<M extends State>({
   if (configData?.select) {
     const newConfig = {
       ...configData,
-      select: { ...configData.select, selectedExperimentNames },
+      select: {
+        ...configData.select,
+        selectedExperimentNames,
+      },
     };
     model.setState({ config: newConfig });
   }

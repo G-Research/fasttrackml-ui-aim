@@ -117,14 +117,15 @@
   margin: 10px;
 }
 
-.Popper__SelectForm__select{
+.Popper__SelectForm__select {
   @extend .SelectForm__param__select;
 }
 
-.Popper__SelectForm__option{
+.Popper__SelectForm__option {
   @extend .SelectForm__option !optional;
 }
 
-.Popper__SelectForm__option__label{
+.Popper__SelectForm__option__label {
   @extend .SelectForm__option__label !optional;
+  margin-left: $space-xs;
 }
