@@ -51,13 +51,13 @@ function SideBar(): React.FunctionComponentElement<React.ReactNode> {
   }, []);
 
   useEffect(() => {
-    fetch(`${getBaseHost()}/admin/namespaces/list`)
+    fetch(`${getBaseHost()}/chooser/namespaces`)
       .then((response) => response.json())
       .then((data) =>
         setNamespaces(data.map((item: { code: any }) => item.code)),
       );
 
-    fetch(`${getBaseHost()}${getPrefix()}admin/namespaces/current`)
+    fetch(`${getBaseHost()}${getPrefix()}chooser/namespaces/current`)
       .then((response) => response.json())
       .then((data) => {
         const selected = data.code;
