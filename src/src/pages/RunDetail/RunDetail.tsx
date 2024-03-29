@@ -347,6 +347,10 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
                         style={{ marginLeft: '2rem' }}
                       >
                         <div style={{ fontSize: '0.8rem' }}>
+                          <Icon
+                            name='live-demo'
+                            style={{ marginRight: '0.3rem' }}
+                          />
                           Open in Classic UI
                         </div>
                       </MaterialLink>
