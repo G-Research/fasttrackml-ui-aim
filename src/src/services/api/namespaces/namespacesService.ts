@@ -6,8 +6,8 @@ import { IApiRequest } from 'types/services/services';
 import API from '../api';
 
 const endpoints = {
-  NAMESPACES: '/admin/namespaces/list',
-  CURRENT_NAMESPACE: `${getPrefix()}admin/namespaces/current`,
+  NAMESPACES: '/chooser/namespaces',
+  CURRENT_NAMESPACE: `${getPrefix()}chooser/namespaces/current`,
 };
 
 function fetchNamespacesList(): IApiRequest<IAppData[]> {

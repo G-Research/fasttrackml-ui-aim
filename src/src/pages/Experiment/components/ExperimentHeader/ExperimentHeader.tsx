@@ -128,7 +128,13 @@ function ExperimentHeader({
                     target='_blank'
                     style={{ marginLeft: '2rem' }}
                   >
-                    <div style={{ fontSize: '0.8rem' }}>Open in Classic UI</div>
+                    <div style={{ fontSize: '0.8rem' }}>
+                      <Icon
+                        name='live-demo'
+                        style={{ marginRight: '0.3rem' }}
+                      />
+                      Open in Classic UI
+                    </div>
                   </Link>
                 </>
               ) : (
