@@ -5,7 +5,7 @@ import { IExperimentData } from 'modules/core/api/experimentsApi';
 
 import experimentEngine from './ExperimentStore';
 
-function useExperimentState(experimentId: string) {
+function useExperimentState(experimentId?: string) {
   const { current: engine } = React.useRef(experimentEngine);
   const experimentState: IResourceState<IExperimentData> =
     engine.experimentState((state) => state);
@@ -21,7 +21,12 @@ function useExperimentState(experimentId: string) {
   }, []);
 
   React.useEffect(() => {
-    engine.fetchExperimentData(experimentId as any);
+    if (experimentId) {
+      engine.fetchExperimentData(experimentId as any);
+    } else {
+      // Fetch the default experiment in the namespace
+      engine.fetchExperimentsData();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [experimentId]);
 
