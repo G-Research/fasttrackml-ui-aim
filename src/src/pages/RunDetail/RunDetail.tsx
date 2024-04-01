@@ -13,7 +13,13 @@ import {
 } from 'react-router-dom';
 import { useModel } from 'hooks';
 
-import { Paper, Tab, Tabs, Tooltip } from '@material-ui/core';
+import {
+  Paper,
+  Tab,
+  Tabs,
+  Tooltip,
+  Link as MaterialLink,
+} from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 
 import { Button, Icon, Text } from 'components/kit';
@@ -27,6 +33,7 @@ import Spinner from 'components/kit/Spinner';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DATE_WITH_SECONDS } from 'config/dates/dates';
 import { PathEnum } from 'config/enums/routesEnum';
+import { getBaseHost } from 'config/config';
 
 import CompareSelectedRunsPopover from 'pages/Metrics/components/Table/CompareSelectedRunsPopover';
 
@@ -34,6 +41,7 @@ import runDetailAppModel from 'services/models/runs/runDetailAppModel';
 import * as analytics from 'services/analytics';
 import notesModel from 'services/models/notes/notesModel';
 import { AppNameEnum } from 'services/models/explorer';
+import namespacesService from 'services/api/namespaces/namespacesService';
 
 import { setDocumentTitle } from 'utils/document/documentTitle';
 import { processDurationTime } from 'utils/processDurationTime';
@@ -83,6 +91,12 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
   const [isRunSelectDropdownOpen, setIsRunSelectDropdownOpen] =
     React.useState(false);
   const [activeTab, setActiveTab] = React.useState(pathname);
+  const [selectedNamespace, setSelectedNamespace] = React.useState<string>('');
+  React.useEffect(() => {
+    namespacesService.fetchCurrentNamespacePath().then((data) => {
+      setSelectedNamespace(data);
+    });
+  }, []);
 
   function redirect(): void {
     const splitPathname: string[] = pathname.split('/');
@@ -320,6 +334,26 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
                             : dateNow,
                         )}`}
                       </Text>
+                      <MaterialLink
+                        href={
+                          getBaseHost() +
+                          selectedNamespace +
+                          '/mlflow/#/experiments/' +
+                          runData?.runInfo?.experiment?.id +
+                          '/runs/' +
+                          runHash
+                        }
+                        target='_blank'
+                        style={{ marginLeft: '2rem' }}
+                      >
+                        <div style={{ fontSize: '0.8rem' }}>
+                          <Icon
+                            name='live-demo'
+                            style={{ marginRight: '0.3rem' }}
+                          />
+                          Open in Classic UI
+                        </div>
+                      </MaterialLink>
                     </>
                   ) : (
                     <Skeleton
