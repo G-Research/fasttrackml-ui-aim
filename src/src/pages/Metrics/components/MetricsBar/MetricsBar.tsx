@@ -13,6 +13,10 @@ import ConfirmModal from 'components/ConfirmModal/ConfirmModal';
 
 import { DOCUMENTATIONS } from 'config/references';
 
+import { IResourceState } from 'modules/core/utils/createResource';
+import { IExperimentData } from 'modules/core/api/experimentsApi';
+
+import createExperimentEngine from 'pages/Dashboard/components/ExploreSection/ExperimentsCard/ExperimentsStore';
 import ExperimentBar from 'pages/Experiment/components/ExperimentBar';
 import useExperimentState from 'pages/Experiment/useExperimentState';
 
@@ -41,9 +45,22 @@ function MetricsBar({
 
   const route = useRouteMatch<any>();
 
+  const { current: experimentsEngine } = React.useRef(createExperimentEngine);
+
+  const experimentsStore: IResourceState<IExperimentData[]> =
+    experimentsEngine.experimentsState((state) => state);
+
+  React.useEffect(() => {
+    experimentsEngine.fetchExperiments();
+    return () => {
+      experimentsEngine.destroy();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Fetch all experiments along with default
   const { experimentState, experimentsState, getExperimentsData } =
-    useExperimentState('0');
+    useExperimentState(experimentsStore.data?.[0]?.id);
 
   const { data: experimentData, loading: isExperimentLoading } =
     experimentState;
