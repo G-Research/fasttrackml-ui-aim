@@ -261,7 +261,7 @@ export interface IMetricsDataParams {
   metrics: Array<[string, string]>;
   query: string;
   steps: number;
-  x_axis: any;
+  x_axis: string;
   skip_system?: boolean;
 }
 
