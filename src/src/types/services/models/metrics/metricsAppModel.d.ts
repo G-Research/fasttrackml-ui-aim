@@ -258,7 +258,7 @@ export interface IAlignMetricsDataParams {
 
 export interface IMetricsDataParams {
   report_progress?: boolean;
-  metrics: Array<[string, string]>;
+  metrics: Array<{ key: string; context: string }>;
   query: string;
   steps: number;
   x_axis: string;
