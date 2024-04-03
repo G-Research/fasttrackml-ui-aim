@@ -542,6 +542,23 @@ function createAppModel(appConfig: IAppInitialConfig) {
       if (!appId) {
         setModelDefaultAppConfigData();
       }
+
+      // fetch project params now and update every 30s
+      fetchProjectParamsAndUpdateState();
+      setInterval(fetchProjectParamsAndUpdateState, 30000);
+
+      const liveUpdateState = model.getState()?.config?.liveUpdate;
+
+      if (liveUpdateState?.enabled) {
+        liveUpdateInstance = new LiveUpdateService(
+          appName,
+          updateData,
+          liveUpdateState.delay,
+        );
+      }
+    }
+
+    function fetchProjectParamsAndUpdateState() {
       projectsService
         .getProjectParams(['metric'])
         .call()
@@ -565,15 +582,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
             },
           });
         });
-      const liveUpdateState = model.getState()?.config?.liveUpdate;
-
-      if (liveUpdateState?.enabled) {
-        liveUpdateInstance = new LiveUpdateService(
-          appName,
-          updateData,
-          liveUpdateState.delay,
-        );
-      }
     }
 
     function updateData(newData: ISequence<IMetricTrace>[]): void {
