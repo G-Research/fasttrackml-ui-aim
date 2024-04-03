@@ -51,6 +51,7 @@ import {
   IGroupingSelectOption,
   IMetricAppModelState,
   IMetricsCollection,
+  IMetricsDataParams,
   IMetricTableRowData,
   IOnGroupingModeChangeParams,
   IOnGroupingSelectChangeParams,
@@ -633,7 +634,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
         params[`m[${index}][context]`] = context;
       });
 
-      metricsRequestRef = metricsService.getMetricsData(params);
+      const reqBody: IMetricsDataParams = {
+        metrics: metrics,
+        steps: configData?.chart?.densityType,
+        query: query,
+        x_axis: metric ? { x_axis: metric } : {},
+      };
+      metricsRequestRef = metricsService.getMetricsData(reqBody);
       setRequestProgress(model);
       return {
         call: async () => {

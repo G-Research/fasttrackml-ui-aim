@@ -256,6 +256,15 @@ export interface IAlignMetricsDataParams {
   }[];
 }
 
+export interface IMetricsDataParams {
+  report_progress?: boolean;
+  metrics: Array<[string, string]>;
+  query: string;
+  steps: number;
+  x_axis: any;
+  skip_system?: boolean;
+}
+
 export interface ISmoothing {
   algorithm: SmoothingAlgorithmEnum;
   factor: number;
