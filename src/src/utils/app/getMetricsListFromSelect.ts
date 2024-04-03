@@ -19,17 +19,7 @@ export default function getMetricsListFromSelect(
     const metricName = option.value?.option_name ?? '';
     const context: string =
       option.value?.context && Object.keys(option.value?.context).length > 0
-        ? Object.keys(option.value?.context)
-            .map((item) => {
-              const contextKey = !jsValidVariableRegex.test(item)
-                ? `['${item}']`
-                : `${item}`;
-              const contextValue = (option.value?.context as any)[item];
-              return `{${formatValue(contextKey)}: ${formatValue(
-                contextValue,
-              )}}`;
-            })
-            .join(', ')
+        ? formatValue(option.value?.context)
         : '{}';
 
     metricsList.push([metricName, context]);
