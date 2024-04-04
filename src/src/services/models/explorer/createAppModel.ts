@@ -51,6 +51,7 @@ import {
   IGroupingSelectOption,
   IMetricAppModelState,
   IMetricsCollection,
+  IMetricsDataParams,
   IMetricTableRowData,
   IOnGroupingModeChangeParams,
   IOnGroupingSelectChangeParams,
@@ -624,24 +625,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
       let metrics = getMetricsListFromSelect(configData?.select);
       let query = getQueryStringFromSelect(configData?.select, true);
 
-      let params: {
-        q: string;
-        p?: any;
-        x_axis?: any;
-        [key: string]: any;
-      } = {
-        q: query,
-        p: configData?.chart?.densityType,
-        ...(metric ? { x_axis: metric } : {}),
+      const reqBody: IMetricsDataParams = {
+        metrics: metrics,
+        steps: configData?.chart?.densityType,
+        query: query,
+        x_axis: JSON.stringify(metric ? { x_axis: metric } : {}),
       };
-
-      metrics.forEach((tuple, index) => {
-        const [metric, context] = tuple;
-        params[`m[${index}][metric]`] = metric;
-        params[`m[${index}][context]`] = context;
-      });
-
-      metricsRequestRef = metricsService.getMetricsData(params);
+      metricsRequestRef = metricsService.getMetricsData(reqBody);
       setRequestProgress(model);
       return {
         call: async () => {
