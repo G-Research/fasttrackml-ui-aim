@@ -23,9 +23,10 @@ import './ExperimentSelectionPopover.scss';
 
 function ExperimentSelectionPopover({
   experimentsData,
-  selectedExperimentNames,
+  selectedExperiments,
   isExperimentsLoading,
   getExperimentsData,
+  setSelectedExperiments,
   onSelectExperimentNamesChange,
   onToggleAllExperiments,
 }: IExperimentSelectionPopoverProps): React.FunctionComponentElement<React.ReactNode> {
@@ -36,16 +37,15 @@ function ExperimentSelectionPopover({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Add forceUpdate to force re-render (to update selected experiments)
-  const [, updateState] = React.useState<{}>();
-  const forceUpdate = React.useCallback(() => updateState({}), []);
-
   const [searchValue, setSearchValue] = React.useState<string>('');
   const [isRegexSearch, setIsRegexSearch] = React.useState(false);
   const [invalidRegex, setInvalidRegex] = React.useState<boolean>(false);
+
+  // Visible experiments are the ones that match the search query
   const [visibleExperiments, setVisibleExperiments] = React.useState<
     IExperimentData[]
   >([]);
+
   const [selectedNamespace, setSelectedNamespace] = React.useState<string>('');
   React.useEffect(() => {
     namespacesService.fetchCurrentNamespacePath().then((data) => {
@@ -68,9 +68,17 @@ function ExperimentSelectionPopover({
   }
 
   function handleExperimentClick(experimentName: string): void {
+    // Update model
     onSelectExperimentNamesChange(experimentName);
-    // TODO: Figure out a better way to re-render
-    forceUpdate();
+
+    // Update view
+    if (selectedExperiments.includes(experimentName)) {
+      setSelectedExperiments(
+        selectedExperiments.filter((name) => name !== experimentName),
+      );
+    } else {
+      setSelectedExperiments([...selectedExperiments, experimentName]);
+    }
   }
 
   function experimentInList(
@@ -120,12 +128,27 @@ function ExperimentSelectionPopover({
     // If all experiments are selected, deselect all
     // otherwise, select all that are unselected
     if (checked) {
+      // Update model
       onToggleAllExperiments(visibleExperimentNames);
+
+      // Update view
+      setSelectedExperiments(
+        selectedExperiments.filter(
+          (experimentName) => !visibleExperimentNames.includes(experimentName),
+        ),
+      );
     } else {
+      // Update model
       const unselectedExperiments = visibleExperimentNames?.filter(
-        (experimentName) => !selectedExperimentNames.includes(experimentName),
+        (experimentName) => !selectedExperiments.includes(experimentName),
       );
       onToggleAllExperiments(unselectedExperiments);
+
+      // Update view
+      setSelectedExperiments([
+        ...selectedExperiments,
+        ...unselectedExperiments,
+      ]);
     }
   }
 
@@ -133,7 +156,7 @@ function ExperimentSelectionPopover({
     return (
       visibleExperiments.length > 0 &&
       visibleExperiments.every((experiment) =>
-        selectedExperimentNames.includes(experiment.name),
+        selectedExperiments.includes(experiment.name),
       )
     );
   }
@@ -212,7 +235,7 @@ function ExperimentSelectionPopover({
                     className={classNames('experimentBox', {
                       selected: experimentInList(
                         experiment.name,
-                        selectedExperimentNames,
+                        selectedExperiments,
                       ),
                     })}
                   >
@@ -223,7 +246,7 @@ function ExperimentSelectionPopover({
                         checkedIcon={<CheckBoxIcon />}
                         checked={experimentInList(
                           experiment.name,
-                          selectedExperimentNames,
+                          selectedExperiments,
                         )}
                         size='small'
                         className='experimentBox__checkbox'
@@ -233,10 +256,7 @@ function ExperimentSelectionPopover({
                       <Text
                         size={16}
                         tint={
-                          experimentInList(
-                            experiment.name,
-                            selectedExperimentNames,
-                          )
+                          experimentInList(experiment.name, selectedExperiments)
                             ? 100
                             : 80
                         }
@@ -260,7 +280,7 @@ function ExperimentSelectionPopover({
                             color={
                               experimentInList(
                                 experiment.name,
-                                selectedExperimentNames,
+                                selectedExperiments,
                               )
                                 ? '#414B6D'
                                 : '#606986'
@@ -272,7 +292,7 @@ function ExperimentSelectionPopover({
                             tint={
                               experimentInList(
                                 experiment.name,
-                                selectedExperimentNames,
+                                selectedExperiments,
                               )
                                 ? 80
                                 : 70
