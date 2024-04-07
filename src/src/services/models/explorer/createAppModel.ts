@@ -130,7 +130,6 @@ import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
 import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
 import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
-import onSelectAdvancedQueryChange from 'utils/app/onSelectAdvancedQueryChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
 import onSmoothingChange from 'utils/app/onSmoothingChange';
 import onSortFieldsChange from 'utils/app/onSortFieldsChange';
@@ -646,41 +645,45 @@ function createAppModel(appConfig: IAppInitialConfig) {
       setRequestProgress(model);
       return {
         call: async () => {
-          model.setState({
-            requestStatus: RequestStatusEnum.Pending,
-            queryIsEmpty: false,
-            selectedRows: shouldResetSelectedRows
-              ? {}
-              : model.getState()?.selectedRows,
-          });
-          liveUpdateInstance?.stop().then();
-          try {
-            const stream = await metricsRequestRef.call((detail) => {
-              exceptionHandler({ detail, model });
-              resetModelState(configData, shouldResetSelectedRows!);
+          if (_.isEmpty(configData?.select?.options)) {
+            resetModelState(configData, shouldResetSelectedRows!);
+          } else {
+            model.setState({
+              requestStatus: RequestStatusEnum.Pending,
+              queryIsEmpty: false,
+              selectedRows: shouldResetSelectedRows
+                ? {}
+                : model.getState()?.selectedRows,
             });
-            const runData = await getRunData(stream, (progress) =>
-              setRequestProgress(model, progress),
-            );
-            if (shouldUrlUpdate) {
-              updateURL({ configData, appName });
+            liveUpdateInstance?.stop().then();
+            try {
+              const stream = await metricsRequestRef.call((detail) => {
+                exceptionHandler({ detail, model });
+                resetModelState(configData, shouldResetSelectedRows!);
+              });
+              const runData = await getRunData(stream, (progress) =>
+                setRequestProgress(model, progress),
+              );
+              if (shouldUrlUpdate) {
+                updateURL({ configData, appName });
+              }
+              saveRecentSearches(appName, query);
+              updateData(runData);
+            } catch (ex: Error | any) {
+              if (ex.name === 'AbortError') {
+                // Abort Error
+              } else {
+                // eslint-disable-next-line no-console
+                console.log('Unhandled error: ', ex);
+              }
             }
-            saveRecentSearches(appName, query);
-            updateData(runData);
-          } catch (ex: Error | any) {
-            if (ex.name === 'AbortError') {
-              // Abort Error
-            } else {
-              // eslint-disable-next-line no-console
-              console.log('Unhandled error: ', ex);
-            }
-          }
 
-          liveUpdateInstance?.start({
-            q: query,
-            p: configData?.chart?.densityType,
-            ...(metric && { x_axis: metric }),
-          });
+            liveUpdateInstance?.start({
+              q: query,
+              p: configData?.chart?.densityType,
+              ...(metric && { x_axis: metric }),
+            });
+          }
         },
         abort: metricsRequestRef.abort,
       };
