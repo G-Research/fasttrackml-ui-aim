@@ -24,14 +24,17 @@ function fetchActivityData(): IApiRequest<any> {
 
 function getProjectParams(
   sequences: string[] = ['metric'],
+  selectedExperimentNames: string[] = [],
 ): IApiRequest<IProjectParamsMetrics> {
-  const query = sequences.reduce(
-    (acc: string, sequence: string, index: number) => {
+  const query =
+    sequences.reduce((acc: string, sequence: string, index: number) => {
       acc += `${index === 0 ? '?' : '&'}sequence=${sequence}`;
       return acc;
-    },
-    '',
-  );
+    }, '') +
+    selectedExperimentNames.reduce((acc: string, experimentName: string) => {
+      acc += `&experiment_names=${experimentName}`;
+      return acc;
+    }, '');
   return API.get<IProjectParamsMetrics>(endpoints.GET_PROJECTS_PARAMS + query);
 }
 
