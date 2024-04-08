@@ -223,8 +223,10 @@ function getMetricsAppModelMethods(
   }
 
   function fetchProjectParamsAndUpdateState() {
+    const selectedExperimentNames =
+      model.getState()?.config?.select.selectedExperimentNames;
     projectsService
-      .getProjectParams(['metric'])
+      .getProjectParams(['metric'], selectedExperimentNames)
       .call()
       .then((data) => {
         const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
