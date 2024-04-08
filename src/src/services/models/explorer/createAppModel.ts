@@ -2018,6 +2018,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onSelectExperimentNamesChange(experimentName: string): void {
           // Handle experiment change, then re-fetch metrics data
           onSelectExperimentNamesChange({ experimentName, model });
+          fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
         },
         onToggleAllExperiments(experimentNames: string[]): void {
