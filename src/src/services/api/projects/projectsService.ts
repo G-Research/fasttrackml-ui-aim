@@ -27,7 +27,20 @@ function getProjectParams(
   selectedExperimentNames: string[] = [],
 ): IApiRequest<IProjectParamsMetrics> {
   if (selectedExperimentNames.length === 0) {
-    return API.createEmptyAPIRequestWrapper<IProjectParamsMetrics>();
+    const controller = new AbortController();
+    return {
+      call: () =>
+        new Promise((resolve: (data: IProjectParamsMetrics) => any) => {
+          // Simulating an empty response
+          const data: IProjectParamsMetrics = {
+            metric: {},
+            images: {},
+            params: {},
+          };
+          resolve(data);
+        }),
+      abort: () => controller.abort(),
+    };
   }
   const query =
     sequences.reduce((acc: string, sequence: string, index: number) => {
