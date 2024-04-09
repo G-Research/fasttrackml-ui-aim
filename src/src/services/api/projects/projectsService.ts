@@ -26,6 +26,9 @@ function getProjectParams(
   sequences: string[] = ['metric'],
   selectedExperimentNames: string[] = [],
 ): IApiRequest<IProjectParamsMetrics> {
+  if (selectedExperimentNames.length === 0) {
+    return API.createEmptyAPIRequestWrapper<IProjectParamsMetrics>();
+  }
   const query =
     sequences.reduce((acc: string, sequence: string, index: number) => {
       acc += `${index === 0 ? '?' : '&'}sequence=${sequence}`;

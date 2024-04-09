@@ -1,5 +1,19 @@
 import { getAPIHost, getBaseHost } from 'config/config';
 
+function createEmptyAPIRequestWrapper<ResponseDataType>() {
+  const controller = new AbortController();
+
+  return {
+    call: () =>
+      new Promise(async (resolve: (data: ResponseDataType) => void, reject) => {
+        // Simulating an empty response
+        const emptyPromise = new Promise<ResponseDataType>(() => {});
+        resolve(await emptyPromise);
+      }),
+    abort: () => controller.abort(),
+  };
+}
+
 function createAPIRequestWrapper<ResponseDataType>(
   url: string,
   options: RequestInit = {},
@@ -182,6 +196,7 @@ function getRequestHeaders() {
 }
 
 const API = {
+  createEmptyAPIRequestWrapper,
   get,
   getFromBaseHost,
   getStream,
