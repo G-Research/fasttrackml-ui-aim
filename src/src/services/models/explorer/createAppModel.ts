@@ -559,8 +559,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
     }
 
     function fetchProjectParamsAndUpdateState() {
+      const selectedExperimentNames =
+        model.getState()?.config?.select.selectedExperimentNames;
       projectsService
-        .getProjectParams(['metric'])
+        .getProjectParams(['metric'], selectedExperimentNames)
         .call()
         .then((data) => {
           const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
@@ -2016,6 +2018,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onSelectExperimentNamesChange(experimentName: string): void {
           // Handle experiment change, then re-fetch metrics data
           onSelectExperimentNamesChange({ experimentName, model });
+          fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
         },
         onToggleAllExperiments(experimentNames: string[]): void {
@@ -2232,9 +2235,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
           setModelDefaultAppConfigData();
         }
 
+        const selectedExperimentNames =
+          model.getState()?.config?.select?.selectedExperimentNames;
         const liveUpdateState = model.getState()?.config.liveUpdate;
         projectsService
-          .getProjectParams(['metric'])
+          .getProjectParams(['metric'], selectedExperimentNames)
           .call()
           .then((data) => {
             model.setState({
@@ -3281,8 +3286,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
             chartPanelRef: { current: null },
           };
         }
+        const selectedExperimentNames =
+          model.getState()?.config?.select?.selectedExperimentNames;
         projectsService
-          .getProjectParams(['metric'])
+          .getProjectParams(['metric'], selectedExperimentNames)
           .call()
           .then((data) => {
             model.setState({
@@ -4894,8 +4901,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
         }
         const liveUpdateState = model.getState()?.config?.liveUpdate;
 
+        const selectedExperimentNames =
+          model.getState()?.config?.select.selectedExperimentNames;
         projectsService
-          .getProjectParams(['metric'])
+          .getProjectParams(['metric'], selectedExperimentNames)
           .call()
           .then((data: IProjectParamsMetrics) => {
             model.setState({
