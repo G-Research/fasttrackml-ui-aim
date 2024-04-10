@@ -32,6 +32,16 @@ function ExperimentBar({
     return name;
   }
 
+  // Selected experiments are the ones that are checked
+  const [selectedExperiments, setSelectedExperiments] = React.useState<
+    string[]
+  >(selectedExperimentNames);
+
+  // Update selected experiments in UI when selectedExperimentNames change
+  React.useEffect(() => {
+    setSelectedExperiments(selectedExperimentNames);
+  }, [selectedExperimentNames]);
+
   return (
     <ErrorBoundary>
       <div className='ExperimentBar__headerContainer'>
@@ -67,14 +77,14 @@ function ExperimentBar({
                           <Icon name={opened ? 'arrow-up' : 'arrow-down'} />
                         </Button>
 
-                        {selectedExperimentNames.length === 0 ? (
+                        {selectedExperiments.length === 0 ? (
                           <Text className='ExperimentBar__headerContainer__appBarTitleBox__text'>
                             Select Experiments
                           </Text>
                         ) : null}
 
                         <div className='ExperimentBar__headerContainer__appBarTitleBox__chipContainer'>
-                          {selectedExperimentNames.map((experimentName) => (
+                          {selectedExperiments.map((experimentName) => (
                             <Tooltip
                               key={experimentName}
                               title={experimentName}
@@ -109,7 +119,8 @@ function ExperimentBar({
                 <ExperimentSelectionPopover
                   isExperimentsLoading={isExperimentsLoading}
                   experimentsData={experimentsData}
-                  selectedExperimentNames={selectedExperimentNames}
+                  selectedExperiments={selectedExperiments}
+                  setSelectedExperiments={setSelectedExperiments}
                   getExperimentsData={getExperimentsData}
                   onSelectExperimentNamesChange={onSelectExperimentNamesChange}
                   onToggleAllExperiments={onToggleAllExperiments}
