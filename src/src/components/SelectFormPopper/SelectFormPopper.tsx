@@ -1,6 +1,7 @@
 // @ts-nocheck
 /* eslint-disable react/prop-types */
 import React from 'react';
+import { VariableSizeList as List } from 'react-window';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import {
@@ -19,6 +20,44 @@ import { Text } from 'components/kit';
 
 import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
+const Row = ({ index, style, children }) => {
+  return <div style={style}>{children[index]}</div>;
+};
+
+const ListboxComponent = React.forwardRef(function ListboxComponent(
+  props,
+  ref,
+) {
+  const { children, role, ...other } = props;
+  const itemCount = Array.isArray(children) ? children.length : 0;
+  const HEADER_HEIGHT = 50; // Altezza dell'header
+  const ROW_HEIGHT = 48; // Altezza di ogni riga
+
+  const getItemSize = (index) => {
+    const rows = children[index].props.children[1].props.children.length;
+    return HEADER_HEIGHT + ROW_HEIGHT * rows;
+  };
+
+  return (
+    <div ref={ref}>
+      <div {...other}>
+        <List
+          height={200}
+          width={600}
+          itemCount={itemCount}
+          itemSize={getItemSize}
+        >
+          {({ index, style }) => (
+            <Row index={index} style={style}>
+              {children}
+            </Row>
+          )}
+        </List>
+      </div>
+    </div>
+  );
+});
+
 const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
   id,
   open,
@@ -36,11 +75,14 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
   className,
   classes,
 }) => {
+  const listRef = React.useRef(null); // to get reference of list container
+  const rowHeights = React.useRef({}); // to have heights of every row item
   const handleKeyDown = (event) => {
     if (event.key === 'ArrowLeft') {
       event.stopPropagation();
     }
   };
+
   return (
     <Popper
       id={id}
@@ -53,7 +95,6 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
         open
         onClose={handleClose}
         multiple
-        size='small'
         disablePortal
         disableCloseOnSelect
         options={options}
@@ -66,10 +107,26 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
         getOptionLabel={(option) => option.label}
         renderTags={() => null}
         disableClearable={true}
-        ListboxProps={{
-          style: {
-            height: 400,
-          },
+        disableListWrap
+        ListboxComponent={ListboxComponent}
+        renderOption={(option) => {
+          let selected: boolean = !!selectedData?.options.find(
+            (item: ISelectOption) => item.key === option.key,
+          )?.key;
+          return (
+            <div className='Popper__SelectForm__option'>
+              <Checkbox
+                color='primary'
+                icon={<CheckBoxOutlineBlank />}
+                checkedIcon={<CheckBoxIcon />}
+                checked={selected}
+                size='small'
+              />
+              <Text className='Popper__SelectForm__option__label' size={14}>
+                {option.label}
+              </Text>
+            </div>
+          );
         }}
         renderInput={(params) => (
           <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -131,25 +188,6 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
             </Tooltip>
           </div>
         )}
-        renderOption={(option) => {
-          let selected: boolean = !!selectedData?.options.find(
-            (item: ISelectOption) => item.key === option.key,
-          )?.key;
-          return (
-            <div className='Popper__SelectForm__option'>
-              <Checkbox
-                color='primary'
-                icon={<CheckBoxOutlineBlank />}
-                checkedIcon={<CheckBoxIcon />}
-                checked={selected}
-                size='small'
-              />
-              <Text className='Popper__SelectForm__option__label' size={14}>
-                {option.label}
-              </Text>
-            </div>
-          );
-        }}
       />
     </Popper>
   );
