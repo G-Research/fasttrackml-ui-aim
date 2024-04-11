@@ -20,9 +20,13 @@ import { Text } from 'components/kit';
 
 import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
-const Row = ({ index, style, children }) => {
-  return <div style={style}>{children[index]}</div>;
-};
+const Row = React.forwardRef(({ index, children, setSize }, ref) => {
+  const rowRef = React.useRef();
+  React.useEffect(() => {
+    setSize(index, rowRef.current.getBoundingClientRect().height);
+  }, [setSize, index]);
+  return <div ref={rowRef}>{children[index]}</div>;
+});
 
 const ListboxComponent = React.forwardRef(function ListboxComponent(
   props,
@@ -30,30 +34,33 @@ const ListboxComponent = React.forwardRef(function ListboxComponent(
 ) {
   const { children, role, ...other } = props;
   const itemCount = Array.isArray(children) ? children.length : 0;
-  const HEADER_HEIGHT = 50; // Altezza dell'header
-  const ROW_HEIGHT = 48; // Altezza di ogni riga
-
-  const getItemSize = (index) => {
-    const rows = children[index].props.children[1].props.children.length;
-    return HEADER_HEIGHT + ROW_HEIGHT * rows;
+  const listRef = React.useRef();
+  const sizeMap = React.useRef({});
+  const setSize = React.useCallback((index, size) => {
+    sizeMap.current = { ...sizeMap.current, [index]: size };
+    listRef.current.resetAfterIndex(index);
+  }, []);
+  const getSize = (index) => {
+    return sizeMap.current[index] || 50;
   };
 
   return (
-    <div ref={ref}>
-      <div {...other}>
-        <List
-          height={200}
-          width={600}
-          itemCount={itemCount}
-          itemSize={getItemSize}
-        >
-          {({ index, style }) => (
-            <Row index={index} style={style}>
+    <div {...other}>
+      <List
+        height={200}
+        width={600}
+        itemCount={itemCount}
+        itemSize={getSize}
+        ref={listRef}
+      >
+        {({ index, style }) => (
+          <div style={style}>
+            <Row index={index} setSize={setSize}>
               {children}
             </Row>
-          )}
-        </List>
-      </div>
+          </div>
+        )}
+      </List>
     </div>
   );
 });
@@ -75,8 +82,6 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
   className,
   classes,
 }) => {
-  const listRef = React.useRef(null); // to get reference of list container
-  const rowHeights = React.useRef({}); // to have heights of every row item
   const handleKeyDown = (event) => {
     if (event.key === 'ArrowLeft') {
       event.stopPropagation();
