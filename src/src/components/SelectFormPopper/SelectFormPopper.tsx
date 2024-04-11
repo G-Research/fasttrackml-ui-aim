@@ -87,7 +87,6 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
       event.stopPropagation();
     }
   };
-
   return (
     <Popper
       id={id}
@@ -100,14 +99,10 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
         open
         onClose={handleClose}
         multiple
+        size='small'
         disablePortal
         disableCloseOnSelect
         options={options}
-        ListboxProps={{
-          style: {
-            maxHeight: 400,
-          },
-        }}
         value={selectedData?.options}
         onChange={onSelect}
         classes={{
@@ -117,27 +112,13 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
         getOptionLabel={(option) => option.label}
         renderTags={() => null}
         disableClearable={true}
+        ListboxProps={{
+          style: {
+            maxHeight: 400,
+          },
+        }}
         disableListWrap
         ListboxComponent={ListboxComponent}
-        renderOption={(option) => {
-          let selected: boolean = !!selectedData?.options.find(
-            (item: ISelectOption) => item.key === option.key,
-          )?.key;
-          return (
-            <div className='Popper__SelectForm__option'>
-              <Checkbox
-                color='primary'
-                icon={<CheckBoxOutlineBlank />}
-                checkedIcon={<CheckBoxIcon />}
-                checked={selected}
-                size='small'
-              />
-              <Text className='Popper__SelectForm__option__label' size={14}>
-                {option.label}
-              </Text>
-            </div>
-          );
-        }}
         renderInput={(params) => (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Tooltip title='Select all visible'>
@@ -198,6 +179,25 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
             </Tooltip>
           </div>
         )}
+        renderOption={(option) => {
+          let selected: boolean = !!selectedData?.options.find(
+            (item: ISelectOption) => item.key === option.key,
+          )?.key;
+          return (
+            <div className='Popper__SelectForm__option'>
+              <Checkbox
+                color='primary'
+                icon={<CheckBoxOutlineBlank />}
+                checkedIcon={<CheckBoxIcon />}
+                checked={selected}
+                size='small'
+              />
+              <Text className='Popper__SelectForm__option__label' size={14}>
+                {option.label}
+              </Text>
+            </div>
+          );
+        }}
       />
     </Popper>
   );
