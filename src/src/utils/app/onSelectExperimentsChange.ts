@@ -23,7 +23,11 @@ export default function onSelectExperimentChange<M extends State>({
   if (index !== -1) {
     selectedExperiments.splice(index, 1);
   } else {
-    selectedExperiments.push(experiment);
+    const experimentShort = {
+      id: experiment.id,
+      name: experiment.name,
+    };
+    selectedExperiments.push(experimentShort);
   }
 
   if (selectedExperiments.length === 0) {
