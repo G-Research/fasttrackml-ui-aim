@@ -13,7 +13,10 @@ import { Icon, Spinner, Text } from 'components/kit';
 import { DATE_WITH_SECONDS } from 'config/dates/dates';
 import { getBaseHost } from 'config/config';
 
-import { IExperimentData } from 'modules/core/api/experimentsApi';
+import {
+  IExperimentData,
+  IExperimentDataShort,
+} from 'modules/core/api/experimentsApi';
 
 import namespacesService from 'services/api/namespaces/namespacesService';
 
@@ -27,7 +30,7 @@ function ExperimentSelectionPopover({
   isExperimentsLoading,
   getExperimentsData,
   setSelectedExperiments,
-  onSelectExperimentNamesChange,
+  onSelectExperimentsChange,
   onToggleAllExperiments,
 }: IExperimentSelectionPopoverProps): React.FunctionComponentElement<React.ReactNode> {
   React.useEffect(() => {
@@ -67,25 +70,24 @@ function ExperimentSelectionPopover({
     return name;
   }
 
-  function handleExperimentClick(experimentName: string): void {
+  function handleExperimentClick(experiment: IExperimentDataShort): void {
     // Update model
-    onSelectExperimentNamesChange(experimentName);
+    onSelectExperimentsChange(experiment);
 
     // Update view
-    if (selectedExperiments.includes(experimentName)) {
+    if (selectedExperiments.some((e) => e.id === experiment.id)) {
       setSelectedExperiments(
-        selectedExperiments.filter((name) => name !== experimentName),
+        selectedExperiments.filter((e) => e.name !== experiment.name),
       );
     } else {
-      setSelectedExperiments([...selectedExperiments, experimentName]);
+      setSelectedExperiments([...selectedExperiments, experiment]);
     }
   }
 
-  function experimentInList(
-    experimentName: string,
-    selectedExperimentNames: string[],
-  ): boolean {
-    return selectedExperimentNames.includes(experimentName);
+  function experimentIsSelected(experiment: IExperimentDataShort): boolean {
+    return selectedExperiments.some(
+      (selectedExperiment) => selectedExperiment.id === experiment.id,
+    );
   }
 
   function handleSearchInputChange(
@@ -122,25 +124,24 @@ function ExperimentSelectionPopover({
   }
 
   function toggleAllExperiments(checked: boolean): void {
-    const visibleExperimentNames = visibleExperiments?.map(
-      (experiment) => experiment.name,
-    );
     // If all experiments are selected, deselect all
     // otherwise, select all that are unselected
     if (checked) {
       // Update model
-      onToggleAllExperiments(visibleExperimentNames);
+      onToggleAllExperiments(visibleExperiments);
 
       // Update view
       setSelectedExperiments(
         selectedExperiments.filter(
-          (experimentName) => !visibleExperimentNames.includes(experimentName),
+          (experiment) =>
+            !visibleExperiments.some((e) => e.id === experiment.id),
         ),
       );
     } else {
       // Update model
-      const unselectedExperiments = visibleExperimentNames?.filter(
-        (experimentName) => !selectedExperiments.includes(experimentName),
+      const unselectedExperiments = visibleExperiments?.filter(
+        (experiment) =>
+          !selectedExperiments.some((e) => e.id === experiment.id),
       );
       onToggleAllExperiments(unselectedExperiments);
 
@@ -153,10 +154,16 @@ function ExperimentSelectionPopover({
   }
 
   function allExperimentsSelected(): boolean {
+    // Create a set of selected experiment IDs
+    const selectedExperimentIds = new Set(
+      selectedExperiments.map((experiment) => experiment.id),
+    );
+
+    // Check if all visible experiments are selected by their IDs
     return (
       visibleExperiments.length > 0 &&
       visibleExperiments.every((experiment) =>
-        selectedExperiments.includes(experiment.name),
+        selectedExperimentIds.has(experiment.id),
       )
     );
   }
@@ -231,12 +238,9 @@ function ExperimentSelectionPopover({
                 visibleExperiments?.map((experiment) => (
                   <Button
                     key={experiment.id}
-                    onClick={() => handleExperimentClick(experiment.name)}
+                    onClick={() => handleExperimentClick(experiment)}
                     className={classNames('experimentBox', {
-                      selected: experimentInList(
-                        experiment.name,
-                        selectedExperiments,
-                      ),
+                      selected: experimentIsSelected(experiment),
                     })}
                   >
                     <div className='experimentBox__leftContainer'>
@@ -244,10 +248,7 @@ function ExperimentSelectionPopover({
                         color='primary'
                         icon={<CheckBoxOutlineBlank />}
                         checkedIcon={<CheckBoxIcon />}
-                        checked={experimentInList(
-                          experiment.name,
-                          selectedExperiments,
-                        )}
+                        checked={experimentIsSelected(experiment)}
                         size='small'
                         className='experimentBox__checkbox'
                       />
@@ -255,11 +256,7 @@ function ExperimentSelectionPopover({
                     <div className='experimentBox__rightContainer'>
                       <Text
                         size={16}
-                        tint={
-                          experimentInList(experiment.name, selectedExperiments)
-                            ? 100
-                            : 80
-                        }
+                        tint={experimentIsSelected(experiment) ? 100 : 80}
                         weight={500}
                         className='experimentBox__experimentName'
                       >
@@ -278,10 +275,7 @@ function ExperimentSelectionPopover({
                           <Icon
                             name='calendar'
                             color={
-                              experimentInList(
-                                experiment.name,
-                                selectedExperiments,
-                              )
+                              experimentIsSelected(experiment)
                                 ? '#414B6D'
                                 : '#606986'
                             }
@@ -289,14 +283,7 @@ function ExperimentSelectionPopover({
                           />
                           <Text
                             size={14}
-                            tint={
-                              experimentInList(
-                                experiment.name,
-                                selectedExperiments,
-                              )
-                                ? 80
-                                : 70
-                            }
+                            tint={experimentIsSelected(experiment) ? 80 : 70}
                             weight={500}
                           >
                             {`${moment(experiment.creation_time * 1000).format(
