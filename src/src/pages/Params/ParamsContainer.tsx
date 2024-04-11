@@ -165,8 +165,8 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       onActivePointChange={paramsAppModel.onActivePointChange}
       onGroupingApplyChange={paramsAppModel.onGroupingApplyChange}
       onGroupingPersistenceChange={paramsAppModel.onGroupingPersistenceChange}
-      onSelectExperimentNamesChange={
-        paramsAppModel.onSelectExperimentNamesChange
+      onSelectExperimentsChange={
+        paramsAppModel.onSelectExperimentsChange
       }
       onToggleAllExperiments={paramsAppModel.onToggleAllExperiments}
       onSelectRunQueryChange={paramsAppModel.onSelectRunQueryChange}
