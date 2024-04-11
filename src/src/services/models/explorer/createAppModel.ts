@@ -17,6 +17,8 @@ import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
+
 import {
   getMetricsTableColumns,
   metricsTableRowRenderer,
@@ -127,7 +129,7 @@ import onParamsScaleTypeChange from 'utils/app/onParamsScaleTypeChange';
 import onParamVisibilityChange from 'utils/app/onParamsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
-import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
 import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
 import onSmoothingChange from 'utils/app/onSmoothingChange';
@@ -2015,14 +2017,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onMetricsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
           onSelectOptionsChange({ data, model });
         },
-        onSelectExperimentNamesChange(experimentName: string): void {
+        onSelectExperimentsChange(experiment: IExperimentDataShort): void {
           // Handle experiment change, then re-fetch metrics data
-          onSelectExperimentNamesChange({ experimentName, model });
+          onSelectExperimentsChange({ experiment, model });
           fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
         },
-        onToggleAllExperiments(experimentNames: string[]): void {
-          onToggleAllExperiments({ experimentNames, model });
+        onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+          onToggleAllExperiments({ experiments, model });
           getMetricsData(true, true).call();
         },
         onSelectRunQueryChange(query: string): void {
@@ -4714,13 +4716,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onParamsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
             onSelectOptionsChange({ data, model });
           },
-          onSelectExperimentNamesChange(experimentName: string): void {
+          onSelectExperimentsChange(experiment: IExperimentDataShort): void {
             // Handle experiment change, then re-fetch params data
-            onSelectExperimentNamesChange({ experimentName, model });
+            onSelectExperimentsChange({ experiment, model });
             getParamsData(true, true).call();
           },
-          onToggleAllExperiments(experimentNames: string[]): void {
-            onToggleAllExperiments({ experimentNames, model });
+          onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+            onToggleAllExperiments({ experiments, model });
             getParamsData(true, true).call();
           },
           onSelectRunQueryChange(query: string): void {
@@ -6239,13 +6241,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onSelectOptionsChange<D>(data: D & Partial<ISelectOption[]>): void {
             onSelectOptionsChange({ data, model });
           },
-          onSelectExperimentNamesChange(experimentName: string): void {
+          onSelectExperimentsChange(experiment: IExperimentDataShort): void {
             // Handle experiment change, then re-fetch scatters data
-            onSelectExperimentNamesChange({ experimentName, model });
+            onSelectExperimentsChange({ experiment, model });
             getScattersData(true, true).call();
           },
-          onToggleAllExperiments(experimentNames: string[]): void {
-            onToggleAllExperiments({ experimentNames, model });
+          onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+            onToggleAllExperiments({ experiments, model });
             getScattersData(true, true).call();
           },
           onSelectRunQueryChange(query: string): void {
