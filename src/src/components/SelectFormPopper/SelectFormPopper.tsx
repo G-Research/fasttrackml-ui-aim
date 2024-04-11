@@ -47,8 +47,8 @@ const ListboxComponent = React.forwardRef(function ListboxComponent(
   return (
     <div {...other}>
       <List
-        height={200}
-        width={600}
+        height={380}
+        width='100%'
         itemCount={itemCount}
         itemSize={getSize}
         ref={listRef}
@@ -103,6 +103,11 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
         disablePortal
         disableCloseOnSelect
         options={options}
+        ListboxProps={{
+          style: {
+            maxHeight: 400,
+          },
+        }}
         value={selectedData?.options}
         onChange={onSelect}
         classes={{
