@@ -167,21 +167,12 @@ function getParamsModelMethods(
         chartPanelRef: { current: null },
       };
     }
-    projectsService
-      .getProjectParams(['metric'])
-      .call()
-      .then((data) => {
-        model.setState({
-          selectFormData: {
-            options: getSelectOptions(data),
-            suggestions: getSuggestionsByExplorer(appName, data),
-          },
-        });
-      });
     model.setState({ ...state });
     if (!appId) {
       setModelDefaultAppConfigData();
     }
+    fetchProjectParamsAndUpdateState();
+
     const liveUpdateState = model.getState()?.config?.liveUpdate;
 
     if (liveUpdateState?.enabled) {
@@ -191,6 +182,22 @@ function getParamsModelMethods(
         liveUpdateState.delay,
       );
     }
+  }
+
+  function fetchProjectParamsAndUpdateState() {
+    const selectedExperimentNames =
+      model.getState()?.config?.select?.selectedExperimentNames;
+    projectsService
+      .getProjectParams(['metric'], selectedExperimentNames)
+      .call()
+      .then((data) => {
+        model.setState({
+          selectFormData: {
+            options: getSelectOptions(data),
+            suggestions: getSuggestionsByExplorer(appName, data),
+          },
+        });
+      });
   }
 
   function updateData(newData: IRun<IParamTrace>[]): void {
@@ -1569,6 +1576,7 @@ function getParamsModelMethods(
       onSelectExperimentNamesChange(experimentName: string): void {
         // Handle experiment change, then re-fetch params data
         onSelectExperimentNamesChange({ experimentName, model });
+        fetchProjectParamsAndUpdateState();
         getParamsData(true, true).call();
       },
       onToggleAllExperiments(experimentNames: string[]): void {
