@@ -3287,6 +3287,24 @@ function createAppModel(appConfig: IAppInitialConfig) {
             chartPanelRef: { current: null },
           };
         }
+        model.setState({ ...state });
+        if (!appId) {
+          setModelDefaultAppConfigData();
+        }
+        fetchProjectParamsAndUpdateState();
+
+        const liveUpdateState = model.getState()?.config?.liveUpdate;
+
+        if (liveUpdateState?.enabled) {
+          liveUpdateInstance = new LiveUpdateService(
+            appName,
+            updateData,
+            liveUpdateState.delay,
+          );
+        }
+      }
+
+      function fetchProjectParamsAndUpdateState() {
         const selectedExperimentNames =
           model.getState()?.config?.select?.selectedExperimentNames;
         projectsService
@@ -3300,19 +3318,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
               },
             });
           });
-        model.setState({ ...state });
-        if (!appId) {
-          setModelDefaultAppConfigData();
-        }
-        const liveUpdateState = model.getState()?.config?.liveUpdate;
-
-        if (liveUpdateState?.enabled) {
-          liveUpdateInstance = new LiveUpdateService(
-            appName,
-            updateData,
-            liveUpdateState.delay,
-          );
-        }
       }
 
       function updateData(newData: IRun<IParamTrace>[]): void {
@@ -4718,6 +4723,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onSelectExperimentNamesChange(experimentName: string): void {
             // Handle experiment change, then re-fetch params data
             onSelectExperimentNamesChange({ experimentName, model });
+            fetchProjectParamsAndUpdateState();
             getParamsData(true, true).call();
           },
           onToggleAllExperiments(experimentNames: string[]): void {
