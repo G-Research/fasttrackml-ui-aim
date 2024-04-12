@@ -545,7 +545,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
       // fetch project params now and update every 30s
       fetchProjectParamsAndUpdateState();
-      setInterval(fetchProjectParamsAndUpdateState, 30000);
 
       const liveUpdateState = model.getState()?.config?.liveUpdate;
 
@@ -559,6 +558,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
     }
 
     function fetchProjectParamsAndUpdateState() {
+      console.log('FETCHING metrics proj/params');
       const selectedExperimentNames =
         model.getState()?.config?.select.selectedExperimentNames;
       projectsService
@@ -1951,6 +1951,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
       destroy,
       deleteRuns,
       archiveRuns,
+      fetchProjectParamsAndUpdateState,
     };
 
     if (grouping) {
