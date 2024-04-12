@@ -558,7 +558,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
     }
 
     function fetchProjectParamsAndUpdateState() {
-      console.log('FETCHING metrics proj/params');
       const selectedExperimentNames =
         model.getState()?.config?.select.selectedExperimentNames;
       projectsService
@@ -4632,6 +4631,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onShuffleChange,
         deleteRuns,
         archiveRuns,
+        fetchProjectParamsAndUpdateState,
       };
 
       if (grouping) {
