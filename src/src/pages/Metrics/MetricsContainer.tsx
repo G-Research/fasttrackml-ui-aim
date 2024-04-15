@@ -201,6 +201,9 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onSelectExperimentNamesChange={
           metricAppModel.onSelectExperimentNamesChange
         }
+        updateSelectedExperimentNames={
+          metricAppModel.updateSelectedExperimentNames
+        }
         onToggleAllExperiments={metricAppModel.onToggleAllExperiments}
         onSelectRunQueryChange={metricAppModel.onSelectRunQueryChange}
         onExportTableData={metricAppModel.onExportTableData}

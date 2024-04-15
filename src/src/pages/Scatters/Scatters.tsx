@@ -65,6 +65,9 @@ function Scatters(
               onSelectExperimentNamesChange={
                 props.onSelectExperimentNamesChange
               }
+              updateSelectedExperimentNames={
+                props.updateSelectedExperimentNames
+              }
               onToggleAllExperiments={props.onToggleAllExperiments}
               title='Scatters explorer'
             />

@@ -204,6 +204,8 @@ import { getMetricLabel } from 'utils/app/getMetricLabel';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
+import updateSelectedExperimentNames from 'utils/app/updateSelectedExperimentNames';
+import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
 
 import { AppDataTypeEnum, AppNameEnum } from './index';
 
@@ -2012,6 +2014,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
     }
     if (selectForm) {
       Object.assign(methods, {
+        updateSelectedExperimentNames(): void {
+          console.log('UPDATING');
+          updateSelectedExperimentNames({ model });
+        },
         onMetricsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
           onSelectOptionsChange({ data, model });
         },
@@ -2020,6 +2026,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onSelectExperimentNamesChange({ experimentName, model });
           fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
+          console.log('FETCHING');
         },
         onToggleAllExperiments(experimentNames: string[]): void {
           onToggleAllExperiments({ experimentNames, model });
@@ -4717,6 +4724,10 @@ function createAppModel(appConfig: IAppInitialConfig) {
       }
       if (selectForm) {
         Object.assign(methods, {
+          updateSelectedExperimentNames(): void {
+            updateSelectedExperimentNames({ model });
+            console.log('UPDATING');
+          },
           onParamsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
             onSelectOptionsChange({ data, model });
           },
@@ -4725,6 +4736,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
             onSelectExperimentNamesChange({ experimentName, model });
             fetchProjectParamsAndUpdateState();
             getParamsData(true, true).call();
+            console.log('FETCHING');
           },
           onToggleAllExperiments(experimentNames: string[]): void {
             onToggleAllExperiments({ experimentNames, model });
@@ -6243,6 +6255,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
       }
       if (selectForm) {
         Object.assign(methods, {
+          updateSelectedExperimentNames(): void {
+            updateSelectedExperimentNames({ model });
+          },
           onSelectOptionsChange<D>(data: D & Partial<ISelectOption[]>): void {
             onSelectOptionsChange({ data, model });
           },
