@@ -63,6 +63,13 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
   }, [metricsData?.rawData]);
 
   React.useEffect(() => {
+    const pollingTimer = setInterval(() => {
+      metricAppModel.fetchProjectParamsAndUpdateState();
+    }, 30000);
+    return () => clearInterval(pollingTimer);
+  }, []);
+
+  React.useEffect(() => {
     metricAppModel.initialize(route.params.appId);
     let appRequestRef: IApiRequest<void>;
     let metricsRequestRef: IApiRequest<void>;

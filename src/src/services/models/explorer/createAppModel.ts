@@ -545,7 +545,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
       // fetch project params now and update every 30s
       fetchProjectParamsAndUpdateState();
-      setInterval(fetchProjectParamsAndUpdateState, 30000);
 
       const liveUpdateState = model.getState()?.config?.liveUpdate;
 
@@ -1951,6 +1950,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
       destroy,
       deleteRuns,
       archiveRuns,
+      fetchProjectParamsAndUpdateState,
     };
 
     if (grouping) {
@@ -4631,6 +4631,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onShuffleChange,
         deleteRuns,
         archiveRuns,
+        fetchProjectParamsAndUpdateState,
       };
 
       if (grouping) {
