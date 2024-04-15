@@ -1,6 +1,7 @@
 // @ts-nocheck
 /* eslint-disable react/prop-types */
 import React from 'react';
+import { VariableSizeList as List } from 'react-window';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import {
@@ -18,6 +19,51 @@ import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import { Text } from 'components/kit';
 
 import { ISelectOption } from 'types/services/models/explorer/createAppModel';
+
+const Row = React.forwardRef(({ index, children, setSize }, ref) => {
+  const rowRef = React.useRef();
+  React.useEffect(() => {
+    setSize(index, rowRef.current.getBoundingClientRect().height);
+  }, [setSize, index]);
+  return <div ref={rowRef}>{children[index]}</div>;
+});
+
+const ListboxComponent = React.forwardRef(function ListboxComponent(
+  props,
+  ref,
+) {
+  const { children, role, ...other } = props;
+  const itemCount = Array.isArray(children) ? children.length : 0;
+  const listRef = React.useRef();
+  const sizeMap = React.useRef({});
+  const setSize = React.useCallback((index, size) => {
+    sizeMap.current = { ...sizeMap.current, [index]: size };
+    listRef.current.resetAfterIndex(index);
+  }, []);
+  const getSize = (index) => {
+    return sizeMap.current[index] || 50;
+  };
+
+  return (
+    <div {...other}>
+      <List
+        height={380}
+        width='100%'
+        itemCount={itemCount}
+        itemSize={getSize}
+        ref={listRef}
+      >
+        {({ index, style }) => (
+          <div style={style}>
+            <Row index={index} setSize={setSize}>
+              {children}
+            </Row>
+          </div>
+        )}
+      </List>
+    </div>
+  );
+});
 
 const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
   id,
@@ -68,9 +114,11 @@ const SelectFormPopper: React.FC<ISelectFormPopperProps> = ({
         disableClearable={true}
         ListboxProps={{
           style: {
-            height: 400,
+            maxHeight: 400,
           },
         }}
+        disableListWrap
+        ListboxComponent={ListboxComponent}
         renderInput={(params) => (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Tooltip title='Select all visible'>
