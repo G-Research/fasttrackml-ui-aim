@@ -28,9 +28,9 @@ const Bookmarks = React.lazy(
 const Dashboard = React.lazy(
   () => import(/* webpackChunkName: "dashboard" */ 'pages/Dashboard/Dashboard'),
 );
-const TagsContainer = React.lazy(
-  () => import(/* webpackChunkName: "tags" */ 'pages/Tags/TagsContainer'),
-);
+// const TagsContainer = React.lazy(
+//   () => import(/* webpackChunkName: "tags" */ 'pages/Tags/TagsContainer'),
+// );
 const Scatters = React.lazy(
   () =>
     import(
@@ -192,15 +192,15 @@ const routes = {
     isExact: true,
     title: pageTitlesEnum.BOOKMARKS,
   },
-  TAGS: {
-    path: PathEnum.Tags,
-    component: TagsContainer,
-    showInSidebar: true,
-    displayName: 'Tags',
-    icon: 'tags',
-    isExact: true,
-    title: pageTitlesEnum.TAGS,
-  },
+  // TAGS: {
+  //   path: PathEnum.Tags,
+  //   component: TagsContainer,
+  //   showInSidebar: true,
+  //   displayName: 'Tags',
+  //   icon: 'tags',
+  //   isExact: true,
+  //   title: pageTitlesEnum.TAGS,
+  // },
   RUN_DETAIL: {
     path: PathEnum.Run_Detail,
     component: RunDetail,
