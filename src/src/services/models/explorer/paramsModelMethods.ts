@@ -1485,6 +1485,7 @@ function getParamsModelMethods(
     onShuffleChange,
     deleteRuns,
     archiveRuns,
+    fetchProjectParamsAndUpdateState,
   };
 
   if (grouping) {
