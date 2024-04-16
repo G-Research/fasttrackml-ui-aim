@@ -207,7 +207,6 @@ function SelectForm({
                 No metrics are selected
               </Text>
             )}
-            {/* Box must expand vertically if too many metrics are selected */}
             <Box
               className='Metrics__SelectForm__tags ScrollBar__hidden'
               flex={1}

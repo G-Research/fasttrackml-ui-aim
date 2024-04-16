@@ -85,7 +85,6 @@
     width: 24px;
     background: #e8f1fc;
     border-radius: 6px;
-    display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
@@ -113,14 +112,16 @@
   }
   &__tags {
     align-items: center;
-    overflow: auto;
-    max-width: calc(100vw - 40rem);
     min-width: 12rem;
     padding-top: 1px;
 
-    // Increase height if too many tags
-    max-height: 16rem;
+    max-height: 3.2rem;
     display: block;
+  
+    overflow-y: scroll;
+    scrollbar-color: auto;
+    scrollbar-width: thin;
+    overflow-x: hidden;
     .Badge {
       margin-right: $space-xxxs;
       margin-bottom: 1px;
