@@ -69,7 +69,7 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
     paramsAppModel.fetchProjectParamsAndUpdateState();
     const pollingTimer = setInterval(() => {
       paramsAppModel.fetchProjectParamsAndUpdateState();
-    }, 3000);
+    }, 30000);
     return () => clearInterval(pollingTimer);
   }, []);
 
