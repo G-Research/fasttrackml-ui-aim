@@ -61,8 +61,9 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
       });
     }
   }, [metricsData?.rawData]);
-
   React.useEffect(() => {
+    metricAppModel.updateSelectedExperiments();
+    metricAppModel.fetchProjectParamsAndUpdateState();
     const pollingTimer = setInterval(() => {
       metricAppModel.fetchProjectParamsAndUpdateState();
     }, 30000);
@@ -200,9 +201,6 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onMetricsSelectChange={metricAppModel.onMetricsSelectChange}
         onSelectExperimentNamesChange={
           metricAppModel.onSelectExperimentNamesChange
-        }
-        updateSelectedExperimentNames={
-          metricAppModel.updateSelectedExperimentNames
         }
         onToggleAllExperiments={metricAppModel.onToggleAllExperiments}
         onSelectRunQueryChange={metricAppModel.onSelectRunQueryChange}

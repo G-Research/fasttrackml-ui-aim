@@ -204,7 +204,6 @@ import { getMetricLabel } from 'utils/app/getMetricLabel';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
-import updateSelectedExperimentNames from 'utils/app/updateSelectedExperimentNames';
 import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
 
 import { AppDataTypeEnum, AppNameEnum } from './index';
@@ -545,9 +544,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         setModelDefaultAppConfigData();
       }
 
-      // fetch project params now and update every 30s
-      fetchProjectParamsAndUpdateState();
-
       const liveUpdateState = model.getState()?.config?.liveUpdate;
 
       if (liveUpdateState?.enabled) {
@@ -559,9 +555,23 @@ function createAppModel(appConfig: IAppInitialConfig) {
       }
     }
 
+    function updateSelectedExperiments() {
+      const configData = model.getState()?.config;
+      const selectedExperimentNames = getSelectedExperimentNames();
+      if (configData?.select) {
+        const newConfig = {
+          ...configData,
+          select: {
+            ...configData.select,
+            selectedExperimentNames,
+          },
+        };
+        model.setState({ config: newConfig });
+      }
+    }
+
     function fetchProjectParamsAndUpdateState() {
-      const selectedExperimentNames =
-        model.getState()?.config?.select.selectedExperimentNames;
+      const selectedExperimentNames = getSelectedExperimentNames();
       projectsService
         .getProjectParams(['metric'], selectedExperimentNames)
         .call()
@@ -1953,6 +1963,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
       deleteRuns,
       archiveRuns,
       fetchProjectParamsAndUpdateState,
+      updateSelectedExperiments,
     };
 
     if (grouping) {
@@ -2014,10 +2025,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
     }
     if (selectForm) {
       Object.assign(methods, {
-        updateSelectedExperimentNames(): void {
-          console.log('UPDATING');
-          updateSelectedExperimentNames({ model });
-        },
         onMetricsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
           onSelectOptionsChange({ data, model });
         },
@@ -2026,7 +2033,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onSelectExperimentNamesChange({ experimentName, model });
           fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
-          console.log('FETCHING');
         },
         onToggleAllExperiments(experimentNames: string[]): void {
           onToggleAllExperiments({ experimentNames, model });
@@ -2242,8 +2248,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           setModelDefaultAppConfigData();
         }
 
-        const selectedExperimentNames =
-          model.getState()?.config?.select?.selectedExperimentNames;
+        const selectedExperimentNames = getSelectedExperimentNames();
         const liveUpdateState = model.getState()?.config.liveUpdate;
         projectsService
           .getProjectParams(['metric'], selectedExperimentNames)
@@ -3297,7 +3302,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         if (!appId) {
           setModelDefaultAppConfigData();
         }
-        fetchProjectParamsAndUpdateState();
 
         const liveUpdateState = model.getState()?.config?.liveUpdate;
 
@@ -3310,9 +3314,23 @@ function createAppModel(appConfig: IAppInitialConfig) {
         }
       }
 
+      function updateSelectedExperiments() {
+        const configData = model.getState()?.config;
+        const selectedExperimentNames = getSelectedExperimentNames();
+        if (configData?.select) {
+          const newConfig = {
+            ...configData,
+            select: {
+              ...configData.select,
+              selectedExperimentNames,
+            },
+          };
+          model.setState({ config: newConfig });
+        }
+      }
+
       function fetchProjectParamsAndUpdateState() {
-        const selectedExperimentNames =
-          model.getState()?.config?.select?.selectedExperimentNames;
+        const selectedExperimentNames = getSelectedExperimentNames();
         projectsService
           .getProjectParams(['metric'], selectedExperimentNames)
           .call()
@@ -4639,6 +4657,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         deleteRuns,
         archiveRuns,
         fetchProjectParamsAndUpdateState,
+        updateSelectedExperiments,
       };
 
       if (grouping) {
@@ -4724,10 +4743,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
       }
       if (selectForm) {
         Object.assign(methods, {
-          updateSelectedExperimentNames(): void {
-            updateSelectedExperimentNames({ model });
-            console.log('UPDATING');
-          },
           onParamsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
             onSelectOptionsChange({ data, model });
           },
@@ -4736,7 +4751,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
             onSelectExperimentNamesChange({ experimentName, model });
             fetchProjectParamsAndUpdateState();
             getParamsData(true, true).call();
-            console.log('FETCHING');
           },
           onToggleAllExperiments(experimentNames: string[]): void {
             onToggleAllExperiments({ experimentNames, model });
@@ -6188,6 +6202,20 @@ function createAppModel(appConfig: IAppInitialConfig) {
           abort: runsDeleteRef.abort,
         };
       }
+      function updateSelectedExperiments() {
+        const configData = model.getState()?.config;
+        const selectedExperimentNames = getSelectedExperimentNames();
+        if (configData?.select) {
+          const newConfig = {
+            ...configData,
+            select: {
+              ...configData.select,
+              selectedExperimentNames,
+            },
+          };
+          model.setState({ config: newConfig });
+        }
+      }
 
       const methods = {
         initialize,
@@ -6209,6 +6237,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         changeLiveUpdateConfig,
         archiveRuns,
         deleteRuns,
+        updateSelectedExperiments,
       };
 
       if (grouping) {
@@ -6255,9 +6284,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
       }
       if (selectForm) {
         Object.assign(methods, {
-          updateSelectedExperimentNames(): void {
-            updateSelectedExperimentNames({ model });
-          },
           onSelectOptionsChange<D>(data: D & Partial<ISelectOption[]>): void {
             onSelectOptionsChange({ data, model });
           },

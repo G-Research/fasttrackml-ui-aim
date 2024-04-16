@@ -94,9 +94,6 @@ function Metrics(
               onSelectExperimentNamesChange={
                 props.onSelectExperimentNamesChange
               }
-              updateSelectedExperimentNames={
-                props.updateSelectedExperimentNames
-              }
               onToggleAllExperiments={props.onToggleAllExperiments}
             />
             <div className='Metrics__SelectForm__Grouping__container'>

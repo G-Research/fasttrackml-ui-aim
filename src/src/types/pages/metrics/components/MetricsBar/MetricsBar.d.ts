@@ -13,6 +13,5 @@ export interface IMetricsBarProps {
   }) => void;
   title: string;
   onSelectExperimentNamesChange: (experimentName: string) => void;
-  updateSelectedExperimentNames: () => void;
   onToggleAllExperiments: (experimentNames: string[]) => void;
 }

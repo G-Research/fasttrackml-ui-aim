@@ -26,7 +26,6 @@ function getProjectParams(
   sequences: string[] = ['metric'],
   selectedExperimentNames: string[] = [],
 ): IApiRequest<IProjectParamsMetrics> {
-  console.log('selectedExps: ', selectedExperimentNames);
   if (selectedExperimentNames.length === 0) {
     const controller = new AbortController();
     return {

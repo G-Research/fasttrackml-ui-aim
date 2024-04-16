@@ -65,9 +65,11 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
   }, [paramsData?.rawData]);
 
   React.useEffect(() => {
+    paramsAppModel.updateSelectedExperiments();
+    paramsAppModel.fetchProjectParamsAndUpdateState();
     const pollingTimer = setInterval(() => {
       paramsAppModel.fetchProjectParamsAndUpdateState();
-    }, 30000);
+    }, 3000);
     return () => clearInterval(pollingTimer);
   }, []);
 
@@ -174,9 +176,6 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       onGroupingPersistenceChange={paramsAppModel.onGroupingPersistenceChange}
       onSelectExperimentNamesChange={
         paramsAppModel.onSelectExperimentNamesChange
-      }
-      updateSelectedExperimentNames={
-        paramsAppModel.updateSelectedExperimentNames
       }
       onToggleAllExperiments={paramsAppModel.onToggleAllExperiments}
       onSelectRunQueryChange={paramsAppModel.onSelectRunQueryChange}
