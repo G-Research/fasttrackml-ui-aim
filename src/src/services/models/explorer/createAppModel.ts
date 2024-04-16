@@ -354,7 +354,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
             query: '',
             advancedMode: false,
             advancedQuery: '',
-            selectedExperimentNames: [],
           };
         }
         return config;
@@ -475,7 +474,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
             query: '',
             advancedMode: false,
             advancedQuery: '',
-            selectedExperimentNames: [],
           };
         }
         //TODO solve the problem with keeping table config after switching from Scatters explore to Params explore. But the solution is temporal
@@ -2232,18 +2230,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           setModelDefaultAppConfigData();
         }
 
-        const selectedExperimentNames = getSelectedExperimentNames();
         const liveUpdateState = model.getState()?.config.liveUpdate;
-        projectsService
-          .getProjectParams(['metric'], selectedExperimentNames)
-          .call()
-          .then((data) => {
-            model.setState({
-              selectFormData: {
-                suggestions: getSuggestionsByExplorer(appName, data),
-              },
-            });
-          });
         if (liveUpdateState?.enabled) {
           liveUpdateInstance = new LiveUpdateService(
             appName,
@@ -4902,8 +4889,17 @@ function createAppModel(appConfig: IAppInitialConfig) {
         }
         const liveUpdateState = model.getState()?.config?.liveUpdate;
 
-        const selectedExperimentNames =
-          model.getState()?.config?.select.selectedExperimentNames;
+        if (liveUpdateState?.enabled) {
+          liveUpdateInstance = new LiveUpdateService(
+            appName,
+            updateData,
+            liveUpdateState.delay,
+          );
+        }
+      }
+
+      function fetchProjectParamsAndUpdateState() {
+        const selectedExperimentNames = getSelectedExperimentNames();
         projectsService
           .getProjectParams(['metric'], selectedExperimentNames)
           .call()
@@ -4915,14 +4911,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
               },
             });
           });
-
-        if (liveUpdateState?.enabled) {
-          liveUpdateInstance = new LiveUpdateService(
-            appName,
-            updateData,
-            liveUpdateState.delay,
-          );
-        }
       }
 
       function updateData(newData: IRun<IParamTrace>[]): void {
@@ -6191,6 +6179,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         changeLiveUpdateConfig,
         archiveRuns,
         deleteRuns,
+        fetchProjectParamsAndUpdateState,
       };
 
       if (grouping) {
@@ -6243,6 +6232,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onSelectExperimentNamesChange(experimentName: string): void {
             // Handle experiment change, then re-fetch scatters data
             onSelectExperimentNamesChange({ experimentName, model });
+            fetchProjectParamsAndUpdateState();
             getScattersData(true, true).call();
           },
           onToggleAllExperiments(experimentNames: string[]): void {
