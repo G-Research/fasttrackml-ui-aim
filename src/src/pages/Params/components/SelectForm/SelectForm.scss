@@ -18,14 +18,18 @@
 }
 
 .SelectForm__tags {
-  display: flex;
   align-items: center;
-  overflow: auto;
-  max-width: calc(100vw - 40rem);
-  min-width: 15rem;
+  min-width: 12rem;
+  max-height: 3.2rem;
+
+  overflow-y: scroll;
+  scrollbar-color: auto;
+  scrollbar-width: thin;
+  overflow-x: hidden;
 
   .Badge {
-    margin-right: 0.5rem;
+    margin-right: $space-xxxs;
+    margin-bottom: 2px;
     &:last-child {
       margin-right: 20px;
     }
@@ -78,11 +82,11 @@
   width: 24px;
   background: #e8f1fc;
   border-radius: 6px;
-  display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   position: relative;
+  display: inline-flex;
   &.disabled {
     opacity: 0.5;
   }
@@ -91,12 +95,6 @@
     position: absolute;
     width: 20px;
     height: 34px;
-    background: rgba(255, 255, 255, 0.5);
-    background: linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 1) 92%
-    );
     left: -20px;
     top: -5px;
     border-radius: 0;

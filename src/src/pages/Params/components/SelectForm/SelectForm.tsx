@@ -143,7 +143,7 @@ function SelectForm({
     <ErrorBoundary>
       <div className='SelectForm__container'>
         <div className='SelectForm__params__container'>
-          <Box display='flex'>
+          <Box display='flex' alignItems='center'>
             <Box
               width='100%'
               display='flex'
@@ -151,7 +151,7 @@ function SelectForm({
               alignItems='center'
             >
               <ErrorBoundary>
-                <Box display='flex' alignItems='center'>
+                <Box display='flex' alignItems='center' width='100%'>
                   <Button
                     variant='contained'
                     color='primary'
@@ -201,7 +201,7 @@ function SelectForm({
                             (tag: ISelectOption) => {
                               return (
                                 <Badge
-                                  size='large'
+                                  size='small'
                                   key={tag.label}
                                   label={tag.label}
                                   value={tag.key}
@@ -211,26 +211,30 @@ function SelectForm({
                               );
                             },
                           )}
+
+                          {selectedParamsData?.options &&
+                            selectedParamsData.options.length > 1 && (
+                              <ErrorBoundary>
+                                <Button
+                                  onClick={() => onParamsSelectChange([])}
+                                  withOnlyIcon
+                                  className={classNames(
+                                    'SelectForm__clearAll',
+                                    {
+                                      disabled: isDisabled,
+                                    },
+                                  )}
+                                  size='xSmall'
+                                  disabled={isDisabled}
+                                >
+                                  <Icon name='close' />
+                                </Button>
+                              </ErrorBoundary>
+                            )}
                         </Box>
                       </ErrorBoundary>
                     )}
                 </Box>
-                {selectedParamsData?.options &&
-                  selectedParamsData.options.length > 1 && (
-                    <ErrorBoundary>
-                      <Button
-                        onClick={() => onParamsSelectChange([])}
-                        withOnlyIcon
-                        className={classNames('SelectForm__clearAll', {
-                          disabled: isDisabled,
-                        })}
-                        size='xSmall'
-                        disabled={isDisabled}
-                      >
-                        <Icon name='close' />
-                      </Button>
-                    </ErrorBoundary>
-                  )}
               </ErrorBoundary>
             </Box>
             <Button
