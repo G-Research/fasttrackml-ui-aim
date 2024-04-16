@@ -65,7 +65,6 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
   }, [paramsData?.rawData]);
 
   React.useEffect(() => {
-    paramsAppModel.updateSelectedExperiments();
     paramsAppModel.fetchProjectParamsAndUpdateState();
     const pollingTimer = setInterval(() => {
       paramsAppModel.fetchProjectParamsAndUpdateState();

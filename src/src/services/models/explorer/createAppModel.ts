@@ -555,21 +555,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
       }
     }
 
-    function updateSelectedExperiments() {
-      const configData = model.getState()?.config;
-      const selectedExperimentNames = getSelectedExperimentNames();
-      if (configData?.select) {
-        const newConfig = {
-          ...configData,
-          select: {
-            ...configData.select,
-            selectedExperimentNames,
-          },
-        };
-        model.setState({ config: newConfig });
-      }
-    }
-
     function fetchProjectParamsAndUpdateState() {
       const selectedExperimentNames = getSelectedExperimentNames();
       projectsService
@@ -1963,7 +1948,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
       deleteRuns,
       archiveRuns,
       fetchProjectParamsAndUpdateState,
-      updateSelectedExperiments,
     };
 
     if (grouping) {
@@ -3314,21 +3298,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         }
       }
 
-      function updateSelectedExperiments() {
-        const configData = model.getState()?.config;
-        const selectedExperimentNames = getSelectedExperimentNames();
-        if (configData?.select) {
-          const newConfig = {
-            ...configData,
-            select: {
-              ...configData.select,
-              selectedExperimentNames,
-            },
-          };
-          model.setState({ config: newConfig });
-        }
-      }
-
       function fetchProjectParamsAndUpdateState() {
         const selectedExperimentNames = getSelectedExperimentNames();
         projectsService
@@ -4657,7 +4626,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         deleteRuns,
         archiveRuns,
         fetchProjectParamsAndUpdateState,
-        updateSelectedExperiments,
       };
 
       if (grouping) {
@@ -6202,20 +6170,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
           abort: runsDeleteRef.abort,
         };
       }
-      function updateSelectedExperiments() {
-        const configData = model.getState()?.config;
-        const selectedExperimentNames = getSelectedExperimentNames();
-        if (configData?.select) {
-          const newConfig = {
-            ...configData,
-            select: {
-              ...configData.select,
-              selectedExperimentNames,
-            },
-          };
-          model.setState({ config: newConfig });
-        }
-      }
 
       const methods = {
         initialize,
@@ -6237,7 +6191,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         changeLiveUpdateConfig,
         archiveRuns,
         deleteRuns,
-        updateSelectedExperiments,
       };
 
       if (grouping) {

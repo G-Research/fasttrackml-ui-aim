@@ -62,7 +62,6 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
     }
   }, [metricsData?.rawData]);
   React.useEffect(() => {
-    metricAppModel.updateSelectedExperiments();
     metricAppModel.fetchProjectParamsAndUpdateState();
     const pollingTimer = setInterval(() => {
       metricAppModel.fetchProjectParamsAndUpdateState();

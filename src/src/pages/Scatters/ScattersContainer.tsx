@@ -70,10 +70,6 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
   }, [scattersData?.rawData]);
 
   React.useEffect(() => {
-    scattersAppModel.updateSelectedExperiments();
-  }, []);
-
-  React.useEffect(() => {
     scattersAppModel.initialize(route.params.appId);
     let appRequestRef: IApiRequest<void>;
     if (route.params.appId) {
