@@ -1581,6 +1581,7 @@ function getParamsModelMethods(
       },
       onToggleAllExperiments(experimentNames: string[]): void {
         onToggleAllExperiments({ experimentNames, model });
+        fetchProjectParamsAndUpdateState();
         getParamsData(true, true).call();
       },
       onSelectRunQueryChange(query: string): void {

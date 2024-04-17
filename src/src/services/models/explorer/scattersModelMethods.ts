@@ -1509,6 +1509,7 @@ function getScattersModelMethods(
       },
       onToggleAllExperiments(experimentNames: string[]): void {
         onToggleAllExperiments({ experimentNames, model });
+        fetchProjectParamsAndUpdateState();
         getScattersData(true, true).call();
       },
       onSelectRunQueryChange(query: string): void {

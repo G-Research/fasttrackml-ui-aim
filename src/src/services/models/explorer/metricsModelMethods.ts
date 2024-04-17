@@ -1652,6 +1652,7 @@ function getMetricsAppModelMethods(
       },
       onToggleAllExperiments(experimentNames: string[]): void {
         onToggleAllExperiments({ experimentNames, model });
+        fetchProjectParamsAndUpdateState();
         getMetricsData(true, true).call();
       },
       onSelectRunQueryChange(query: string): void {
