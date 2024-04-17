@@ -55,6 +55,14 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
   }, chartElemRef);
 
   React.useEffect(() => {
+    scattersAppModel.fetchProjectParamsAndUpdateState();
+    const pollingTimer = setInterval(() => {
+      scattersAppModel.fetchProjectParamsAndUpdateState();
+    }, 30000);
+    return () => clearInterval(pollingTimer);
+  }, []);
+
+  React.useEffect(() => {
     if (tableRef.current && chartPanelRef.current) {
       setComponentRefs({
         model: scattersAppModel,
