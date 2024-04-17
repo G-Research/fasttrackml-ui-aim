@@ -2018,6 +2018,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         },
         onToggleAllExperiments(experimentNames: string[]): void {
           onToggleAllExperiments({ experimentNames, model });
+          fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
         },
         onSelectRunQueryChange(query: string): void {
@@ -4709,6 +4710,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           },
           onToggleAllExperiments(experimentNames: string[]): void {
             onToggleAllExperiments({ experimentNames, model });
+            fetchProjectParamsAndUpdateState();
             getParamsData(true, true).call();
           },
           onSelectRunQueryChange(query: string): void {
@@ -6237,6 +6239,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           },
           onToggleAllExperiments(experimentNames: string[]): void {
             onToggleAllExperiments({ experimentNames, model });
+            fetchProjectParamsAndUpdateState();
             getScattersData(true, true).call();
           },
           onSelectRunQueryChange(query: string): void {
