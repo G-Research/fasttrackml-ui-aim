@@ -29,15 +29,4 @@ export default function onSelectExperimentNamesChange<M extends State>({
   } else {
     setItem('selectedExperimentNames', selectedExperimentNames);
   }
-
-  if (configData?.select) {
-    const newConfig = {
-      ...configData,
-      select: {
-        ...configData.select,
-        selectedExperimentNames,
-      },
-    };
-    model.setState({ config: newConfig });
-  }
 }

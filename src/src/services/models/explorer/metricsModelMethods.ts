@@ -152,6 +152,7 @@ import { onCopyToClipBoard } from 'utils/onCopyToClipBoard';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
+import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
 
 import { InitialAppModelType } from './config';
 
@@ -207,8 +208,6 @@ function getMetricsAppModelMethods(
     if (!appId) {
       setModelDefaultAppConfigData();
     }
-    // fetch project params now and update every 30s
-    fetchProjectParamsAndUpdateState();
 
     const liveUpdateState = model.getState()?.config?.liveUpdate;
 
@@ -222,8 +221,7 @@ function getMetricsAppModelMethods(
   }
 
   function fetchProjectParamsAndUpdateState() {
-    const selectedExperimentNames =
-      model.getState()?.config?.select.selectedExperimentNames;
+    const selectedExperimentNames = getSelectedExperimentNames();
     projectsService
       .getProjectParams(['metric'], selectedExperimentNames)
       .call()

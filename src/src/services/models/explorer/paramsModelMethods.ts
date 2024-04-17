@@ -114,6 +114,7 @@ import onRowsVisibilityChange from 'utils/app/onRowsVisibilityChange';
 import { getMetricsInitialRowData } from 'utils/app/getMetricsInitialRowData';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import { getMetricLabel } from 'utils/app/getMetricLabel';
+import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
 
 import { InitialAppModelType } from './config';
 
@@ -171,7 +172,6 @@ function getParamsModelMethods(
     if (!appId) {
       setModelDefaultAppConfigData();
     }
-    fetchProjectParamsAndUpdateState();
 
     const liveUpdateState = model.getState()?.config?.liveUpdate;
 
@@ -185,8 +185,7 @@ function getParamsModelMethods(
   }
 
   function fetchProjectParamsAndUpdateState() {
-    const selectedExperimentNames =
-      model.getState()?.config?.select?.selectedExperimentNames;
+    const selectedExperimentNames = getSelectedExperimentNames();
     projectsService
       .getProjectParams(['metric'], selectedExperimentNames)
       .call()

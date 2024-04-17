@@ -118,6 +118,7 @@ import onRowsVisibilityChange from 'utils/app/onRowsVisibilityChange';
 import { getMetricsInitialRowData } from 'utils/app/getMetricsInitialRowData';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import { getMetricLabel } from 'utils/app/getMetricLabel';
+import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
 
 import { InitialAppModelType } from './config';
 
@@ -176,9 +177,19 @@ function getScattersModelMethods(
       setModelDefaultAppConfigData();
     }
     const liveUpdateState = model.getState()?.config?.liveUpdate;
+    if (liveUpdateState?.enabled) {
+      liveUpdateInstance = new LiveUpdateService(
+        appName,
+        updateData,
+        liveUpdateState.delay,
+      );
+    }
+  }
 
+  function fetchProjectParamsAndUpdateState() {
+    const selectedExperimentNames = getSelectedExperimentNames();
     projectsService
-      .getProjectParams(['metric'])
+      .getProjectParams(['metric'], selectedExperimentNames)
       .call()
       .then((data: IProjectParamsMetrics) => {
         model.setState({
@@ -188,14 +199,6 @@ function getScattersModelMethods(
           },
         });
       });
-
-    if (liveUpdateState?.enabled) {
-      liveUpdateInstance = new LiveUpdateService(
-        appName,
-        updateData,
-        liveUpdateState.delay,
-      );
-    }
   }
 
   function updateData(newData: IRun<IParamTrace>[]): void {
@@ -1448,6 +1451,7 @@ function getScattersModelMethods(
     changeLiveUpdateConfig,
     archiveRuns,
     deleteRuns,
+    fetchProjectParamsAndUpdateState,
   };
 
   if (grouping) {
@@ -1500,6 +1504,7 @@ function getScattersModelMethods(
       onSelectExperimentNamesChange(experimentName: string): void {
         // Handle experiment change, then re-fetch scatters data
         onSelectExperimentNamesChange({ experimentName, model });
+        fetchProjectParamsAndUpdateState();
         getScattersData(true, true).call();
       },
       onToggleAllExperiments(experimentNames: string[]): void {
