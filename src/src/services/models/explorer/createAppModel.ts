@@ -2274,6 +2274,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onRunsTagsChange({ runHash, tags, model, updateModelData });
       }
 
+      function onSelectExperimentNamesChange(experimentName: string): void {
+        // Handle experiment change, then re-fetch params data
+        onSelectExperimentNamesChange({ experimentName, model });
+        getRunsData(true, true).call();
+      }
+
       function getRunsData(
         shouldUrlUpdate?: boolean,
         shouldResetSelectedRows?: boolean,
@@ -3146,6 +3152,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onNotificationDelete: onModelNotificationDelete,
         setDefaultAppConfigData: setModelDefaultAppConfigData,
         onRunsTagsChange: onModelRunsTagsChange,
+        onSelectExperimentNamesChange: onSelectExperimentNamesChange,
         changeLiveUpdateConfig,
         archiveRuns,
         deleteRuns,
