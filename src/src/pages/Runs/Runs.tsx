@@ -5,8 +5,6 @@ import ProgressBar from 'components/ProgressBar/ProgressBar';
 
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 
-import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
-
 import RunsTable from './RunsTable';
 import RunsBar from './components/RunsBar/RunsBar';
 import SearchBar from './components/SearchBar/SearchBar';
@@ -16,10 +14,6 @@ import './Runs.scss';
 function Runs(props: any): React.FunctionComponentElement<React.ReactNode> {
   const [isProgressBarVisible, setIsProgressBarVisible] =
     React.useState<boolean>(false);
-  const [selectedExperimentNames, setSelectedExperimentNames] = React.useState<
-    string[]
-  >(getSelectedExperimentNames());
-
   return (
     <div className='Runs__container'>
       <section className='Runs__section'>
@@ -28,8 +22,6 @@ function Runs(props: any): React.FunctionComponentElement<React.ReactNode> {
             {...props.liveUpdateConfig}
             onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
             disabled={isProgressBarVisible}
-            onSelectExperimentNamesChange={props.onSelectExperimentNamesChange}
-            onToggleAllExperiments={props.onToggleAllExperiments}
           />
           <SearchBar
             selectFormData={props.selectFormData}
