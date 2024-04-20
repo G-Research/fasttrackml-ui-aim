@@ -2276,12 +2276,38 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
       function onSelectExperiment(experimentName: string): void {
         onSelectExperimentNamesChange({ experimentName, model });
-        getRunsData(true, true).call();
+        try {
+          getRunsData().call((detail) => {
+            exceptionHandler({ detail, model });
+          });
+        } catch (err: any) {
+          onNotificationAdd({
+            model,
+            notification: {
+              id: Date.now(),
+              messages: [err.message],
+              severity: 'error',
+            },
+          });
+        }
       }
 
       function onSelectExperiments(experimentNames: string[]): void {
         onToggleAllExperiments({ experimentNames, model });
-        getRunsData(true, true).call();
+        try {
+          getRunsData().call((detail) => {
+            exceptionHandler({ detail, model });
+          });
+        } catch (err: any) {
+          onNotificationAdd({
+            model,
+            notification: {
+              id: Date.now(),
+              messages: [err.message],
+              severity: 'error',
+            },
+          });
+        }
       }
 
       function getRunsData(
@@ -2307,7 +2333,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
         liveUpdateInstance?.stop().then();
 
-        runsRequestRef = runsService.getRunsData(query, 45, pagination?.offset);
+        const selectedExperimentNames = getSelectedExperimentNames();
+        runsRequestRef = runsService.getRunsData(
+          query,
+          45,
+          pagination?.offset,
+          selectedExperimentNames,
+        );
         let limit = pagination.limit;
         setRequestProgress(model);
         return {
