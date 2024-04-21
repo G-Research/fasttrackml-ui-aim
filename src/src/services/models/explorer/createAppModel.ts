@@ -206,6 +206,7 @@ import { getMetricLabel } from 'utils/app/getMetricLabel';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import { AppDataTypeEnum, AppNameEnum } from './index';
 
@@ -355,7 +356,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
             query: '',
             advancedMode: false,
             advancedQuery: '',
-            selectedExperimentNames: [],
           };
         }
         return config;
@@ -476,7 +476,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
             query: '',
             advancedMode: false,
             advancedQuery: '',
-            selectedExperimentNames: [],
           };
         }
         //TODO solve the problem with keeping table config after switching from Scatters explore to Params explore. But the solution is temporal
@@ -545,10 +544,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
         setModelDefaultAppConfigData();
       }
 
-      // fetch project params now and update every 30s
-      fetchProjectParamsAndUpdateState();
-      setInterval(fetchProjectParamsAndUpdateState, 30000);
-
       const liveUpdateState = model.getState()?.config?.liveUpdate;
 
       if (liveUpdateState?.enabled) {
@@ -561,10 +556,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
     }
 
     function fetchProjectParamsAndUpdateState() {
-      const selectedExperimentNames =
-        model.getState()?.config?.select.selectedExperimentNames;
+      const selectedExperiments = getSelectedExperiments();
       projectsService
-        .getProjectParams(['metric'], selectedExperimentNames)
+        .getProjectParams(
+          ['metric'],
+          selectedExperiments.map((e) => e.name),
+        )
         .call()
         .then((data) => {
           const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
@@ -1953,6 +1950,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
       destroy,
       deleteRuns,
       archiveRuns,
+      fetchProjectParamsAndUpdateState,
     };
 
     if (grouping) {
@@ -2025,6 +2023,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         },
         onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
           onToggleAllExperiments({ experiments, model });
+          fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
         },
         onSelectRunQueryChange(query: string): void {
@@ -2237,19 +2236,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
           setModelDefaultAppConfigData();
         }
 
-        const selectedExperimentNames =
-          model.getState()?.config?.select?.selectedExperimentNames;
         const liveUpdateState = model.getState()?.config.liveUpdate;
-        projectsService
-          .getProjectParams(['metric'], selectedExperimentNames)
-          .call()
-          .then((data) => {
-            model.setState({
-              selectFormData: {
-                suggestions: getSuggestionsByExplorer(appName, data),
-              },
-            });
-          });
         if (liveUpdateState?.enabled) {
           liveUpdateInstance = new LiveUpdateService(
             appName,
@@ -3288,23 +3275,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
             chartPanelRef: { current: null },
           };
         }
-        const selectedExperimentNames =
-          model.getState()?.config?.select?.selectedExperimentNames;
-        projectsService
-          .getProjectParams(['metric'], selectedExperimentNames)
-          .call()
-          .then((data) => {
-            model.setState({
-              selectFormData: {
-                options: getSelectOptions(data),
-                suggestions: getSuggestionsByExplorer(appName, data),
-              },
-            });
-          });
         model.setState({ ...state });
         if (!appId) {
           setModelDefaultAppConfigData();
         }
+
         const liveUpdateState = model.getState()?.config?.liveUpdate;
 
         if (liveUpdateState?.enabled) {
@@ -3314,6 +3289,24 @@ function createAppModel(appConfig: IAppInitialConfig) {
             liveUpdateState.delay,
           );
         }
+      }
+
+      function fetchProjectParamsAndUpdateState() {
+        const selectedExperiments = getSelectedExperiments();
+        projectsService
+          .getProjectParams(
+            ['metric'],
+            selectedExperiments.map((e) => e.name),
+          )
+          .call()
+          .then((data) => {
+            model.setState({
+              selectFormData: {
+                options: getSelectOptions(data),
+                suggestions: getSuggestionsByExplorer(appName, data),
+              },
+            });
+          });
       }
 
       function updateData(newData: IRun<IParamTrace>[]): void {
@@ -4628,6 +4621,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onShuffleChange,
         deleteRuns,
         archiveRuns,
+        fetchProjectParamsAndUpdateState,
       };
 
       if (grouping) {
@@ -4719,10 +4713,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onSelectExperimentsChange(experiment: IExperimentDataShort): void {
             // Handle experiment change, then re-fetch params data
             onSelectExperimentsChange({ experiment, model });
+            fetchProjectParamsAndUpdateState();
             getParamsData(true, true).call();
           },
           onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
             onToggleAllExperiments({ experiments, model });
+            fetchProjectParamsAndUpdateState();
             getParamsData(true, true).call();
           },
           onSelectRunQueryChange(query: string): void {
@@ -4903,10 +4899,22 @@ function createAppModel(appConfig: IAppInitialConfig) {
         }
         const liveUpdateState = model.getState()?.config?.liveUpdate;
 
-        const selectedExperimentNames =
-          model.getState()?.config?.select.selectedExperimentNames;
+        if (liveUpdateState?.enabled) {
+          liveUpdateInstance = new LiveUpdateService(
+            appName,
+            updateData,
+            liveUpdateState.delay,
+          );
+        }
+      }
+
+      function fetchProjectParamsAndUpdateState() {
+        const selectedExperiments = getSelectedExperiments();
         projectsService
-          .getProjectParams(['metric'], selectedExperimentNames)
+          .getProjectParams(
+            ['metric'],
+            selectedExperiments.map((e) => e.name),
+          )
           .call()
           .then((data: IProjectParamsMetrics) => {
             model.setState({
@@ -4916,14 +4924,6 @@ function createAppModel(appConfig: IAppInitialConfig) {
               },
             });
           });
-
-        if (liveUpdateState?.enabled) {
-          liveUpdateInstance = new LiveUpdateService(
-            appName,
-            updateData,
-            liveUpdateState.delay,
-          );
-        }
       }
 
       function updateData(newData: IRun<IParamTrace>[]): void {
@@ -6192,6 +6192,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         changeLiveUpdateConfig,
         archiveRuns,
         deleteRuns,
+        fetchProjectParamsAndUpdateState,
       };
 
       if (grouping) {
@@ -6244,10 +6245,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onSelectExperimentsChange(experiment: IExperimentDataShort): void {
             // Handle experiment change, then re-fetch scatters data
             onSelectExperimentsChange({ experiment, model });
+            fetchProjectParamsAndUpdateState();
             getScattersData(true, true).call();
           },
           onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
             onToggleAllExperiments({ experiments, model });
+            fetchProjectParamsAndUpdateState();
             getScattersData(true, true).call();
           },
           onSelectRunQueryChange(query: string): void {

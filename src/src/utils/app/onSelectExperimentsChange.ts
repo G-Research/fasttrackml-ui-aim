@@ -35,17 +35,4 @@ export default function onSelectExperimentChange<M extends State>({
   } else {
     setItem('selectedExperiments', JSON.stringify(selectedExperiments));
   }
-
-  const selectedExperimentNames = selectedExperiments.map((e) => e.name);
-
-  if (configData?.select) {
-    const newConfig = {
-      ...configData,
-      select: {
-        ...configData.select,
-        selectedExperimentNames,
-      },
-    };
-    model.setState({ config: newConfig });
-  }
 }
