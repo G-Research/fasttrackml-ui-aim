@@ -13,7 +13,6 @@ export default function onSelectExperimentChange<M extends State>({
   experiment: IExperimentDataShort;
   model: IModel<M>;
 }) {
-  const configData = model.getState()?.config;
   const selectedExperiments = getSelectedExperiments();
 
   const index = selectedExperiments.findIndex((e) => e.id === experiment.id);
