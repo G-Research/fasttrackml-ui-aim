@@ -1,5 +1,8 @@
 import { IApiRequest } from 'types/services/services';
-import { IAlignMetricsDataParams } from 'types/services/models/metrics/metricsAppModel';
+import {
+  IAlignMetricsDataParams,
+  IMetricsDataParams,
+} from 'types/services/models/metrics/metricsAppModel';
 
 import API from '../api';
 // import generateMetrics from './metricsMock';
@@ -10,8 +13,10 @@ const endpoints = {
   GET_ALIGNED_METRICS: 'runs/search/metric/align',
 };
 
-function getMetricsData(params: {}): IApiRequest<ReadableStream> {
-  return API.getStream<ReadableStream>(endpoints.GET_METRICS, params);
+function getMetricsData(params: IMetricsDataParams): IApiRequest<any> {
+  return API.getStream<IApiRequest<any>>(endpoints.GET_METRICS, params, {
+    method: 'POST',
+  });
 
   // We will not remove this part yet, though we will need to refactor mock data structure
   // due to API schema changes
