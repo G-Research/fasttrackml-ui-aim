@@ -3913,10 +3913,23 @@ function createAppModel(appConfig: IAppInitialConfig) {
             TABLE_DEFAULT_CONFIG?.[AppNameEnum.PARAMS]?.hiddenColumns;
 
           if (unselectedColumnState === UnselectedColumnState.FORCE_HIDE) {
-            // Push unique values to hiddenColumns
+            // Extract the combined keys from metricsColumns dictionary
+            const metricList = Object.keys(metricsColumns).reduce(
+              (acc: string[], key: string) => {
+                const metricKeys = Object.keys(metricsColumns[key]);
+                return acc.concat(
+                  metricKeys.map((metricKey) => `${key} ${metricKey}`.trim()),
+                );
+              },
+              [],
+            );
+
+            const metricsAndParams = metricList.concat(params);
             hiddenColumns = _.uniq(
-              hiddenColumns?.concat(
-                params.filter((item: string) => !selected.includes(item)),
+              defaultHiddenColumns?.concat(
+                metricsAndParams.filter(
+                  (item: string) => !selected.includes(item),
+                ),
               ),
             );
           } else {
@@ -5066,13 +5079,26 @@ function createAppModel(appConfig: IAppInitialConfig) {
           let hiddenColumns = configData.table?.hiddenColumns;
 
           const defaultHiddenColumns =
-            TABLE_DEFAULT_CONFIG?.[AppNameEnum.SCATTERS]?.hiddenColumns;
+            TABLE_DEFAULT_CONFIG?.[AppNameEnum.PARAMS]?.hiddenColumns;
 
           if (unselectedColumnState === UnselectedColumnState.FORCE_HIDE) {
-            // Push unique values to hiddenColumns
+            // Extract the combined keys from metricsColumns dictionary
+            const metricList = Object.keys(metricsColumns).reduce(
+              (acc: string[], key: string) => {
+                const metricKeys = Object.keys(metricsColumns[key]);
+                return acc.concat(
+                  metricKeys.map((metricKey) => `${key} ${metricKey}`.trim()),
+                );
+              },
+              [],
+            );
+
+            const metricsAndParams = metricList.concat(params);
             hiddenColumns = _.uniq(
-              hiddenColumns?.concat(
-                params.filter((item: string) => !selected.includes(item)),
+              defaultHiddenColumns?.concat(
+                metricsAndParams.filter(
+                  (item: string) => !selected.includes(item),
+                ),
               ),
             );
           } else {
