@@ -2017,12 +2017,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
         },
         onSelectExperimentsChange(experiment: IExperimentDataShort): void {
           // Handle experiment change, then re-fetch metrics data
-          onSelectExperimentsChange({ experiment, model });
+          onSelectExperimentsChange(experiment);
           fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
         },
         onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
-          onToggleAllExperiments({ experiments, model });
+          onToggleAllExperiments(experiments);
           fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
         },
@@ -4712,12 +4712,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
           },
           onSelectExperimentsChange(experiment: IExperimentDataShort): void {
             // Handle experiment change, then re-fetch params data
-            onSelectExperimentsChange({ experiment, model });
+            onSelectExperimentsChange(experiment);
             fetchProjectParamsAndUpdateState();
             getParamsData(true, true).call();
           },
           onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
-            onToggleAllExperiments({ experiments, model });
+            onToggleAllExperiments(experiments);
             fetchProjectParamsAndUpdateState();
             getParamsData(true, true).call();
           },
@@ -6244,12 +6244,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
           },
           onSelectExperimentsChange(experiment: IExperimentDataShort): void {
             // Handle experiment change, then re-fetch scatters data
-            onSelectExperimentsChange({ experiment, model });
+            onSelectExperimentsChange(experiment);
             fetchProjectParamsAndUpdateState();
             getScattersData(true, true).call();
           },
           onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
-            onToggleAllExperiments({ experiments, model });
+            onToggleAllExperiments(experiments);
             fetchProjectParamsAndUpdateState();
             getScattersData(true, true).call();
           },
