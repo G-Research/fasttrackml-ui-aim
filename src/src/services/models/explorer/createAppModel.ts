@@ -560,7 +560,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
       projectsService
         .getProjectParams(
           ['metric'],
-          selectedExperiments.map((e) => e.name),
+          selectedExperiments.map((e) => e.id),
         )
         .call()
         .then((data) => {
@@ -3296,7 +3296,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         projectsService
           .getProjectParams(
             ['metric'],
-            selectedExperiments.map((e) => e.name),
+            selectedExperiments.map((e) => e.id),
           )
           .call()
           .then((data) => {
@@ -4913,7 +4913,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         projectsService
           .getProjectParams(
             ['metric'],
-            selectedExperiments.map((e) => e.name),
+            selectedExperiments.map((e) => e.id),
           )
           .call()
           .then((data: IProjectParamsMetrics) => {
