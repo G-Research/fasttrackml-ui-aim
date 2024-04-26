@@ -20,9 +20,15 @@ const endpoints = {
     `runs/${id}/${trace}/get-step`,
 };
 
-function getRunsData(query?: string, limit?: number, offset?: string) {
+function getRunsData(
+  query?: string,
+  limit?: number,
+  offset?: string,
+  selectedExperimentNames?: string[],
+) {
   return API.getStream<ReadableStream>(endpoints.GET_RUNS, {
     q: query || '',
+    experiment_names: selectedExperimentNames,
     ...(limit ? { limit } : {}),
     ...(offset ? { offset } : {}),
   });

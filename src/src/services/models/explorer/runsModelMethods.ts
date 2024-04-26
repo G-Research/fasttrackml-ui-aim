@@ -51,6 +51,8 @@ import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
+import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import { onTableDiffShow } from 'utils/app/onTableDiffShow';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
 import updateSortFields from 'utils/app/updateTableSortFields';
@@ -77,6 +79,7 @@ import { getMetricsInitialRowData } from 'utils/app/getMetricsInitialRowData';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import onMetricsValueKeyChange from 'utils/app/onMetricsValueKeyChange';
+import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
 
 import { InitialAppModelType } from './config';
 
@@ -181,6 +184,42 @@ function getRunsModelMethods(
     onRunsTagsChange({ runHash, tags, model, updateModelData });
   }
 
+  function onSelectExperiment(experimentName: string): void {
+    onSelectExperimentNamesChange({ experimentName, model });
+    try {
+      getRunsData().call((detail) => {
+        exceptionHandler({ detail, model });
+      });
+    } catch (err: any) {
+      onNotificationAdd({
+        model,
+        notification: {
+          id: Date.now(),
+          messages: [err.message],
+          severity: 'error',
+        },
+      });
+    }
+  }
+
+  function onSelectExperiments(experimentNames: string[]): void {
+    onToggleAllExperiments({ experimentNames, model });
+    try {
+      getRunsData().call((detail) => {
+        exceptionHandler({ detail, model });
+      });
+    } catch (err: any) {
+      onNotificationAdd({
+        model,
+        notification: {
+          id: Date.now(),
+          messages: [err.message],
+          severity: 'error',
+        },
+      });
+    }
+  }
+
   function getRunsData(
     shouldUrlUpdate?: boolean,
     shouldResetSelectedRows?: boolean,
@@ -204,7 +243,13 @@ function getRunsModelMethods(
 
     liveUpdateInstance?.stop().then();
 
-    runsRequestRef = runsService.getRunsData(query, 45, pagination?.offset);
+    const selectedExperimentNames = getSelectedExperimentNames();
+    runsRequestRef = runsService.getRunsData(
+      query,
+      45,
+      pagination?.offset,
+      selectedExperimentNames,
+    );
     let limit = pagination.limit;
     setRequestProgress(model);
     return {
@@ -1048,6 +1093,8 @@ function getRunsModelMethods(
     onNotificationDelete: onModelNotificationDelete,
     setDefaultAppConfigData: setModelDefaultAppConfigData,
     onRunsTagsChange: onModelRunsTagsChange,
+    onSelectExperimentNamesChange: onSelectExperiment,
+    onToggleAllExperiments: onSelectExperiments,
     changeLiveUpdateConfig,
     archiveRuns,
     deleteRuns,
