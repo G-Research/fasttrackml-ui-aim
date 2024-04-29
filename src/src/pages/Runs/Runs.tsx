@@ -4,9 +4,11 @@ import NotificationContainer from 'components/NotificationContainer/Notification
 import ProgressBar from 'components/ProgressBar/ProgressBar';
 
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
+import pageTitlesEnum from 'config/pageTitles/pageTitles';
+
+import AppBar from 'pages/Metrics/components/MetricsBar/MetricsBar';
 
 import RunsTable from './RunsTable';
-import RunsBar from './components/RunsBar/RunsBar';
 import SearchBar from './components/SearchBar/SearchBar';
 
 import './Runs.scss';
@@ -18,10 +20,17 @@ function Runs(props: any): React.FunctionComponentElement<React.ReactNode> {
     <div className='Runs__container'>
       <section className='Runs__section'>
         <div className='Runs__section__appBarContainer Runs__fullHeight'>
-          <RunsBar
-            {...props.liveUpdateConfig}
-            onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
+          <AppBar
             disabled={isProgressBarVisible}
+            explorerName='RUNS'
+            onBookmarkCreate={props.onBookmarkCreate}
+            onBookmarkUpdate={props.onBookmarkUpdate}
+            onResetConfigData={props.onResetConfigData}
+            liveUpdateConfig={props.liveUpdateConfig}
+            onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
+            onSelectExperimentNamesChange={props.onSelectExperimentNamesChange}
+            onToggleAllExperiments={props.onToggleAllExperiments}
+            title={pageTitlesEnum.RUNS_EXPLORER}
           />
           <SearchBar
             selectFormData={props.selectFormData}
