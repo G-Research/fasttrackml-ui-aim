@@ -2279,8 +2279,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onRunsTagsChange({ runHash, tags, model, updateModelData });
       }
 
-      function onSelectExperiment(experimentName: string): void {
-        onSelectExperimentNamesChange({ experimentName, model });
+      function onSelectExperiment(experiment: IExperimentDataShort): void {
+        onSelectExperimentsChange({ experiment, model });
         try {
           getRunsData().call((detail) => {
             exceptionHandler({ detail, model });
@@ -2297,8 +2297,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
         }
       }
 
-      function onSelectExperiments(experimentNames: string[]): void {
-        onToggleAllExperiments({ experimentNames, model });
+      function onSelectExperiments(experiments: IExperimentDataShort[]): void {
+        onToggleAllExperiments({ experiments, model });
         try {
           getRunsData().call((detail) => {
             exceptionHandler({ detail, model });
@@ -2338,7 +2338,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
         liveUpdateInstance?.stop().then();
 
-        const selectedExperimentNames = getSelectedExperimentNames();
+        const selectedExperimentNames = getSelectedExperiments().map(
+          (e) => e.name,
+        );
         runsRequestRef = runsService.getRunsData(
           query,
           45,
@@ -3193,7 +3195,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onNotificationDelete: onModelNotificationDelete,
         setDefaultAppConfigData: setModelDefaultAppConfigData,
         onRunsTagsChange: onModelRunsTagsChange,
-        onSelectExperimentNamesChange: onSelectExperiment,
+        onSelectExperimentsChange: onSelectExperiment,
         onToggleAllExperiments: onSelectExperiments,
         changeLiveUpdateConfig,
         archiveRuns,
