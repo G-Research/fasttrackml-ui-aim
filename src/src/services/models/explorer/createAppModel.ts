@@ -2279,6 +2279,42 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onRunsTagsChange({ runHash, tags, model, updateModelData });
       }
 
+      function onSelectExperiment(experimentName: string): void {
+        onSelectExperimentNamesChange({ experimentName, model });
+        try {
+          getRunsData().call((detail) => {
+            exceptionHandler({ detail, model });
+          });
+        } catch (err: any) {
+          onNotificationAdd({
+            model,
+            notification: {
+              id: Date.now(),
+              messages: [err.message],
+              severity: 'error',
+            },
+          });
+        }
+      }
+
+      function onSelectExperiments(experimentNames: string[]): void {
+        onToggleAllExperiments({ experimentNames, model });
+        try {
+          getRunsData().call((detail) => {
+            exceptionHandler({ detail, model });
+          });
+        } catch (err: any) {
+          onNotificationAdd({
+            model,
+            notification: {
+              id: Date.now(),
+              messages: [err.message],
+              severity: 'error',
+            },
+          });
+        }
+      }
+
       function getRunsData(
         shouldUrlUpdate?: boolean,
         shouldResetSelectedRows?: boolean,
@@ -2302,7 +2338,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
         liveUpdateInstance?.stop().then();
 
-        runsRequestRef = runsService.getRunsData(query, 45, pagination?.offset);
+        const selectedExperimentNames = getSelectedExperimentNames();
+        runsRequestRef = runsService.getRunsData(
+          query,
+          45,
+          pagination?.offset,
+          selectedExperimentNames,
+        );
         let limit = pagination.limit;
         setRequestProgress(model);
         return {
@@ -3151,6 +3193,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onNotificationDelete: onModelNotificationDelete,
         setDefaultAppConfigData: setModelDefaultAppConfigData,
         onRunsTagsChange: onModelRunsTagsChange,
+        onSelectExperimentNamesChange: onSelectExperiment,
+        onToggleAllExperiments: onSelectExperiments,
         changeLiveUpdateConfig,
         archiveRuns,
         deleteRuns,
