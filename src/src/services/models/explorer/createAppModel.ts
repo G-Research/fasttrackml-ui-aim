@@ -205,6 +205,7 @@ import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
 import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
+import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import { AppDataTypeEnum, AppNameEnum } from './index';
 
@@ -577,25 +578,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
               },
             },
           });
-          updateSelectedMetrics();
+          removeOldSelectedMetrics(model);
         });
-    }
-
-    function updateSelectedMetrics() {
-      // Check if selected metrics are still available in the select options
-      const selectedMetricsData = model.getState()?.config?.select;
-      if (selectedMetricsData) {
-        const selectedMetrics = selectedMetricsData.options;
-        const selectOptions = model.getState()?.selectFormData?.options;
-        if (selectOptions) {
-          const newSelectedMetrics = selectedMetrics.filter((metric: any) =>
-            selectOptions.find((option: any) => option.key === metric.key),
-          );
-          if (selectedMetrics.length !== newSelectedMetrics.length) {
-            onSelectOptionsChange({ data: newSelectedMetrics, model });
-          }
-        }
-      }
     }
 
     function updateData(newData: ISequence<IMetricTrace>[]): void {
@@ -3360,25 +3344,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
                 suggestions: getSuggestionsByExplorer(appName, data),
               },
             });
-            updateSelectedMetrics();
+            removeOldSelectedMetrics(model);
           });
-      }
-
-      function updateSelectedMetrics() {
-        // Check if selected metrics are still available in the select options
-        const selectedMetricsData = model.getState()?.config?.select;
-        if (selectedMetricsData) {
-          const selectedMetrics = selectedMetricsData.options;
-          const selectOptions = model.getState()?.selectFormData?.options;
-          if (selectOptions) {
-            const newSelectedMetrics = selectedMetrics.filter((metric: any) =>
-              selectOptions.find((option: any) => option.key === metric.key),
-            );
-            if (selectedMetrics.length !== newSelectedMetrics.length) {
-              onSelectOptionsChange({ data: newSelectedMetrics, model });
-            }
-          }
-        }
       }
 
       function updateData(newData: IRun<IParamTrace>[]): void {
@@ -4992,25 +4959,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
                 suggestions: getSuggestionsByExplorer(appName, data),
               },
             });
-            updateSelectedMetrics();
+            removeOldSelectedMetrics(model);
           });
-      }
-
-      function updateSelectedMetrics() {
-        // Check if selected metrics are still available in the select options
-        const selectedMetricsData = model.getState()?.config?.select;
-        if (selectedMetricsData) {
-          const selectedMetrics = selectedMetricsData.options;
-          const selectOptions = model.getState()?.selectFormData?.options;
-          if (selectOptions) {
-            const newSelectedMetrics = selectedMetrics.filter((metric: any) =>
-              selectOptions.find((option: any) => option.key === metric.key),
-            );
-            if (selectedMetrics.length !== newSelectedMetrics.length) {
-              onSelectOptionsChange({ data: newSelectedMetrics, model });
-            }
-          }
-        }
       }
 
       function updateData(newData: IRun<IParamTrace>[]): void {
