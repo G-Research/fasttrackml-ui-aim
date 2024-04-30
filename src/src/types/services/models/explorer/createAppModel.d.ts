@@ -110,7 +110,6 @@ export interface ISelectConfig {
   query: string;
   advancedMode?: boolean;
   advancedQuery?: string;
-  selectedExperimentNames?: string[];
 }
 
 export interface ITableConfig {

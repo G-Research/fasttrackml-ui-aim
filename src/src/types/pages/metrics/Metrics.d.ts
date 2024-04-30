@@ -47,6 +47,7 @@ import { ITagInfo } from 'types/tags/Tags';
 
 import { HighlightEnum } from 'utils/d3';
 import { IRequestProgress } from 'utils/app/setRequestProgress';
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 export interface IMetricProps extends Partial<RouteChildrenProps> {
   tableRef: React.RefObject<ITableRef>;
@@ -131,8 +132,8 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onAlignmentTypeChange: (type: XAlignmentEnum) => void;
   onDensityTypeChange: (type: DensityOptions) => void;
   onMetricsSelectChange: (options: ISelectOption[]) => void;
-  onSelectExperimentNamesChange: (experimentName: string) => void;
-  onToggleAllExperiments: (experimentNames: string[]) => void;
+  onSelectExperimentsChange: (experiment: IExperimentDataShort) => void;
+  onToggleAllExperiments: (experiments: IExperimentDataShort[]) => void;
   onSelectRunQueryChange: (query: string) => void;
   onRowsVisibilityChange: (metricKeys: string[]) => void;
   onExportTableData: (e: React.ChangeEvent<any>) => void;

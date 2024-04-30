@@ -202,9 +202,7 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onAlignmentTypeChange={metricAppModel.onAlignmentTypeChange}
         onDensityTypeChange={metricAppModel.onDensityTypeChange}
         onMetricsSelectChange={metricAppModel.onMetricsSelectChange}
-        onSelectExperimentNamesChange={
-          metricAppModel.onSelectExperimentNamesChange
-        }
+        onSelectExperimentsChange={metricAppModel.onSelectExperimentsChange}
         onToggleAllExperiments={metricAppModel.onToggleAllExperiments}
         onSelectRunQueryChange={metricAppModel.onSelectRunQueryChange}
         onExportTableData={metricAppModel.onExportTableData}

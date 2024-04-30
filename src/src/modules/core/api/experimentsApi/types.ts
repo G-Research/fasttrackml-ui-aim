@@ -30,6 +30,17 @@ export interface IExperimentData {
 }
 
 /**
+ * interface IExperimentDataShort
+ * a shortened version of the experiment data interface
+ * used for storing selected experiments
+ * jescalada: TODO: replace to use list of IDs instead
+ */
+export interface IExperimentDataShort {
+  id: string;
+  name: string;
+}
+
+/**
  * type GetExperimentContributionsResult
  * The response type of GET /experiments/{exp_id}/activity
 
