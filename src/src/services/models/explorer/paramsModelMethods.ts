@@ -117,6 +117,7 @@ import { getMetricsInitialRowData } from 'utils/app/getMetricsInitialRowData';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import { getMetricLabel } from 'utils/app/getMetricLabel';
 import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import { InitialAppModelType } from './config';
 
@@ -201,6 +202,7 @@ function getParamsModelMethods(
             suggestions: getSuggestionsByExplorer(appName, data),
           },
         });
+        removeOldSelectedMetrics(model);
       });
   }
 

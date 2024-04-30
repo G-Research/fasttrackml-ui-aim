@@ -155,6 +155,7 @@ import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
 import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import { InitialAppModelType } from './config';
 
@@ -249,6 +250,7 @@ function getMetricsAppModelMethods(
             },
           },
         });
+        removeOldSelectedMetrics(model);
       });
   }
 
