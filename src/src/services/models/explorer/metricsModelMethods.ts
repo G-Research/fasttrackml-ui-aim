@@ -15,6 +15,8 @@ import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
+
 import {
   getMetricsTableColumns,
   metricsTableRowRenderer,
@@ -93,7 +95,7 @@ import onGroupingSelectChange from 'utils/app/onGroupingSelectChange';
 import onHighlightModeChange from 'utils/app/onHighlightModeChange';
 import onIgnoreOutliersChange from 'utils/app/onIgnoreOutliersChange';
 import onSelectOptionsChange from 'utils/app/onSelectOptionsChange';
-import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
 import onMetricVisibilityChange from 'utils/app/onMetricsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
@@ -152,7 +154,7 @@ import { onCopyToClipBoard } from 'utils/onCopyToClipBoard';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
-import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import { InitialAppModelType } from './config';
 
@@ -221,9 +223,12 @@ function getMetricsAppModelMethods(
   }
 
   function fetchProjectParamsAndUpdateState() {
-    const selectedExperimentNames = getSelectedExperimentNames();
+    const selectedExperiments = getSelectedExperiments();
     projectsService
-      .getProjectParams(['metric'], selectedExperimentNames)
+      .getProjectParams(
+        ['metric'],
+        selectedExperiments.map((e) => e.id),
+      )
       .call()
       .then((data) => {
         const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
@@ -1645,13 +1650,14 @@ function getMetricsAppModelMethods(
       onMetricsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
         onSelectOptionsChange({ data, model });
       },
-      onSelectExperimentNamesChange(experimentName: string): void {
+      onSelectExperimentsChange(experiment: IExperimentDataShort): void {
         // Handle experiment change, then re-fetch metrics data
-        onSelectExperimentNamesChange({ experimentName, model });
+        onSelectExperimentsChange({ experiment, model });
+        fetchProjectParamsAndUpdateState();
         getMetricsData(true, true).call();
       },
-      onToggleAllExperiments(experimentNames: string[]): void {
-        onToggleAllExperiments({ experimentNames, model });
+      onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+        onToggleAllExperiments({ experiments, model });
         fetchProjectParamsAndUpdateState();
         getMetricsData(true, true).call();
       },

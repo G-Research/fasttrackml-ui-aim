@@ -12,6 +12,8 @@ import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
+
 import {
   getParamsTableColumns,
   paramsTableRowRenderer,
@@ -73,7 +75,7 @@ import onParamsScaleTypeChange from 'utils/app/onParamsScaleTypeChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
-import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
 import onSortFieldsChange from 'utils/app/onSortFieldsChange';
 import { onTableDiffShow } from 'utils/app/onTableDiffShow';
 import { onTableResizeEnd } from 'utils/app/onTableResizeEnd';
@@ -114,7 +116,7 @@ import onRowsVisibilityChange from 'utils/app/onRowsVisibilityChange';
 import { getMetricsInitialRowData } from 'utils/app/getMetricsInitialRowData';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import { getMetricLabel } from 'utils/app/getMetricLabel';
-import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import { InitialAppModelType } from './config';
 
@@ -185,9 +187,12 @@ function getParamsModelMethods(
   }
 
   function fetchProjectParamsAndUpdateState() {
-    const selectedExperimentNames = getSelectedExperimentNames();
+    const selectedExperiments = getSelectedExperiments();
     projectsService
-      .getProjectParams(['metric'], selectedExperimentNames)
+      .getProjectParams(
+        ['metric'],
+        selectedExperiments.map((e) => e.id),
+      )
       .call()
       .then((data) => {
         model.setState({
@@ -1573,14 +1578,14 @@ function getParamsModelMethods(
       onParamsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
         onSelectOptionsChange({ data, model });
       },
-      onSelectExperimentNamesChange(experimentName: string): void {
+      onSelectExperimentsChange(experiment: IExperimentDataShort): void {
         // Handle experiment change, then re-fetch params data
-        onSelectExperimentNamesChange({ experimentName, model });
+        onSelectExperimentsChange({ experiment, model });
         fetchProjectParamsAndUpdateState();
         getParamsData(true, true).call();
       },
-      onToggleAllExperiments(experimentNames: string[]): void {
-        onToggleAllExperiments({ experimentNames, model });
+      onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+        onToggleAllExperiments({ experiments, model });
         fetchProjectParamsAndUpdateState();
         getParamsData(true, true).call();
       },

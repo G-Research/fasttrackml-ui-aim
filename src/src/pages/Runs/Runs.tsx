@@ -28,7 +28,7 @@ function Runs(props: any): React.FunctionComponentElement<React.ReactNode> {
             onResetConfigData={props.onResetConfigData}
             liveUpdateConfig={props.liveUpdateConfig}
             onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
-            onSelectExperimentNamesChange={props.onSelectExperimentNamesChange}
+            onSelectExperimentsChange={props.onSelectExperimentsChange}
             onToggleAllExperiments={props.onToggleAllExperiments}
             title={pageTitlesEnum.RUNS_EXPLORER}
           />

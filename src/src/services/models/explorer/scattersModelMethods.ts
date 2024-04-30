@@ -14,6 +14,8 @@ import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
+
 import {
   getParamsTableColumns,
   paramsTableRowRenderer,
@@ -85,7 +87,7 @@ import onTableRowClick from 'utils/app/onTableRowClick';
 import onTableRowHover from 'utils/app/onTableRowHover';
 import onTableSortChange from 'utils/app/onTableSortChange';
 import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
-import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
 import updateSortFields from 'utils/app/updateTableSortFields';
 import contextToString from 'utils/contextToString';
@@ -118,7 +120,7 @@ import onRowsVisibilityChange from 'utils/app/onRowsVisibilityChange';
 import { getMetricsInitialRowData } from 'utils/app/getMetricsInitialRowData';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import { getMetricLabel } from 'utils/app/getMetricLabel';
-import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import { InitialAppModelType } from './config';
 
@@ -187,9 +189,12 @@ function getScattersModelMethods(
   }
 
   function fetchProjectParamsAndUpdateState() {
-    const selectedExperimentNames = getSelectedExperimentNames();
+    const selectedExperiments = getSelectedExperiments();
     projectsService
-      .getProjectParams(['metric'], selectedExperimentNames)
+      .getProjectParams(
+        ['metric'],
+        selectedExperiments.map((e) => e.id),
+      )
       .call()
       .then((data: IProjectParamsMetrics) => {
         model.setState({
@@ -1501,14 +1506,14 @@ function getScattersModelMethods(
       onSelectOptionsChange<D>(data: D & Partial<ISelectOption[]>): void {
         onSelectOptionsChange({ data, model });
       },
-      onSelectExperimentNamesChange(experimentName: string): void {
+      onSelectExperimentsChange(experiment: IExperimentDataShort): void {
         // Handle experiment change, then re-fetch scatters data
-        onSelectExperimentNamesChange({ experimentName, model });
+        onSelectExperimentsChange({ experiment, model });
         fetchProjectParamsAndUpdateState();
         getScattersData(true, true).call();
       },
-      onToggleAllExperiments(experimentNames: string[]): void {
-        onToggleAllExperiments({ experimentNames, model });
+      onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+        onToggleAllExperiments({ experiments, model });
         fetchProjectParamsAndUpdateState();
         getScattersData(true, true).call();
       },

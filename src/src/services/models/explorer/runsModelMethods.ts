@@ -12,6 +12,8 @@ import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 import { MetricsValueKeyEnum } from 'config/enums/tableEnums';
 
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
+
 import {
   getRunsTableColumns,
   runsTableRowRenderer,
@@ -51,7 +53,7 @@ import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
-import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
 import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import { onTableDiffShow } from 'utils/app/onTableDiffShow';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
@@ -79,7 +81,7 @@ import { getMetricsInitialRowData } from 'utils/app/getMetricsInitialRowData';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import onMetricsValueKeyChange from 'utils/app/onMetricsValueKeyChange';
-import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import { InitialAppModelType } from './config';
 
@@ -184,8 +186,8 @@ function getRunsModelMethods(
     onRunsTagsChange({ runHash, tags, model, updateModelData });
   }
 
-  function onSelectExperiment(experimentName: string): void {
-    onSelectExperimentNamesChange({ experimentName, model });
+  function onSelectExperiment(experiment: IExperimentDataShort): void {
+    onSelectExperimentsChange({ experiment, model });
     try {
       getRunsData().call((detail) => {
         exceptionHandler({ detail, model });
@@ -202,8 +204,8 @@ function getRunsModelMethods(
     }
   }
 
-  function onSelectExperiments(experimentNames: string[]): void {
-    onToggleAllExperiments({ experimentNames, model });
+  function onSelectExperiments(experiments: IExperimentDataShort[]): void {
+    onToggleAllExperiments({ experiments, model });
     try {
       getRunsData().call((detail) => {
         exceptionHandler({ detail, model });
@@ -243,7 +245,7 @@ function getRunsModelMethods(
 
     liveUpdateInstance?.stop().then();
 
-    const selectedExperimentNames = getSelectedExperimentNames();
+    const selectedExperimentNames = getSelectedExperiments().map((e) => e.name);
     runsRequestRef = runsService.getRunsData(
       query,
       45,
@@ -1093,7 +1095,7 @@ function getRunsModelMethods(
     onNotificationDelete: onModelNotificationDelete,
     setDefaultAppConfigData: setModelDefaultAppConfigData,
     onRunsTagsChange: onModelRunsTagsChange,
-    onSelectExperimentNamesChange: onSelectExperiment,
+    onSelectExperimentsChange: onSelectExperiment,
     onToggleAllExperiments: onSelectExperiments,
     changeLiveUpdateConfig,
     archiveRuns,
