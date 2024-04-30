@@ -206,7 +206,7 @@ import { getMetricLabel } from 'utils/app/getMetricLabel';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
-import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import { AppDataTypeEnum, AppNameEnum } from './index';
