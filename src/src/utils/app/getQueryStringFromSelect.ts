@@ -5,7 +5,7 @@ import { jsValidVariableRegex } from 'utils/getObjectPaths';
 
 import { formatValue } from '../formatValue';
 
-import { getSelectedExperimentNames } from './getSelectedExperimentNames';
+import { getSelectedExperiments } from './getSelectedExperiments';
 
 export default function getQueryStringFromSelect(
   selectData: ISelectConfig,
@@ -54,11 +54,11 @@ export default function getQueryStringFromSelect(
         : '';
     }
 
-    const selectedExperiments = getSelectedExperimentNames();
+    const selectedExperiments = getSelectedExperiments();
 
-    const experimentNames = `run.experiment in ["${selectedExperiments.join(
-      '", "',
-    )}"]`;
+    const experimentNames = `run.experiment in ["${selectedExperiments
+      .map((e) => e.name)
+      .join('", "')}"]`;
 
     if (simpleInput && selections) {
       query = `${simpleInput} and ${selections}`;

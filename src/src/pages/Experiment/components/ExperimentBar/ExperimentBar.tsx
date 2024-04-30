@@ -8,6 +8,8 @@ import { Button, Icon, Text } from 'components/kit';
 import ControlPopover from 'components/ControlPopover/ControlPopover';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
+
 import ExperimentSelectionPopover from '../ExperimentSelectionPopover';
 
 import { IExperimentBarProps } from '.';
@@ -18,9 +20,9 @@ function ExperimentBar({
   isExperimentLoading,
   isExperimentsLoading,
   experimentsData,
-  selectedExperimentNames,
+  selectedExperiments,
   getExperimentsData,
-  onSelectExperimentNamesChange,
+  onSelectExperimentsChange,
   onToggleAllExperiments,
 }: IExperimentBarProps): React.FunctionComponentElement<React.ReactNode> {
   function shortenExperimentName(name?: string): string {
@@ -33,14 +35,13 @@ function ExperimentBar({
   }
 
   // Selected experiments are the ones that are checked
-  const [selectedExperiments, setSelectedExperiments] = React.useState<
-    string[]
-  >(selectedExperimentNames);
+  const [selectedExperimentsState, setSelectedExperimentsState] =
+    React.useState<IExperimentDataShort[]>(selectedExperiments);
 
-  // Update selected experiments in UI when selectedExperimentNames change
+  // Update selected experiments in UI when selectedExperiments change
   React.useEffect(() => {
-    setSelectedExperiments(selectedExperimentNames);
-  }, [selectedExperimentNames]);
+    setSelectedExperimentsState(selectedExperiments);
+  }, [selectedExperiments]);
 
   return (
     <ErrorBoundary>
@@ -77,25 +78,25 @@ function ExperimentBar({
                           <Icon name={opened ? 'arrow-up' : 'arrow-down'} />
                         </Button>
 
-                        {selectedExperiments.length === 0 ? (
+                        {selectedExperimentsState.length === 0 ? (
                           <Text className='ExperimentBar__headerContainer__appBarTitleBox__text'>
                             Select Experiments
                           </Text>
                         ) : null}
 
                         <div className='ExperimentBar__headerContainer__appBarTitleBox__chipContainer'>
-                          {selectedExperiments.map((experimentName) => (
+                          {selectedExperimentsState.map((experiment) => (
                             <Tooltip
-                              key={experimentName}
-                              title={experimentName}
+                              key={experiment.id}
+                              title={experiment.name}
                             >
                               <Chip
                                 className='ExperimentBar__headerContainer__appBarTitleBox__chipContainer__chip'
                                 variant='outlined'
                                 size='small'
-                                label={shortenExperimentName(experimentName)}
+                                label={shortenExperimentName(experiment.name)}
                                 onDelete={() =>
-                                  onSelectExperimentNamesChange(experimentName)
+                                  onSelectExperimentsChange(experiment)
                                 }
                               />
                             </Tooltip>
@@ -119,10 +120,10 @@ function ExperimentBar({
                 <ExperimentSelectionPopover
                   isExperimentsLoading={isExperimentsLoading}
                   experimentsData={experimentsData}
-                  selectedExperiments={selectedExperiments}
-                  setSelectedExperiments={setSelectedExperiments}
+                  selectedExperiments={selectedExperimentsState}
+                  setSelectedExperiments={setSelectedExperimentsState}
                   getExperimentsData={getExperimentsData}
-                  onSelectExperimentNamesChange={onSelectExperimentNamesChange}
+                  onSelectExperimentsChange={onSelectExperimentsChange}
                   onToggleAllExperiments={onToggleAllExperiments}
                 />
               }

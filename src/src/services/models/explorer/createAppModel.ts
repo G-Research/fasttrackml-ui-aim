@@ -17,6 +17,8 @@ import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
+
 import {
   getMetricsTableColumns,
   metricsTableRowRenderer,
@@ -127,7 +129,7 @@ import onParamsScaleTypeChange from 'utils/app/onParamsScaleTypeChange';
 import onParamVisibilityChange from 'utils/app/onParamsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
-import onSelectExperimentNamesChange from 'utils/app/onSelectExperimentNamesChange';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
 import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
 import onSmoothingChange from 'utils/app/onSmoothingChange';
@@ -204,7 +206,7 @@ import { getMetricLabel } from 'utils/app/getMetricLabel';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
-import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import { AppDataTypeEnum, AppNameEnum } from './index';
 
@@ -554,9 +556,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
     }
 
     function fetchProjectParamsAndUpdateState() {
-      const selectedExperimentNames = getSelectedExperimentNames();
+      const selectedExperiments = getSelectedExperiments();
       projectsService
-        .getProjectParams(['metric'], selectedExperimentNames)
+        .getProjectParams(
+          ['metric'],
+          selectedExperiments.map((e) => e.id),
+        )
         .call()
         .then((data) => {
           const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
@@ -2010,14 +2015,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onMetricsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
           onSelectOptionsChange({ data, model });
         },
-        onSelectExperimentNamesChange(experimentName: string): void {
+        onSelectExperimentsChange(experiment: IExperimentDataShort): void {
           // Handle experiment change, then re-fetch metrics data
-          onSelectExperimentNamesChange({ experimentName, model });
+          onSelectExperimentsChange({ experiment, model });
           fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
         },
-        onToggleAllExperiments(experimentNames: string[]): void {
-          onToggleAllExperiments({ experimentNames, model });
+        onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+          onToggleAllExperiments({ experiments, model });
           fetchProjectParamsAndUpdateState();
           getMetricsData(true, true).call();
         },
@@ -2274,8 +2279,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onRunsTagsChange({ runHash, tags, model, updateModelData });
       }
 
-      function onSelectExperiment(experimentName: string): void {
-        onSelectExperimentNamesChange({ experimentName, model });
+      function onSelectExperiment(experiment: IExperimentDataShort): void {
+        onSelectExperimentsChange({ experiment, model });
         try {
           getRunsData().call((detail) => {
             exceptionHandler({ detail, model });
@@ -2292,8 +2297,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
         }
       }
 
-      function onSelectExperiments(experimentNames: string[]): void {
-        onToggleAllExperiments({ experimentNames, model });
+      function onSelectExperiments(experiments: IExperimentDataShort[]): void {
+        onToggleAllExperiments({ experiments, model });
         try {
           getRunsData().call((detail) => {
             exceptionHandler({ detail, model });
@@ -2333,7 +2338,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
         liveUpdateInstance?.stop().then();
 
-        const selectedExperimentNames = getSelectedExperimentNames();
+        const selectedExperimentNames = getSelectedExperiments().map(
+          (e) => e.name,
+        );
         runsRequestRef = runsService.getRunsData(
           query,
           45,
@@ -3188,7 +3195,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onNotificationDelete: onModelNotificationDelete,
         setDefaultAppConfigData: setModelDefaultAppConfigData,
         onRunsTagsChange: onModelRunsTagsChange,
-        onSelectExperimentNamesChange: onSelectExperiment,
+        onSelectExperimentsChange: onSelectExperiment,
         onToggleAllExperiments: onSelectExperiments,
         changeLiveUpdateConfig,
         archiveRuns,
@@ -3331,9 +3338,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
       }
 
       function fetchProjectParamsAndUpdateState() {
-        const selectedExperimentNames = getSelectedExperimentNames();
+        const selectedExperiments = getSelectedExperiments();
         projectsService
-          .getProjectParams(['metric'], selectedExperimentNames)
+          .getProjectParams(
+            ['metric'],
+            selectedExperiments.map((e) => e.id),
+          )
           .call()
           .then((data) => {
             model.setState({
@@ -4746,14 +4756,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onParamsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
             onSelectOptionsChange({ data, model });
           },
-          onSelectExperimentNamesChange(experimentName: string): void {
+          onSelectExperimentsChange(experiment: IExperimentDataShort): void {
             // Handle experiment change, then re-fetch params data
-            onSelectExperimentNamesChange({ experimentName, model });
+            onSelectExperimentsChange({ experiment, model });
             fetchProjectParamsAndUpdateState();
             getParamsData(true, true).call();
           },
-          onToggleAllExperiments(experimentNames: string[]): void {
-            onToggleAllExperiments({ experimentNames, model });
+          onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+            onToggleAllExperiments({ experiments, model });
             fetchProjectParamsAndUpdateState();
             getParamsData(true, true).call();
           },
@@ -4945,9 +4955,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
       }
 
       function fetchProjectParamsAndUpdateState() {
-        const selectedExperimentNames = getSelectedExperimentNames();
+        const selectedExperiments = getSelectedExperiments();
         projectsService
-          .getProjectParams(['metric'], selectedExperimentNames)
+          .getProjectParams(
+            ['metric'],
+            selectedExperiments.map((e) => e.id),
+          )
           .call()
           .then((data: IProjectParamsMetrics) => {
             model.setState({
@@ -6275,14 +6288,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onSelectOptionsChange<D>(data: D & Partial<ISelectOption[]>): void {
             onSelectOptionsChange({ data, model });
           },
-          onSelectExperimentNamesChange(experimentName: string): void {
+          onSelectExperimentsChange(experiment: IExperimentDataShort): void {
             // Handle experiment change, then re-fetch scatters data
-            onSelectExperimentNamesChange({ experimentName, model });
+            onSelectExperimentsChange({ experiment, model });
             fetchProjectParamsAndUpdateState();
             getScattersData(true, true).call();
           },
-          onToggleAllExperiments(experimentNames: string[]): void {
-            onToggleAllExperiments({ experimentNames, model });
+          onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+            onToggleAllExperiments({ experiments, model });
             fetchProjectParamsAndUpdateState();
             getScattersData(true, true).call();
           },
