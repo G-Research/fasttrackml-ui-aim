@@ -207,6 +207,7 @@ import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
 import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import { AppDataTypeEnum, AppNameEnum } from './index';
 
@@ -582,6 +583,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
               },
             },
           });
+          removeOldSelectedMetrics(model);
         });
     }
 
@@ -3352,6 +3354,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
                 suggestions: getSuggestionsByExplorer(appName, data),
               },
             });
+            removeOldSelectedMetrics(model);
           });
       }
 
@@ -4969,6 +4972,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
                 suggestions: getSuggestionsByExplorer(appName, data),
               },
             });
+            removeOldSelectedMetrics(model);
           });
       }
 
