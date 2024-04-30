@@ -185,9 +185,7 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
         onNotificationAdd={scattersAppModel.onNotificationAdd}
         onNotificationDelete={scattersAppModel.onNotificationDelete}
         onResetConfigData={scattersAppModel.onResetConfigData}
-        onSelectExperimentNamesChange={
-          scattersAppModel.onSelectExperimentNamesChange
-        }
+        onSelectExperimentsChange={scattersAppModel.onSelectExperimentsChange}
         onToggleAllExperiments={scattersAppModel.onToggleAllExperiments}
         onSelectOptionsChange={scattersAppModel.onSelectOptionsChange}
         onSelectRunQueryChange={scattersAppModel.onSelectRunQueryChange}

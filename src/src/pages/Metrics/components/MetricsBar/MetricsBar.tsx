@@ -14,7 +14,10 @@ import ConfirmModal from 'components/ConfirmModal/ConfirmModal';
 import { DOCUMENTATIONS } from 'config/references';
 
 import { IResourceState } from 'modules/core/utils/createResource';
-import { IExperimentData } from 'modules/core/api/experimentsApi';
+import {
+  IExperimentData,
+  IExperimentDataShort,
+} from 'modules/core/api/experimentsApi';
 
 import createExperimentEngine from 'pages/Dashboard/components/ExploreSection/ExperimentsCard/ExperimentsStore';
 import ExperimentBar from 'pages/Experiment/components/ExperimentBar';
@@ -22,7 +25,7 @@ import useExperimentState from 'pages/Experiment/useExperimentState';
 
 import { IMetricsBarProps } from 'types/pages/metrics/components/MetricsBar/MetricsBar';
 
-import { getSelectedExperimentNames } from 'utils/app/getSelectedExperimentNames';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import './MetricsBar.scss';
 
@@ -35,13 +38,13 @@ function MetricsBar({
   onBookmarkUpdate,
   onResetConfigData,
   onLiveUpdateConfigChange,
-  onSelectExperimentNamesChange,
+  onSelectExperimentsChange,
   onToggleAllExperiments,
 }: IMetricsBarProps): React.FunctionComponentElement<React.ReactNode> {
   const [popover, setPopover] = React.useState<string>('');
-  const [selectedExperimentNames, setSelectedExperimentNames] = React.useState<
-    string[]
-  >(getSelectedExperimentNames());
+  const [selectedExperiments, setSelectedExperiments] = React.useState<
+    IExperimentDataShort[]
+  >(getSelectedExperiments());
 
   const route = useRouteMatch<any>();
 
@@ -81,9 +84,9 @@ function MetricsBar({
     handleClosePopover();
   }
 
-  function handleExperimentNamesChange(experimentName: string): void {
-    onSelectExperimentNamesChange(experimentName);
-    setSelectedExperimentNames(getSelectedExperimentNames());
+  function handleExperimentsChange(experiment: IExperimentDataShort): void {
+    onSelectExperimentsChange(experiment);
+    setSelectedExperiments(getSelectedExperiments());
   }
 
   return (
@@ -93,9 +96,9 @@ function MetricsBar({
           experimentsData={experimentsData}
           isExperimentLoading={isExperimentLoading}
           isExperimentsLoading={isExperimentsLoading}
-          selectedExperimentNames={selectedExperimentNames}
+          selectedExperiments={selectedExperiments}
           getExperimentsData={getExperimentsData}
-          onSelectExperimentNamesChange={handleExperimentNamesChange}
+          onSelectExperimentsChange={handleExperimentsChange}
           onToggleAllExperiments={onToggleAllExperiments}
         />
         <LiveUpdateSettings
