@@ -47,7 +47,21 @@ function AutocompleteInput({
         monacoConfig.theme.config,
       );
       monaco.editor.setTheme(monacoConfig.theme.name);
+
+      // Prevent editor from adding spaces on enter after an open parenthesis
+      monaco.languages.setLanguageConfiguration('python', {
+        onEnterRules: [
+          {
+            beforeText: new RegExp(/(\s*\(\s*)$/),
+            action: {
+              indentAction: monaco.languages.IndentAction.None,
+              appendText: '',
+            },
+          },
+        ],
+      });
     }
+
     const onResize = _.debounce(() => {
       setContainerWidth(window.innerWidth);
     }, 500);
