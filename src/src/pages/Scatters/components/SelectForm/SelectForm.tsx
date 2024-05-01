@@ -94,6 +94,18 @@ function SelectForm({
   return (
     <ErrorBoundary>
       <div className='Scatters__SelectForm'>
+        <ErrorBoundary>
+          <div className='Scatters__SelectForm__TextField'>
+            <AutocompleteInput
+              refObject={autocompleteRef}
+              context={selectFormData?.suggestions}
+              error={selectFormData?.error}
+              value={selectedOptionsData?.query}
+              onEnter={handleParamsSearch}
+              disabled={isDisabled}
+            />
+          </div>
+        </ErrorBoundary>
         <Box display='flex'>
           <ErrorBoundary>
             <div className='Scatters__SelectForm__container__options'>
@@ -176,18 +188,6 @@ function SelectForm({
             </Button>
           </div>
         </Box>
-        <ErrorBoundary>
-          <div className='Scatters__SelectForm__TextField'>
-            <AutocompleteInput
-              refObject={autocompleteRef}
-              context={selectFormData?.suggestions}
-              error={selectFormData?.error}
-              value={selectedOptionsData?.query}
-              onEnter={handleParamsSearch}
-              disabled={isDisabled}
-            />
-          </div>
-        </ErrorBoundary>
       </div>
     </ErrorBoundary>
   );
