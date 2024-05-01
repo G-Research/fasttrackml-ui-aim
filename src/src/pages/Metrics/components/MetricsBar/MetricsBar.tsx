@@ -62,8 +62,19 @@ function MetricsBar({
   }, []);
 
   // Fetch all experiments along with default
-  const { experimentState, experimentsState, getExperimentsData } =
-    useExperimentState(experimentsStore.data?.[0]?.id);
+  const {
+    experimentState,
+    experimentsState,
+    selectedExperiments: filteredSelectedExperiments,
+    getExperimentsData,
+  } = useExperimentState(experimentsStore.data?.[0]?.id);
+
+  // Remove selected experiments that are not in the list of fetched experiments
+  React.useEffect(() => {
+    if (filteredSelectedExperiments.length !== selectedExperiments.length) {
+      setSelectedExperiments(filteredSelectedExperiments);
+    }
+  }, [filteredSelectedExperiments, selectedExperiments]);
 
   const { data: experimentData, loading: isExperimentLoading } =
     experimentState;
