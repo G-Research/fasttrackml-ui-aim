@@ -207,6 +207,7 @@ import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
 import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import { AppDataTypeEnum, AppNameEnum } from './index';
 
@@ -560,7 +561,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
       projectsService
         .getProjectParams(
           ['metric'],
-          selectedExperiments.map((e) => e.name),
+          selectedExperiments.map((e) => e.id),
         )
         .call()
         .then((data) => {
@@ -582,6 +583,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
               },
             },
           });
+          removeOldSelectedMetrics(model);
         });
     }
 
@@ -2279,6 +2281,42 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onRunsTagsChange({ runHash, tags, model, updateModelData });
       }
 
+      function onSelectExperiment(experiment: IExperimentDataShort): void {
+        onSelectExperimentsChange(experiment);
+        try {
+          getRunsData().call((detail) => {
+            exceptionHandler({ detail, model });
+          });
+        } catch (err: any) {
+          onNotificationAdd({
+            model,
+            notification: {
+              id: Date.now(),
+              messages: [err.message],
+              severity: 'error',
+            },
+          });
+        }
+      }
+
+      function onSelectExperiments(experiments: IExperimentDataShort[]): void {
+        onToggleAllExperiments(experiments);
+        try {
+          getRunsData().call((detail) => {
+            exceptionHandler({ detail, model });
+          });
+        } catch (err: any) {
+          onNotificationAdd({
+            model,
+            notification: {
+              id: Date.now(),
+              messages: [err.message],
+              severity: 'error',
+            },
+          });
+        }
+      }
+
       function getRunsData(
         shouldUrlUpdate?: boolean,
         shouldResetSelectedRows?: boolean,
@@ -2302,7 +2340,15 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
         liveUpdateInstance?.stop().then();
 
-        runsRequestRef = runsService.getRunsData(query, 45, pagination?.offset);
+        const selectedExperimentNames = getSelectedExperiments().map(
+          (e) => e.name,
+        );
+        runsRequestRef = runsService.getRunsData(
+          query,
+          45,
+          pagination?.offset,
+          selectedExperimentNames,
+        );
         let limit = pagination.limit;
         setRequestProgress(model);
         return {
@@ -3151,6 +3197,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onNotificationDelete: onModelNotificationDelete,
         setDefaultAppConfigData: setModelDefaultAppConfigData,
         onRunsTagsChange: onModelRunsTagsChange,
+        onSelectExperimentsChange: onSelectExperiment,
+        onToggleAllExperiments: onSelectExperiments,
         changeLiveUpdateConfig,
         archiveRuns,
         deleteRuns,
@@ -3296,7 +3344,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         projectsService
           .getProjectParams(
             ['metric'],
-            selectedExperiments.map((e) => e.name),
+            selectedExperiments.map((e) => e.id),
           )
           .call()
           .then((data) => {
@@ -3306,6 +3354,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
                 suggestions: getSuggestionsByExplorer(appName, data),
               },
             });
+            removeOldSelectedMetrics(model);
           });
       }
 
@@ -4913,7 +4962,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         projectsService
           .getProjectParams(
             ['metric'],
-            selectedExperiments.map((e) => e.name),
+            selectedExperiments.map((e) => e.id),
           )
           .call()
           .then((data: IProjectParamsMetrics) => {
@@ -4923,6 +4972,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
                 suggestions: getSuggestionsByExplorer(appName, data),
               },
             });
+            removeOldSelectedMetrics(model);
           });
       }
 
