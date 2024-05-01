@@ -1,11 +1,14 @@
-import { IExperimentData } from 'modules/core/api/experimentsApi/types';
+import {
+  IExperimentData,
+  IExperimentDataShort,
+} from 'modules/core/api/experimentsApi/types';
 
 export interface IExperimentBarProps {
   isExperimentLoading: boolean;
   isExperimentsLoading: boolean;
   experimentsData: IExperimentData[] | null;
-  selectedExperimentNames: string[];
+  selectedExperiments: IExperimentDataShort[];
   getExperimentsData: () => void;
-  onSelectExperimentNamesChange: (experimentName: string) => void;
-  onToggleAllExperiments: (experimentNames: string[]) => void;
+  onSelectExperimentsChange: (experiment: IExperimentDataShort) => void;
+  onToggleAllExperiments: (experiments: IExperimentDataShort[]) => void;
 }
