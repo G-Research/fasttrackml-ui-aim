@@ -1654,12 +1654,12 @@ function getMetricsAppModelMethods(
       },
       onSelectExperimentsChange(experiment: IExperimentDataShort): void {
         // Handle experiment change, then re-fetch metrics data
-        onSelectExperimentsChange({ experiment, model });
+        onSelectExperimentsChange(experiment);
         fetchProjectParamsAndUpdateState();
         getMetricsData(true, true).call();
       },
       onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
-        onToggleAllExperiments({ experiments, model });
+        onToggleAllExperiments(experiments);
         fetchProjectParamsAndUpdateState();
         getMetricsData(true, true).call();
       },

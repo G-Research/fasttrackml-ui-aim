@@ -1,18 +1,12 @@
 import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
-import { IModel, State } from 'types/services/models/model';
-
 import { setItem } from 'utils/storage';
 
 import { getSelectedExperiments } from './getSelectedExperiments';
 
-export default function onSelectExperimentChange<M extends State>({
-  experiment,
-  model,
-}: {
-  experiment: IExperimentDataShort;
-  model: IModel<M>;
-}) {
+export default function onSelectExperimentChange(
+  experiment: IExperimentDataShort,
+) {
   const selectedExperiments = getSelectedExperiments();
 
   const index = selectedExperiments.findIndex((e) => e.id === experiment.id);

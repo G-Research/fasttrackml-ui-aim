@@ -1510,12 +1510,12 @@ function getScattersModelMethods(
       },
       onSelectExperimentsChange(experiment: IExperimentDataShort): void {
         // Handle experiment change, then re-fetch scatters data
-        onSelectExperimentsChange({ experiment, model });
+        onSelectExperimentsChange(experiment);
         fetchProjectParamsAndUpdateState();
         getScattersData(true, true).call();
       },
       onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
-        onToggleAllExperiments({ experiments, model });
+        onToggleAllExperiments(experiments);
         fetchProjectParamsAndUpdateState();
         getScattersData(true, true).call();
       },

@@ -187,7 +187,7 @@ function getRunsModelMethods(
   }
 
   function onSelectExperiment(experiment: IExperimentDataShort): void {
-    onSelectExperimentsChange({ experiment, model });
+    onSelectExperimentsChange(experiment);
     try {
       getRunsData().call((detail) => {
         exceptionHandler({ detail, model });
@@ -205,7 +205,7 @@ function getRunsModelMethods(
   }
 
   function onSelectExperiments(experiments: IExperimentDataShort[]): void {
-    onToggleAllExperiments({ experiments, model });
+    onToggleAllExperiments(experiments);
     try {
       getRunsData().call((detail) => {
         exceptionHandler({ detail, model });

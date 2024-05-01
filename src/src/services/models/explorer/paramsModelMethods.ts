@@ -1582,12 +1582,12 @@ function getParamsModelMethods(
       },
       onSelectExperimentsChange(experiment: IExperimentDataShort): void {
         // Handle experiment change, then re-fetch params data
-        onSelectExperimentsChange({ experiment, model });
+        onSelectExperimentsChange(experiment);
         fetchProjectParamsAndUpdateState();
         getParamsData(true, true).call();
       },
       onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
-        onToggleAllExperiments({ experiments, model });
+        onToggleAllExperiments(experiments);
         fetchProjectParamsAndUpdateState();
         getParamsData(true, true).call();
       },
