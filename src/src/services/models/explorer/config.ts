@@ -80,6 +80,8 @@ function initializeAppModel(appConfig: IAppInitialConfig): InitialAppModelType {
             resizeMode: TABLE_DEFAULT_CONFIG.metrics.resizeMode,
             rowHeight: TABLE_DEFAULT_CONFIG.metrics.rowHeight,
             sortFields: [...TABLE_DEFAULT_CONFIG.metrics.sortFields],
+            unselectedColumnState:
+              TABLE_DEFAULT_CONFIG.metrics.unselectedColumnState,
             hiddenMetrics: [...TABLE_DEFAULT_CONFIG.metrics.hiddenMetrics],
             hiddenColumns: [...TABLE_DEFAULT_CONFIG.metrics.hiddenColumns],
             columnsWidths: { tags: 300 },
@@ -201,6 +203,8 @@ function initializeAppModel(appConfig: IAppInitialConfig): InitialAppModelType {
           config.table = {
             metricsValueKey: TABLE_DEFAULT_CONFIG.runs.metricsValueKey,
             rowHeight: TABLE_DEFAULT_CONFIG.runs.rowHeight,
+            unselectedColumnState:
+              TABLE_DEFAULT_CONFIG.metrics.unselectedColumnState,
             hideSystemMetrics: TABLE_DEFAULT_CONFIG.runs.hideSystemMetrics,
             hiddenMetrics: TABLE_DEFAULT_CONFIG.runs.hiddenMetrics,
             hiddenColumns: TABLE_DEFAULT_CONFIG.runs.hiddenColumns,
@@ -249,6 +253,8 @@ function initializeAppModel(appConfig: IAppInitialConfig): InitialAppModelType {
           if (components.charts.indexOf(ChartTypeEnum.ScatterPlot) !== -1) {
             config.table = {
               ...config?.table!,
+              unselectedColumnState:
+                TABLE_DEFAULT_CONFIG.metrics.unselectedColumnState,
               resizeMode: TABLE_DEFAULT_CONFIG.scatters.resizeMode,
             };
             config.chart = {

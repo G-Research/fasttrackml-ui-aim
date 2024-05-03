@@ -7,7 +7,11 @@ import { IAxesScaleRange } from 'components/AxesPropsPopover';
 import COLORS from 'config/colors/colors';
 import DASH_ARRAYS from 'config/dash-arrays/dashArrays';
 import { ResizeModeEnum } from 'config/enums/tableEnums';
-import { RowHeightSize } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  TABLE_DEFAULT_CONFIG,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { DensityOptions } from 'config/enums/densityEnum';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
@@ -86,6 +90,7 @@ import onAxesScaleTypeChange from 'utils/app/onAxesScaleTypeChange';
 import onChangeTooltip from 'utils/app/onChangeTooltip';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
+import onDefaultColumnsVisibilityChange from 'utils/app/onDefaultColumnsVisibilityChange';
 import onGroupingApplyChange from 'utils/app/onGroupingApplyChange';
 import onGroupingModeChange from 'utils/app/onGroupingModeChange';
 import onGroupingPaletteChange from 'utils/app/onGroupingPaletteChange';
@@ -158,6 +163,8 @@ import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import { InitialAppModelType } from './config';
+
+import { AppNameEnum } from './index';
 
 // ************ Metrics App Model Methods
 
@@ -854,6 +861,39 @@ function getMetricsAppModelMethods(
       configData,
       groupingSelectOptions,
     );
+
+    const unselectedColumnState = configData.table?.unselectedColumnState;
+
+    if (unselectedColumnState !== UnselectedColumnState.DEFAULT) {
+      const selected = configData.select?.options.map(
+        (option: ISelectOption) => option.label,
+      );
+      let hiddenColumns = configData.table?.hiddenColumns;
+
+      const defaultHiddenColumns =
+        TABLE_DEFAULT_CONFIG?.[AppNameEnum.METRICS]?.hiddenColumns;
+
+      if (unselectedColumnState === UnselectedColumnState.FORCE_HIDE) {
+        // Push unique values to hiddenColumns
+        hiddenColumns = _.uniq(
+          hiddenColumns?.concat(
+            params.filter((item: string) => !selected.includes(item)),
+          ),
+        );
+      } else {
+        // Remove unselected values from hiddenColumns
+        hiddenColumns = defaultHiddenColumns;
+      }
+
+      configData = {
+        ...configData,
+        table: {
+          ...configData.table,
+          rowHeight: configData.table?.rowHeight!,
+          hiddenColumns,
+        },
+      };
+    }
 
     const tableColumns = getMetricsTableColumns(
       params,
@@ -1756,6 +1796,14 @@ function getMetricsAppModelMethods(
       onColumnsVisibilityChange(hiddenColumns: string[]): void {
         onColumnsVisibilityChange({
           hiddenColumns,
+          model,
+          appName,
+          updateModelData,
+        });
+      },
+      onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+        onDefaultColumnsVisibilityChange({
+          unselectedColumnState: state,
           model,
           appName,
           updateModelData,

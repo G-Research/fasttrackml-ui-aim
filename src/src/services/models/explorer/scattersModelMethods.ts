@@ -7,7 +7,11 @@ import { IPoint } from 'components/ScatterPlot';
 import COLORS from 'config/colors/colors';
 import DASH_ARRAYS from 'config/dash-arrays/dashArrays';
 import { MetricsValueKeyEnum, ResizeModeEnum } from 'config/enums/tableEnums';
-import { RowHeightSize } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  TABLE_DEFAULT_CONFIG,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
@@ -68,6 +72,7 @@ import getRunData from 'utils/app/getRunData';
 import onChangeTooltip from 'utils/app/onChangeTooltip';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
+import onDefaultColumnsVisibilityChange from 'utils/app/onDefaultColumnsVisibilityChange';
 import onGroupingApplyChange from 'utils/app/onGroupingApplyChange';
 import onGroupingModeChange from 'utils/app/onGroupingModeChange';
 import onGroupingPaletteChange from 'utils/app/onGroupingPaletteChange';
@@ -247,6 +252,52 @@ function getScattersModelMethods(
       groupingSelectOptions,
     );
     const sortFields = modelState?.config?.table.sortFields;
+
+    const unselectedColumnState = configData.table?.unselectedColumnState;
+
+    if (unselectedColumnState !== UnselectedColumnState.DEFAULT) {
+      const selected = modelState?.config?.select?.options.map(
+        (option: ISelectOption) => option.label,
+      );
+
+      let hiddenColumns = configData.table?.hiddenColumns;
+
+      const defaultHiddenColumns =
+        TABLE_DEFAULT_CONFIG?.[AppNameEnum.PARAMS]?.hiddenColumns;
+
+      if (unselectedColumnState === UnselectedColumnState.FORCE_HIDE) {
+        // Extract the combined keys from metricsColumns dictionary
+        const metricList = Object.keys(metricsColumns).reduce(
+          (acc: string[], key: string) => {
+            const metricKeys = Object.keys(metricsColumns[key]);
+            return acc.concat(
+              metricKeys.map((metricKey) => `${key} ${metricKey}`.trim()),
+            );
+          },
+          [],
+        );
+
+        const metricsAndParams = metricList.concat(params);
+        hiddenColumns = _.uniq(
+          defaultHiddenColumns?.concat(
+            metricsAndParams.filter((item: string) => !selected.includes(item)),
+          ),
+        );
+      } else {
+        // Remove unselected values from hiddenColumns
+        hiddenColumns = defaultHiddenColumns;
+      }
+
+      configData = {
+        ...configData,
+        table: {
+          ...configData.table,
+          rowHeight: modelState?.config?.table?.rowHeight!,
+          unselectedColumnState,
+          hiddenColumns,
+        },
+      };
+    }
 
     const tableColumns = getParamsTableColumns(
       sortOptions,
@@ -1566,6 +1617,14 @@ function getScattersModelMethods(
       onColumnsVisibilityChange(hiddenColumns: string[]): void {
         onColumnsVisibilityChange({
           hiddenColumns,
+          model,
+          appName,
+          updateModelData,
+        });
+      },
+      onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+        onDefaultColumnsVisibilityChange({
+          unselectedColumnState: state,
           model,
           appName,
           updateModelData,

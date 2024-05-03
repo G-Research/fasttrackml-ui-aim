@@ -4,7 +4,10 @@ import _ from 'lodash-es';
 
 import COLORS from 'config/colors/colors';
 import DASH_ARRAYS from 'config/dash-arrays/dashArrays';
-import { RowHeightSize } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
@@ -51,6 +54,7 @@ import { getFilteredGroupingOptions } from 'utils/app/getFilteredGroupingOptions
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
+import onDefaultColumnsVisibilityChange from 'utils/app/onDefaultColumnsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
 import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
@@ -1139,6 +1143,14 @@ function getRunsModelMethods(
       onColumnsVisibilityChange(hiddenColumns: string[]): void {
         onColumnsVisibilityChange({
           hiddenColumns,
+          model,
+          appName,
+          updateModelData,
+        });
+      },
+      onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+        onDefaultColumnsVisibilityChange({
+          unselectedColumnState: state,
           model,
           appName,
           updateModelData,

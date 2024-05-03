@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { RowHeight, RowHeightSize } from 'config/table/tableConfigs';
+import { RowHeight, RowHeightSize, UnselectedColumnState } from 'config/table/tableConfigs';
 import {
   MetricsValueKeyEnum,
   ResizeModeEnum,
@@ -27,6 +27,7 @@ export interface ITableProps {
   estimatedRowHeight?: number;
   onManageColumns?: (order: IColumnsOrderData) => void;
   onColumnsVisibilityChange?: (hiddenColumns: string[] | string) => void;
+  onDefaultColumnsVisibilityChange?: (state: UnselectedColumnState) => void;
   hiddenChartRows?: boolean;
   onTableDiffShow?: () => void;
   onSort?: (field: string, value: 'asc' | 'desc' | 'none') => void;
@@ -53,6 +54,7 @@ export interface ITableProps {
   rowHeightMode?: any;
   columnsOrder?: IColumnsOrder;
   hiddenColumns?: string[];
+  unselectedColumnState?: UnselectedColumnState;
   hideSystemMetrics?: boolean;
   updateColumns?: any;
   columnsWidths?: any;
