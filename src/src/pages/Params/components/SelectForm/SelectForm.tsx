@@ -143,6 +143,18 @@ function SelectForm({
     <ErrorBoundary>
       <div className='SelectForm__container'>
         <div className='SelectForm__params__container'>
+          <ErrorBoundary>
+            <div className='SelectForm__TextField'>
+              <AutocompleteInput
+                refObject={autocompleteRef}
+                context={selectFormData?.suggestions}
+                error={selectFormData?.error}
+                onEnter={handleParamsSearch}
+                value={selectedParamsData?.query}
+                disabled={isDisabled}
+              />
+            </div>
+          </ErrorBoundary>
           <Box display='flex' alignItems='center'>
             <Box
               width='100%'
@@ -255,16 +267,6 @@ function SelectForm({
               {requestIsPending ? 'Cancel' : 'Search'}
             </Button>
           </Box>
-          <div className='SelectForm__TextField'>
-            <AutocompleteInput
-              refObject={autocompleteRef}
-              context={selectFormData?.suggestions}
-              error={selectFormData?.error}
-              onEnter={handleParamsSearch}
-              value={selectedParamsData?.query}
-              disabled={isDisabled}
-            />
-          </div>
         </div>
       </div>
     </ErrorBoundary>

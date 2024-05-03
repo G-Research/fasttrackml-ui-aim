@@ -3,6 +3,9 @@ import React from 'react';
 import { IResourceState } from 'modules/core/utils/createResource';
 import { IExperimentData } from 'modules/core/api/experimentsApi';
 
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+import onSelectExperimentChange from 'utils/app/onSelectExperimentsChange';
+
 import experimentEngine from './ExperimentStore';
 
 function useExperimentState(experimentId?: string) {
@@ -30,9 +33,24 @@ function useExperimentState(experimentId?: string) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [experimentId]);
 
+  if (!experimentsState.loading) {
+    // Remove selected experiments that are not in the list of fetched experiments
+    const selectedExperiments = getSelectedExperiments();
+    selectedExperiments.forEach((experiment) => {
+      if (
+        !experimentsState.data?.find(
+          (fetchedExperiment) => fetchedExperiment.id === experiment.id,
+        )
+      ) {
+        onSelectExperimentChange(experiment);
+      }
+    });
+  }
+
   return {
     experimentState,
     experimentsState,
+    selectedExperiments: getSelectedExperiments(),
     getExperimentsData: engine.fetchExperimentsData,
     updateExperiment: engine.updateExperiment,
     deleteExperiment: engine.deleteExperiment,
