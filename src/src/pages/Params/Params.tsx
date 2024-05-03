@@ -72,6 +72,7 @@ const Params = ({
   resizeMode,
   notifyData,
   hiddenColumns,
+  unselectedColumnState,
   liveUpdateConfig,
   selectFormData,
   selectedParams,
@@ -97,6 +98,7 @@ const Params = ({
   onTableResizeModeChange,
   onNotificationDelete,
   onColumnsVisibilityChange,
+  onDefaultColumnsVisibilityChange,
   onTableDiffShow,
   onSortReset,
   onAxisBrushExtentChange,
@@ -327,6 +329,7 @@ const Params = ({
                         hiddenRows={hiddenMetrics}
                         hiddenColumns={hiddenColumns}
                         hideSystemMetrics={hideSystemMetrics}
+                        unselectedColumnState={unselectedColumnState}
                         resizeMode={resizeMode}
                         columnsWidths={columnsWidths}
                         selectedRows={selectedRows}
@@ -339,6 +342,9 @@ const Params = ({
                         onSort={onSortFieldsChange}
                         onExport={onExportTableData}
                         onColumnsVisibilityChange={onColumnsVisibilityChange}
+                        onDefaultColumnsVisibilityChange={
+                          onDefaultColumnsVisibilityChange
+                        }
                         onManageColumns={onColumnsOrderChange}
                         onRowHeightChange={onRowHeightChange}
                         onRowsChange={onParamVisibilityChange}

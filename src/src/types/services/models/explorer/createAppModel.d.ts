@@ -1,5 +1,5 @@
 import { ResizeModeEnum } from 'config/enums/tableEnums';
-import { RowHeightSize } from 'config/table/tableConfigs';
+import { RowHeightSize, UnselectedColumnState } from 'config/table/tableConfigs';
 import { DensityOptions } from 'config/enums/densityEnum';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
@@ -116,6 +116,7 @@ export interface ITableConfig {
   resizeMode?: ResizeModeEnum;
   rowHeight: RowHeightSize;
   sortFields?: SortField[];
+  unselectedColumnState?: UnselectedColumnState;
   hiddenMetrics?: string[];
   hiddenColumns?: string[];
   hideSystemMetrics?: boolean;
