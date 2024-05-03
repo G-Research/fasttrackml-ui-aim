@@ -24,14 +24,33 @@ function fetchActivityData(): IApiRequest<any> {
 
 function getProjectParams(
   sequences: string[] = ['metric'],
+  selectedExperimentIds: string[] = [],
 ): IApiRequest<IProjectParamsMetrics> {
-  const query = sequences.reduce(
-    (acc: string, sequence: string, index: number) => {
+  if (selectedExperimentIds.length === 0) {
+    const controller = new AbortController();
+    return {
+      call: () =>
+        new Promise((resolve: (data: IProjectParamsMetrics) => any) => {
+          // Simulating an empty response
+          const data: IProjectParamsMetrics = {
+            metric: {},
+            images: {},
+            params: {},
+          };
+          resolve(data);
+        }),
+      abort: () => controller.abort(),
+    };
+  }
+  const query =
+    sequences.reduce((acc: string, sequence: string, index: number) => {
       acc += `${index === 0 ? '?' : '&'}sequence=${sequence}`;
       return acc;
-    },
-    '',
-  );
+    }, '') +
+    selectedExperimentIds.reduce((acc: string, experimentId: string) => {
+      acc += `&experiments=${experimentId}`;
+      return acc;
+    }, '');
   return API.get<IProjectParamsMetrics>(endpoints.GET_PROJECTS_PARAMS + query);
 }
 

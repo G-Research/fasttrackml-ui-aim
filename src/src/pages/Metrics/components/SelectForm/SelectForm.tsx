@@ -1,23 +1,13 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import {
-  Box,
-  Checkbox,
-  Divider,
-  InputBase,
-  Popper,
-  Tooltip,
-} from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import {
-  CheckBox as CheckBoxIcon,
-  CheckBoxOutlineBlank,
-} from '@material-ui/icons';
+import { Box, Divider, Tooltip } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { Button, Icon, Badge, Text } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 import AutocompleteInput from 'components/AutocompleteInput';
+import SelectFormPopper from 'components/SelectFormPopper/SelectFormPopper';
 
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 
@@ -29,6 +19,12 @@ import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
 import './SelectForm.scss';
 
+const useStyles = makeStyles({
+  popper: {
+    width: '100% !important',
+  },
+});
+
 function SelectForm({
   requestIsPending,
   isDisabled = false,
@@ -36,34 +32,28 @@ function SelectForm({
   selectFormData,
   onMetricsSelectChange,
   onSelectRunQueryChange,
-  onSelectAdvancedQueryChange,
-  toggleSelectAdvancedMode,
   onSearchQueryCopy,
 }: ISelectFormProps): React.FunctionComponentElement<React.ReactNode> {
   const [anchorEl, setAnchorEl] = React.useState<any>(null);
   const [searchValue, setSearchValue] = React.useState<string>('');
+  const [isRegexSearch, setIsRegexSearch] = React.useState(false);
+  const [regexError, setRegexError] = React.useState<string | null>(null);
   const searchRef: any = React.useRef<React.MutableRefObject<any>>(null);
   const autocompleteRef: any = React.useRef<React.MutableRefObject<any>>(null);
-  const advancedAutocompleteRef: any =
-    React.useRef<React.MutableRefObject<any>>(null);
   React.useEffect(() => {
     return () => {
       searchRef.current?.abort();
     };
   }, []);
+  const classes = useStyles();
 
   function handleMetricSearch(): void {
     if (requestIsPending) {
       return;
     }
-    let query = selectedMetricsData?.advancedMode
-      ? advancedAutocompleteRef?.current?.getValue()
-      : autocompleteRef?.current?.getValue();
-    if (selectedMetricsData?.advancedMode) {
-      onSelectAdvancedQueryChange(advancedAutocompleteRef.current.getValue());
-    } else {
-      onSelectRunQueryChange(autocompleteRef.current.getValue());
-    }
+    let query = autocompleteRef?.current?.getValue();
+
+    onSelectRunQueryChange(autocompleteRef.current.getValue());
     searchRef.current = metricAppModel.getMetricsData(true, true, query ?? '');
     searchRef.current.call();
     trackEvent(ANALYTICS_EVENT_KEYS.metrics.searchClick);
@@ -82,7 +72,7 @@ function SelectForm({
     event: React.ChangeEvent<{}>,
     value: ISelectOption[],
   ): void {
-    if (event.type === 'click') {
+    if (event.type === 'click' || event.type === 'change') {
       const lookup = value.reduce(
         (acc: { [key: string]: number }, curr: ISelectOption) => {
           acc[curr.key] = ++acc[curr.key] || 0;
@@ -99,10 +89,6 @@ function SelectForm({
       (opt: ISelectOption) => opt.key !== field,
     );
     onMetricsSelectChange(fieldData);
-  }
-
-  function toggleEditMode(): void {
-    toggleSelectAdvancedMode();
   }
 
   function handleClick(event: React.ChangeEvent<any>) {
@@ -123,7 +109,6 @@ function SelectForm({
   function handleResetSelectForm(): void {
     onMetricsSelectChange([]);
     onSelectRunQueryChange('');
-    onSelectAdvancedQueryChange('');
   }
 
   function handleSearchInputChange(
@@ -133,12 +118,27 @@ function SelectForm({
   }
 
   const options = React.useMemo(() => {
-    return (
-      selectFormData?.options?.filter(
-        (option) => option.label.indexOf(searchValue) !== -1,
-      ) ?? []
-    );
-  }, [searchValue, selectFormData?.options]);
+    if (isRegexSearch) {
+      try {
+        const regex = new RegExp(searchValue, 'i');
+        setRegexError(null);
+        return (
+          selectFormData?.options?.filter((option) =>
+            regex.test(option.label),
+          ) ?? []
+        );
+      } catch (error) {
+        setRegexError('Invalid Regex');
+        return [];
+      }
+    } else {
+      return (
+        selectFormData?.options?.filter(
+          (option) => option.label.indexOf(searchValue) !== -1,
+        ) ?? []
+      );
+    }
+  }, [searchValue, selectFormData?.options, isRegexSearch]);
 
   const open: boolean = !!anchorEl;
   const id = open ? 'select-metric' : undefined;
@@ -152,143 +152,6 @@ function SelectForm({
             justifyContent='space-between'
             alignItems='center'
           >
-            {selectedMetricsData?.advancedMode ? (
-              <div className='Metrics__SelectForm__textarea'>
-                <AutocompleteInput
-                  advanced
-                  error={selectFormData.advancedError}
-                  refObject={advancedAutocompleteRef}
-                  context={selectFormData?.advancedSuggestions}
-                  value={selectedMetricsData?.advancedQuery}
-                  onEnter={handleMetricSearch}
-                  disabled={isDisabled}
-                />
-              </div>
-            ) : (
-              <>
-                <Box display='flex' alignItems='center'>
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    onClick={handleClick}
-                    aria-describedby={id}
-                    disabled={isDisabled}
-                  >
-                    <Icon name='plus' style={{ marginRight: '0.5rem' }} />
-                    Metrics
-                  </Button>
-                  <Popper
-                    id={id}
-                    open={open}
-                    anchorEl={anchorEl}
-                    placement='bottom-start'
-                    className='Metrics__SelectForm__Popper'
-                  >
-                    <Autocomplete
-                      open
-                      onClose={handleClose}
-                      multiple
-                      className='Autocomplete__container'
-                      size='small'
-                      disablePortal={true}
-                      disableCloseOnSelect
-                      options={options}
-                      value={selectedMetricsData?.options}
-                      onChange={onSelect}
-                      groupBy={(option) => option.group}
-                      getOptionLabel={(option) => option.label}
-                      renderTags={() => null}
-                      disableClearable={true}
-                      ListboxProps={{
-                        style: {
-                          height: 400,
-                        },
-                      }}
-                      renderInput={(params) => (
-                        <InputBase
-                          ref={params.InputProps.ref}
-                          inputProps={{
-                            ...params.inputProps,
-                            value: searchValue,
-                            onChange: handleSearchInputChange,
-                          }}
-                          spellCheck={false}
-                          placeholder='Search'
-                          autoFocus={true}
-                          className='Metrics__SelectForm__metric__select'
-                        />
-                      )}
-                      renderOption={(option) => {
-                        let selected: boolean =
-                          !!selectedMetricsData?.options.find(
-                            (item: ISelectOption) => item.key === option.key,
-                          )?.key;
-                        return (
-                          <div className='Metrics__SelectForm__option'>
-                            <Checkbox
-                              color='primary'
-                              icon={<CheckBoxOutlineBlank />}
-                              checkedIcon={<CheckBoxIcon />}
-                              checked={selected}
-                              size='small'
-                            />
-                            <Text
-                              className='Metrics__SelectForm__option__label'
-                              size={14}
-                            >
-                              {option.label}
-                            </Text>
-                          </div>
-                        );
-                      }}
-                    />
-                  </Popper>
-                  <Divider
-                    style={{ margin: '0 1rem' }}
-                    orientation='vertical'
-                    flexItem
-                  />
-                  {selectedMetricsData?.options.length === 0 && (
-                    <Text tint={50} size={14} weight={400}>
-                      No metrics are selected
-                    </Text>
-                  )}
-                  <Box
-                    className='Metrics__SelectForm__tags ScrollBar__hidden'
-                    flex={1}
-                  >
-                    {selectedMetricsData?.options?.map((tag: ISelectOption) => {
-                      return (
-                        <Badge
-                          size='large'
-                          key={tag.label}
-                          label={tag.label}
-                          value={tag.key}
-                          onDelete={handleDelete}
-                          disabled={isDisabled}
-                        />
-                      );
-                    })}
-                  </Box>
-                </Box>
-                {selectedMetricsData?.options &&
-                  selectedMetricsData.options.length > 1 && (
-                    <Button
-                      onClick={() => onMetricsSelectChange([])}
-                      withOnlyIcon
-                      className={classNames('Metrics__SelectForm__clearAll', {
-                        disabled: isDisabled,
-                      })}
-                      size='xSmall'
-                      disabled={isDisabled}
-                    >
-                      <Icon name='close' />
-                    </Button>
-                  )}
-              </>
-            )}
-          </Box>
-          {selectedMetricsData?.advancedMode ? null : (
             <div className='Metrics__SelectForm__TextField'>
               <AutocompleteInput
                 refObject={autocompleteRef}
@@ -299,9 +162,111 @@ function SelectForm({
                 disabled={isDisabled}
               />
             </div>
-          )}
+          </Box>
+          <Box
+            display='flex'
+            alignItems='center'
+            className='Metrics__SelectForm__metricsBox'
+          >
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={handleClick}
+              aria-describedby={id}
+              disabled={isDisabled}
+              className='Metrics__SelectForm__metricsButton'
+            >
+              <Icon name='plus' style={{ marginRight: '0.5rem' }} />
+              Metrics
+            </Button>
+            <SelectFormPopper
+              id={id}
+              type='metrics'
+              open={open}
+              anchorEl={anchorEl}
+              options={options}
+              selectedData={selectedMetricsData}
+              onSelect={onSelect}
+              searchValue={searchValue}
+              handleSearchInputChange={handleSearchInputChange}
+              handleClose={handleClose}
+              regexError={regexError}
+              setRegexError={setRegexError}
+              isRegexSearch={isRegexSearch}
+              setIsRegexSearch={setIsRegexSearch}
+              className='Metrics__SelectForm__Popper'
+              classes={classes}
+            />
+            <Divider
+              style={{ margin: '0 1rem' }}
+              orientation='vertical'
+              flexItem
+            />
+            {selectedMetricsData?.options.length === 0 && (
+              <Text tint={50} size={14} weight={400}>
+                No metrics are selected
+              </Text>
+            )}
+            <Box
+              className='Metrics__SelectForm__tags ScrollBar__hidden'
+              flex={1}
+            >
+              {selectedMetricsData?.options?.map((tag: ISelectOption) => {
+                return (
+                  <Badge
+                    size='small'
+                    key={tag.label}
+                    label={tag.label}
+                    value={tag.key}
+                    onDelete={handleDelete}
+                    disabled={isDisabled}
+                  />
+                );
+              })}
+              {selectedMetricsData?.options &&
+                selectedMetricsData.options.length > 1 && (
+                  <Button
+                    onClick={() => onMetricsSelectChange([])}
+                    withOnlyIcon
+                    className={classNames('Metrics__SelectForm__clearAll', {
+                      disabled: isDisabled,
+                    })}
+                    size='xSmall'
+                    disabled={isDisabled}
+                  >
+                    <Icon name='close' />
+                  </Button>
+                )}
+            </Box>
+          </Box>
         </div>
         <div className='Metrics__SelectForm__container__search'>
+          <div className='Metrics__SelectForm__search__actions'>
+            <Tooltip title='Reset query'>
+              <div>
+                <Button
+                  onClick={handleResetSelectForm}
+                  withOnlyIcon={true}
+                  disabled={isDisabled}
+                  style={{ width: '3rem' }}
+                >
+                  <Icon name='reset' />
+                </Button>
+              </div>
+            </Tooltip>
+            <Tooltip title='Copy search query'>
+              <div>
+                <Button
+                  onClick={onSearchQueryCopy}
+                  withOnlyIcon={true}
+                  disabled={isDisabled}
+                  style={{ width: '3rem' }}
+                >
+                  <Icon name='copy' />
+                </Button>
+              </div>
+            </Tooltip>
+          </div>
           <Button
             fullWidth
             key={`${requestIsPending}`}
@@ -318,48 +283,6 @@ function SelectForm({
           >
             {requestIsPending ? 'Cancel' : 'Search'}
           </Button>
-          <div className='Metrics__SelectForm__search__actions'>
-            <Tooltip title='Reset query'>
-              <div>
-                <Button
-                  onClick={handleResetSelectForm}
-                  withOnlyIcon={true}
-                  disabled={isDisabled}
-                >
-                  <Icon name='reset' />
-                </Button>
-              </div>
-            </Tooltip>
-            <Tooltip
-              title={
-                selectedMetricsData?.advancedMode
-                  ? 'Switch to default mode'
-                  : 'Enable advanced search mode '
-              }
-            >
-              <div>
-                <Button
-                  className={selectedMetricsData?.advancedMode ? 'active' : ''}
-                  withOnlyIcon={true}
-                  onClick={toggleEditMode}
-                  disabled={isDisabled}
-                >
-                  <Icon name='edit' />
-                </Button>
-              </div>
-            </Tooltip>
-            <Tooltip title='Copy search query'>
-              <div>
-                <Button
-                  onClick={onSearchQueryCopy}
-                  withOnlyIcon={true}
-                  disabled={isDisabled}
-                >
-                  <Icon name='copy' />
-                </Button>
-              </div>
-            </Tooltip>
-          </div>
         </div>
       </div>
     </ErrorBoundary>

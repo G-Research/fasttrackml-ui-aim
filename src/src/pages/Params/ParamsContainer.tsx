@@ -65,6 +65,14 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
   }, [paramsData?.rawData]);
 
   React.useEffect(() => {
+    paramsAppModel.fetchProjectParamsAndUpdateState();
+    const pollingTimer = setInterval(() => {
+      paramsAppModel.fetchProjectParamsAndUpdateState();
+    }, 30000);
+    return () => clearInterval(pollingTimer);
+  }, []);
+
+  React.useEffect(() => {
     paramsAppModel.initialize(route.params.appId);
     let appRequestRef: IApiRequest<void>;
     let paramsRequestRef: IApiRequest<void>;
@@ -165,6 +173,8 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       onActivePointChange={paramsAppModel.onActivePointChange}
       onGroupingApplyChange={paramsAppModel.onGroupingApplyChange}
       onGroupingPersistenceChange={paramsAppModel.onGroupingPersistenceChange}
+      onSelectExperimentsChange={paramsAppModel.onSelectExperimentsChange}
+      onToggleAllExperiments={paramsAppModel.onToggleAllExperiments}
       onSelectRunQueryChange={paramsAppModel.onSelectRunQueryChange}
       onBookmarkCreate={paramsAppModel.onBookmarkCreate}
       onBookmarkUpdate={paramsAppModel.onBookmarkUpdate}

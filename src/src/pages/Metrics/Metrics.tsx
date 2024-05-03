@@ -91,6 +91,8 @@ function Metrics(
               liveUpdateConfig={props.liveUpdateConfig}
               onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
               title={pageTitlesEnum.METRICS_EXPLORER}
+              onSelectExperimentsChange={props.onSelectExperimentsChange}
+              onToggleAllExperiments={props.onToggleAllExperiments}
             />
             <div className='Metrics__SelectForm__Grouping__container'>
               <SelectForm
@@ -102,8 +104,6 @@ function Metrics(
                 selectedMetricsData={props.selectedMetricsData}
                 onMetricsSelectChange={props.onMetricsSelectChange}
                 onSelectRunQueryChange={props.onSelectRunQueryChange}
-                onSelectAdvancedQueryChange={props.onSelectAdvancedQueryChange}
-                toggleSelectAdvancedMode={props.toggleSelectAdvancedMode}
                 onSearchQueryCopy={props.onSearchQueryCopy}
               />
               <Grouping

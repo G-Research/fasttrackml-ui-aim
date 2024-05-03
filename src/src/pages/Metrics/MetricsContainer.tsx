@@ -63,6 +63,14 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
   }, [metricsData?.rawData]);
 
   React.useEffect(() => {
+    metricAppModel.fetchProjectParamsAndUpdateState();
+    const pollingTimer = setInterval(() => {
+      metricAppModel.fetchProjectParamsAndUpdateState();
+    }, 30000);
+    return () => clearInterval(pollingTimer);
+  }, []);
+
+  React.useEffect(() => {
     metricAppModel.initialize(route.params.appId);
     let appRequestRef: IApiRequest<void>;
     let metricsRequestRef: IApiRequest<void>;
@@ -191,9 +199,9 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onAlignmentTypeChange={metricAppModel.onAlignmentTypeChange}
         onDensityTypeChange={metricAppModel.onDensityTypeChange}
         onMetricsSelectChange={metricAppModel.onMetricsSelectChange}
+        onSelectExperimentsChange={metricAppModel.onSelectExperimentsChange}
+        onToggleAllExperiments={metricAppModel.onToggleAllExperiments}
         onSelectRunQueryChange={metricAppModel.onSelectRunQueryChange}
-        onSelectAdvancedQueryChange={metricAppModel.onSelectAdvancedQueryChange}
-        toggleSelectAdvancedMode={metricAppModel.toggleSelectAdvancedMode}
         onExportTableData={metricAppModel.onExportTableData}
         onRowHeightChange={metricAppModel.onRowHeightChange}
         onSortChange={metricAppModel.onSortChange}

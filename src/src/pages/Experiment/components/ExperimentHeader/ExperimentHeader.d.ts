@@ -7,4 +7,6 @@ export interface IExperimentHeaderProps {
   experimentsData: IExperimentData[] | null;
   experimentId: string;
   getExperimentsData: () => void;
+  isCompact?: boolean;
+  onExperimentChange?: (experimentId: string) => void;
 }

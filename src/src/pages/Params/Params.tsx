@@ -116,10 +116,14 @@ const Params = ({
   onRunsTagsChange,
   onRowsVisibilityChange,
   onParamsScaleTypeChange,
+  onSelectExperimentsChange,
+  onToggleAllExperiments,
 }: IParamsProps): React.FunctionComponentElement<React.ReactNode> => {
   let scaleStates = getDefaultScaleStates(highPlotData);
   let newScaleStates = scaleStates;
 
+  // Updates selectedParams prop to render disabled button for point params
+  // Also updates newScaleStates to render the newly selected scales in chart
   function updateParamsState() {
     selectedParams.map((param) => {
       if (scaleStates[param.key] === ScaleEnum.Point) {
@@ -135,6 +139,8 @@ const Params = ({
     }, {});
   }
 
+  // Obtains the original scale for each parameter
+  // (point for string params, linear for numeric params)
   function getDefaultScaleStates(highPlotData: any) {
     const dimensions: { [key: string]: { scaleType: string } } =
       highPlotData?.[0]?.dimensions;
@@ -175,6 +181,7 @@ const Params = ({
     brushExtents,
     selectedParams,
     updateParamsState,
+    newScaleStates,
   ]);
 
   return (
@@ -190,6 +197,8 @@ const Params = ({
               onResetConfigData={onResetConfigData}
               liveUpdateConfig={liveUpdateConfig}
               onLiveUpdateConfigChange={onLiveUpdateConfigChange}
+              onSelectExperimentsChange={onSelectExperimentsChange}
+              onToggleAllExperiments={onToggleAllExperiments}
               title={pageTitlesEnum.PARAMS_EXPLORER}
             />
           </div>

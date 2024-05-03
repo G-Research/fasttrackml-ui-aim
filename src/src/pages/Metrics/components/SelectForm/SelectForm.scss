@@ -11,16 +11,22 @@
     flex-direction: column;
     justify-content: space-between;
     padding-right: 1rem;
-    height: 4.5rem;
+    min-height: 4.5rem;
     /* TODO [GA]: Override MUI default styles in a nice way */
     .MuiBox-root {
       justify-content: flex-start;
     }
   }
+
+  &__metricsButton {
+    margin-top: $space-xs;
+    margin-bottom: $space-xs;
+  }
+
   &__container__search {
     width: 103px;
     display: flex;
-    justify-content: space-between;
+    justify-content: baseline;
     flex-direction: column;
   }
   &__Popper {
@@ -46,6 +52,7 @@
   }
   &__TextField {
     position: relative;
+    width: 100%;
   }
   &__textarea {
     flex: 1;
@@ -56,6 +63,7 @@
   }
   &__search__button {
     width: 100%;
+    margin-top: $space-xs;
   }
   &__search__actions {
     display: flex;
@@ -77,11 +85,11 @@
     width: 24px;
     background: #e8f1fc;
     border-radius: 6px;
-    display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     position: relative;
+    display: inline-flex;
     &.disabled {
       opacity: 0.5;
     }
@@ -90,12 +98,6 @@
       position: absolute;
       width: 20px;
       height: 34px;
-      background: rgba(255, 255, 255, 0.5);
-      background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 1) 92%
-      );
       left: -20px;
       top: -5px;
       border-radius: 0;
@@ -109,17 +111,43 @@
     }
   }
   &__tags {
-    display: flex;
     align-items: center;
-    overflow: auto;
-    max-width: calc(100vw - 40rem);
     min-width: 12rem;
+    padding-top: 1px;
 
+    max-height: 3.2rem;
+    display: block;
+  
+    overflow-y: scroll;
+    scrollbar-color: auto;
+    scrollbar-width: thin;
+    overflow-x: hidden;
     .Badge {
-      margin-right: 0.5rem;
+      margin-right: $space-xxxs;
+      margin-bottom: 1px;
       &:last-child {
         margin-right: 20px;
       }
     }
   }
+}
+
+.RegexToggle {
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  margin: 10px;
+}
+
+.Popper__SelectForm__select {
+  @extend .Metrics__SelectForm__metric__select;
+}
+
+.Popper__SelectForm__option {
+  @extend .Metrics__SelectForm__option !optional;
+}
+
+.Popper__SelectForm__option__label {
+  @extend .Metrics__SelectForm__option__label !optional;
+  margin-left: $space-xs;
 }

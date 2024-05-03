@@ -152,6 +152,7 @@ export interface IHighPlotConfig {
       [key: string]: [number, number] | [string, string];
     };
   };
+  // paramsScaleType: IParamsScaleStates;
 }
 
 export interface ILineChartConfig {

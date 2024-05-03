@@ -1,4 +1,4 @@
-import { getAPIHost } from 'config/config';
+import { getAPIHost, getBaseHost } from 'config/config';
 
 function createAPIRequestWrapper<ResponseDataType>(
   url: string,
@@ -11,7 +11,7 @@ function createAPIRequestWrapper<ResponseDataType>(
   return {
     call: (exceptionHandler?: (error: ResponseDataType) => any) =>
       new Promise((resolve: (data: ResponseDataType) => void, reject) => {
-        fetch(`${getAPIHost()}/${url}`, { ...options, signal })
+        fetch(`${url}`, { ...options, signal })
           .then(async (response) => {
             try {
               if (response.status >= 400) {
@@ -54,13 +54,19 @@ function getStream<ResponseDataType>(
   params?: {},
   options?: RequestInit,
 ) {
+  const queryString = Object.entries(params || {})
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return value.map((v) => `${key}=${v}`).join('&');
+      } else {
+        return `${key}=${value}`;
+      }
+    })
+    .join('&');
+
   return createAPIRequestWrapper<ResponseDataType>(
-    `${url}${
-      options?.method === 'POST'
-        ? ''
-        : params
-        ? '?' + new URLSearchParams(params).toString()
-        : ''
+    `${getAPIHost()}/${url}${
+      options?.method === 'POST' ? '' : queryString ? '?' + queryString : ''
     }`,
     {
       method: 'GET',
@@ -80,7 +86,7 @@ function getStream1<ResponseDataType>(
   options?: RequestInit,
 ) {
   return createAPIRequestWrapper<ResponseDataType>(
-    `${url}${
+    `${getAPIHost()}/${url}${
       options?.method === 'POST' && params
         ? '?' + new URLSearchParams(params).toString()
         : ''
@@ -97,13 +103,32 @@ function getStream1<ResponseDataType>(
   );
 }
 
+function getFromBaseHost<ResponseDataType>(
+  url: string,
+  params?: {},
+  options?: RequestInit,
+) {
+  return createAPIRequestWrapper<ResponseDataType>(
+    `${getBaseHost()}${url}${
+      params ? '?' + new URLSearchParams(params).toString() : ''
+    }`,
+    {
+      method: 'GET',
+      ...options,
+      headers: getRequestHeaders(),
+    },
+  );
+}
+
 function get<ResponseDataType>(
   url: string,
   params?: {},
   options?: RequestInit,
 ) {
   return createAPIRequestWrapper<ResponseDataType>(
-    `${url}${params ? '?' + new URLSearchParams(params).toString() : ''}`,
+    `${getAPIHost()}/${url}${
+      params ? '?' + new URLSearchParams(params).toString() : ''
+    }`,
     {
       method: 'GET',
       ...options,
@@ -117,7 +142,7 @@ function post<ResponseDataType>(
   data: object,
   options?: RequestInit,
 ) {
-  return createAPIRequestWrapper<ResponseDataType>(url, {
+  return createAPIRequestWrapper<ResponseDataType>(`${getAPIHost()}/${url}`, {
     method: 'POST',
     ...options,
     headers: getRequestHeaders(),
@@ -130,7 +155,7 @@ function put<ResponseDataType>(
   data: object,
   options?: RequestInit,
 ) {
-  return createAPIRequestWrapper<ResponseDataType>(url, {
+  return createAPIRequestWrapper<ResponseDataType>(`${getAPIHost()}/${url}`, {
     method: 'PUT',
     ...options,
     headers: getRequestHeaders(),
@@ -139,7 +164,7 @@ function put<ResponseDataType>(
 }
 
 function remove<ResponseDataType>(url: string, options?: RequestInit) {
-  return createAPIRequestWrapper<ResponseDataType>(url, {
+  return createAPIRequestWrapper<ResponseDataType>(`${getAPIHost()}/${url}`, {
     method: 'DELETE',
     ...options,
   });
@@ -158,6 +183,7 @@ function getRequestHeaders() {
 
 const API = {
   get,
+  getFromBaseHost,
   getStream,
   getStream1,
   post,

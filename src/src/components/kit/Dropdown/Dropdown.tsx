@@ -5,6 +5,7 @@ import Select, {
   components,
   ControlProps,
 } from 'react-select';
+import { List } from 'react-virtualized';
 
 import { Icon, Text } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
@@ -19,6 +20,38 @@ import {
 import { IDropdownProps } from '.';
 
 import './Dropdown.scss';
+
+const MenuList = (props: { children: any }) => {
+  const rows = props.children;
+  const rowRenderer = ({
+    key,
+    index,
+    isScrolling,
+    isVisible,
+    style,
+  }: {
+    key: string | number;
+    index: number;
+    isScrolling: boolean;
+    isVisible: boolean;
+    style: React.CSSProperties;
+  }) => (
+    <div key={key} style={style}>
+      {rows[index]}
+    </div>
+  );
+
+  return (
+    <List
+      style={{ width: '100%' }}
+      height={300}
+      width={500}
+      rowHeight={30}
+      rowCount={rows.length | 0}
+      rowRenderer={rowRenderer}
+    />
+  );
+};
 
 /**
  * @property {number} size - input size
@@ -256,6 +289,7 @@ function Dropdown({
           onChange={onChange as any}
           isClearable={isClearable}
           components={{
+            MenuList: MenuList,
             Option: DropdownCustomOption,
             ClearIndicator: ClearIndicator,
             DropdownIndicator: DropdownIndicator,

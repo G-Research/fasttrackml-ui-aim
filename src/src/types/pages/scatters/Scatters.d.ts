@@ -35,6 +35,7 @@ import { IProjectParamsMetrics } from 'types/services/models/projects/projectsMo
 import { ITrendlineOptions } from 'types/services/models/scatter/scatterAppModel';
 
 import { IRequestProgress } from 'utils/app/setRequestProgress';
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 export interface IScattersProps extends Partial<RouteChildrenProps> {
   tableRef: React.RefObject<ITableRef>;
@@ -93,6 +94,8 @@ export interface IScattersProps extends Partial<RouteChildrenProps> {
   onNotificationAdd: (notification: INotification) => void;
   onNotificationDelete: (id: number) => void;
   onResetConfigData: () => void;
+  onSelectExperimentsChange: (experiment: IExperimentDataShort) => void;
+  onToggleAllExperiments: (experiments: IExperimentDataShort[]) => void;
   onSelectOptionsChange: (options: ISelectOption[]) => void;
   onSelectRunQueryChange: (query: string) => void;
   onExportTableData: (e: React.ChangeEvent<any>) => void;

@@ -31,6 +31,7 @@ import {
 
 import { CurveEnum } from 'utils/d3';
 import { IRequestProgress } from 'utils/app/setRequestProgress';
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 export interface IParamsProps extends Partial<RouteChildrenProps> {
   chartElemRef: React.RefObject<HTMLDivElement>;
@@ -90,6 +91,8 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   ) => void;
   onColorIndicatorChange: () => void;
   onParamsSelectChange: (options: ISelectOption[]) => void;
+  onSelectExperimentsChange: (experiment: IExperimentDataShort) => void;
+  onToggleAllExperiments: (experiments: IExperimentDataShort[]) => void;
   onSelectRunQueryChange: (query: string) => void;
   onGroupingSelectChange: (params: IOnGroupingSelectChangeParams) => void;
   onGroupingModeChange: (params: IOnGroupingModeChangeParams) => void;
