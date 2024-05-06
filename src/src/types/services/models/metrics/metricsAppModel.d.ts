@@ -256,9 +256,13 @@ export interface IAlignMetricsDataParams {
   }[];
 }
 
+export interface IContext {
+  [key: string]: any;
+}
+
 export interface IMetricsDataParams {
   report_progress?: boolean;
-  metrics: Array<{ key: string; context: string }>;
+  metrics: Array<{ key: string; context: IContext }>;
   query: string;
   steps: number;
   x_axis: string;
