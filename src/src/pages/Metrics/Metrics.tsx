@@ -40,7 +40,7 @@ import SelectForm from './components/SelectForm/SelectForm';
 
 import './Metrics.scss';
 
-const MaxMetrics = 30;
+const MaxMetrics = 50;
 
 function Metrics(
   props: IMetricProps,
