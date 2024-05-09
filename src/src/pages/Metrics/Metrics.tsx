@@ -39,6 +39,8 @@ import SelectForm from './components/SelectForm/SelectForm';
 
 import './Metrics.scss';
 
+const MAX_METRICS = 30;
+
 function Metrics(
   props: IMetricProps,
 ): React.FunctionComponentElement<React.ReactNode> {
@@ -105,6 +107,8 @@ function Metrics(
                 onMetricsSelectChange={props.onMetricsSelectChange}
                 onSelectRunQueryChange={props.onSelectRunQueryChange}
                 onSearchQueryCopy={props.onSearchQueryCopy}
+                onNotificationAdd={props.onNotificationAdd}
+                maxSelected={MAX_METRICS}
               />
               <Grouping
                 groupingPopovers={GroupingPopovers.filter(
