@@ -186,7 +186,11 @@ function SelectForm({
               anchorEl={anchorEl}
               options={options}
               selectedData={selectedMetricsData}
-              onSelect={onSelect}
+              onSelect={(): void =>
+                selectedMetricsData.length < 3
+                  ? onSelect()
+                  : alert('Maximum selected')
+              }
               searchValue={searchValue}
               handleSearchInputChange={handleSearchInputChange}
               handleClose={handleClose}
