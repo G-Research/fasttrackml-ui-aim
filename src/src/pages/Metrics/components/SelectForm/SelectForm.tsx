@@ -33,8 +33,6 @@ function SelectForm({
   onMetricsSelectChange,
   onSelectRunQueryChange,
   onSearchQueryCopy,
-  onNotificationAdd,
-  maxSelected = 100,
 }: ISelectFormProps): React.FunctionComponentElement<React.ReactNode> {
   const [anchorEl, setAnchorEl] = React.useState<any>(null);
   const [searchValue, setSearchValue] = React.useState<string>('');
@@ -75,17 +73,6 @@ function SelectForm({
     value: ISelectOption[],
   ): void {
     if (event.type === 'click' || event.type === 'change') {
-      if (
-        selectedMetricsData &&
-        selectedMetricsData?.options.length >= maxSelected
-      ) {
-        onNotificationAdd({
-          id: Date.now(),
-          severity: 'error',
-          messages: [`Maximum of ${maxSelected} items can be selected`],
-        });
-        return;
-      }
       const lookup = value.reduce(
         (acc: { [key: string]: number }, curr: ISelectOption) => {
           acc[curr.key] = ++acc[curr.key] || 0;

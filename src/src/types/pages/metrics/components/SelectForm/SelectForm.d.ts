@@ -17,6 +17,4 @@ export interface ISelectFormProps {
   onMetricsSelectChange: (options: ISelectOption[]) => void;
   onSelectRunQueryChange: (query: string) => void;
   onSearchQueryCopy: () => void;
-  onNotificationAdd: (notification: INotification) => void;
-  maxSelected?: number | 100;
 }
