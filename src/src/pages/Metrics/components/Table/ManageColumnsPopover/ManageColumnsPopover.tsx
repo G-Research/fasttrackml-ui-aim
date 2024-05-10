@@ -74,13 +74,10 @@ function ManageColumnsPopover({
     }
   };
 
-  function toggleShoftHidden(key: string) {
-    if (softHidden.includes(key)) {
-      const index = softHidden.indexOf(key);
-      softHidden.splice(index);
-    } else {
-      softHidden.push(key);
-    }
+  function toggleSoftHidden(key: string) {
+    softHidden.includes(key)
+      ? softHidden.splice(softHidden.indexOf(key), 1)
+      : softHidden.push(key);
   }
 
   function onDragStart(result: any) {
@@ -303,7 +300,7 @@ function ManageColumnsPopover({
                             appName={appName}
                             isHidden={isColumnHidden(column.key)}
                             onClick={() => {
-                              toggleShoftHidden(column.key);
+                              toggleSoftHidden(column.key);
                               onColumnsVisibilityChange(
                                 hiddenColumns?.includes(column.key)
                                   ? hiddenColumns?.filter(
@@ -360,7 +357,7 @@ function ManageColumnsPopover({
                             searchKey={searchKey}
                             isHidden={isColumnHidden(column.key)}
                             onClick={() => {
-                              toggleShoftHidden(column.key);
+                              toggleSoftHidden(column.key);
                               onColumnsVisibilityChange(
                                 hiddenColumns?.includes(column.key)
                                   ? hiddenColumns?.filter(
@@ -403,7 +400,7 @@ function ManageColumnsPopover({
                               popoverWidth={popoverWidth}
                               isHidden={isColumnHidden(column.key)}
                               onClick={() => {
-                                toggleShoftHidden(column.key);
+                                toggleSoftHidden(column.key);
                                 onColumnsVisibilityChange(
                                   hiddenColumns.includes(column.key)
                                     ? hiddenColumns.filter(
