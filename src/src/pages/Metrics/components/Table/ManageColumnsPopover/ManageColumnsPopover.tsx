@@ -21,6 +21,7 @@ import { IManageColumnsPopoverProps } from './ManageColumns';
 
 import './ManageColumnsPopover.scss';
 
+let softHidden: string[] = [];
 const initialData = {
   columns: {
     left: {
@@ -72,6 +73,15 @@ function ManageColumnsPopover({
       );
     }
   };
+
+  function toggleShoftHidden(key: string) {
+    if (softHidden.includes(key)) {
+      const index = softHidden.indexOf(key);
+      softHidden.splice(index);
+    } else {
+      softHidden.push(key);
+    }
+  }
 
   function onDragStart(result: any) {
     setDraggingItemId(result.draggableId);
@@ -171,13 +181,20 @@ function ManageColumnsPopover({
   React.useEffect(() => {
     const newState = { ...state };
     const leftList = columnsData.filter(
-      (item: ITableColumn) => item.pin === 'left',
+      (item: ITableColumn) =>
+        item.pin === 'left' &&
+        (!item.isHidden || softHidden.includes(item.key)),
     );
     const rightList = columnsData.filter(
-      (item: ITableColumn) => item.pin === 'right',
+      (item: ITableColumn) =>
+        item.pin === 'right' &&
+        (!item.isHidden || softHidden.includes(item.key)),
     );
     const middleList = columnsData.filter(
-      (item: ITableColumn) => item.pin !== 'left' && item.pin !== 'right',
+      (item: ITableColumn) =>
+        item.pin !== 'left' &&
+        item.pin !== 'right' &&
+        (!item.isHidden || softHidden.includes(item.key)),
     );
     newState.columns.left.list = leftList;
     newState.columns.middle.list = middleList;
@@ -285,15 +302,16 @@ function ManageColumnsPopover({
                             popoverWidth={popoverWidth}
                             appName={appName}
                             isHidden={isColumnHidden(column.key)}
-                            onClick={() =>
+                            onClick={() => {
+                              toggleShoftHidden(column.key);
                               onColumnsVisibilityChange(
                                 hiddenColumns?.includes(column.key)
                                   ? hiddenColumns?.filter(
                                       (col: string) => col !== column.key,
                                     )
                                   : hiddenColumns?.concat([column.key]),
-                              )
-                            }
+                              );
+                            }}
                             draggingItemId={draggingItemId}
                           />
                         ),
@@ -341,15 +359,16 @@ function ManageColumnsPopover({
                             hasSearchableItems
                             searchKey={searchKey}
                             isHidden={isColumnHidden(column.key)}
-                            onClick={() =>
+                            onClick={() => {
+                              toggleShoftHidden(column.key);
                               onColumnsVisibilityChange(
                                 hiddenColumns?.includes(column.key)
                                   ? hiddenColumns?.filter(
                                       (col: string) => col !== column.key,
                                     )
                                   : hiddenColumns?.concat([column.key]),
-                              )
-                            }
+                              );
+                            }}
                             draggingItemId={draggingItemId}
                           />
                         ),
@@ -383,15 +402,16 @@ function ManageColumnsPopover({
                               appName={appName}
                               popoverWidth={popoverWidth}
                               isHidden={isColumnHidden(column.key)}
-                              onClick={() =>
+                              onClick={() => {
+                                toggleShoftHidden(column.key);
                                 onColumnsVisibilityChange(
                                   hiddenColumns.includes(column.key)
                                     ? hiddenColumns.filter(
                                         (col: string) => col !== column.key,
                                       )
                                     : hiddenColumns.concat([column.key]),
-                                )
-                              }
+                                );
+                              }}
                               draggingItemId={draggingItemId}
                             />
                           );
