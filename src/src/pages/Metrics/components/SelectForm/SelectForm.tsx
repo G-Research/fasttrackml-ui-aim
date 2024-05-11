@@ -142,6 +142,7 @@ function SelectForm({
 
   const open: boolean = !!anchorEl;
   const id = open ? 'select-metric' : undefined;
+  let selectedCount = `${selectedMetricsData?.options?.length ?? 0}`;
   return (
     <ErrorBoundary>
       <div className='Metrics__SelectForm'>
@@ -202,11 +203,14 @@ function SelectForm({
               orientation='vertical'
               flexItem
             />
-            {selectedMetricsData?.options.length === 0 && (
-              <Text tint={50} size={14} weight={400}>
-                No metrics are selected
-              </Text>
-            )}
+            <Text tint={50} size={8} weight={400}>
+              {selectedCount} selected
+            </Text>
+            <Divider
+              style={{ margin: '0 1rem' }}
+              orientation='vertical'
+              flexItem
+            />
             <Box
               className='Metrics__SelectForm__tags ScrollBar__hidden'
               flex={1}
