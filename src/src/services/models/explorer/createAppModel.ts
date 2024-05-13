@@ -60,6 +60,7 @@ import {
   ISmoothing,
   ITooltip,
   LegendsConfig,
+  IGroupingCondition,
 } from 'types/services/models/metrics/metricsAppModel';
 import {
   IMetricTrace,
@@ -121,6 +122,7 @@ import onGroupingPaletteChange from 'utils/app/onGroupingPaletteChange';
 import onGroupingPersistenceChange from 'utils/app/onGroupingPersistenceChange';
 import onGroupingReset from 'utils/app/onGroupingReset';
 import onGroupingSelectChange from 'utils/app/onGroupingSelectChange';
+import onGroupingConditionsChange from 'utils/app/onGroupingConditionsChange';
 import onHighlightModeChange from 'utils/app/onHighlightModeChange';
 import onIgnoreOutliersChange from 'utils/app/onIgnoreOutliersChange';
 import onSelectOptionsChange from 'utils/app/onSelectOptionsChange';
@@ -208,6 +210,7 @@ import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
 import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
+import evaluateCondition from 'utils/app/evaluateCondition';
 
 import { AppDataTypeEnum, AppNameEnum } from './index';
 
@@ -1380,6 +1383,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
       const configData = model.getState()!.config;
       const grouping = configData!.grouping;
       const { paletteIndex = 0 } = grouping || {};
+
+      const conditions: IGroupingCondition[] = grouping.conditions || [];
+      const conditionStrings = conditions.map(
+        (condition) =>
+          `${condition.fieldName} ${condition.operator} ${condition.value}`,
+      );
       const groupByColor = getFilteredGroupingOptions({
         groupName: GroupNameEnum.COLOR,
         model,
@@ -1388,10 +1397,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
         groupName: GroupNameEnum.STROKE,
         model,
       });
+
       const groupByChart = getFilteredGroupingOptions({
         groupName: GroupNameEnum.CHART,
         model,
-      });
+      }).concat(conditionStrings);
+
       if (
         groupByColor.length === 0 &&
         groupByStroke.length === 0 &&
@@ -1417,10 +1428,36 @@ function createAppModel(appConfig: IAppInitialConfig) {
       );
 
       for (let i = 0; i < data.length; i++) {
-        const groupValue: { [key: string]: string } = {};
+        const groupValue: { [key: string]: any } = {};
         groupingFields.forEach((field) => {
           groupValue[field] = getValue(data[i], field);
         });
+
+        // Evaluate the conditions and update the row
+        conditionStrings.forEach((conditionString, j) => {
+          // Evaluate the condition
+          const condition = conditions[j];
+
+          // Get everything after the first dot in the field name
+          const fieldName = condition.fieldName.split('.').slice(1).join('.');
+
+          // Flatten default run attributes and store them in a single object
+          const runAttributes = {
+            ...data[i].run.params,
+            ...data[i].run.props,
+            hash: data[i].run.hash,
+            name: data[i].name,
+            tags: data[i].run.params.tags,
+          };
+
+          // Get the relevant attribute's value
+          const attributeValue = getValue(runAttributes, fieldName);
+          groupValue[conditionString] = evaluateCondition(
+            attributeValue,
+            condition,
+          );
+        });
+
         const groupKey = encode(groupValue);
         if (groupValues.hasOwnProperty(groupKey)) {
           groupValues[groupKey].data.push(data[i]);
@@ -2005,6 +2042,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
             appName,
             updateModelData,
             setAggregationEnabled,
+          });
+        },
+        onGroupingConditionsChange(conditions: IGroupingCondition[]): void {
+          onGroupingConditionsChange({
+            conditions,
+            model,
+            appName,
+            updateModelData,
           });
         },
         onShuffleChange(name: 'color' | 'stroke'): void {
