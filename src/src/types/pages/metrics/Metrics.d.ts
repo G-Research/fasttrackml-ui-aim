@@ -6,6 +6,8 @@ import { ResizeModeEnum } from 'config/enums/tableEnums';
 import { DensityOptions } from 'config/enums/densityEnum';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
+
 import {
   IGroupingConfig,
   ISelectConfig,
@@ -30,6 +32,7 @@ import {
   ISmoothing,
   LegendsDataType,
   LegendsConfig,
+  IGroupingCondition,
 } from 'types/services/models/metrics/metricsAppModel';
 import { ITableColumn } from 'types/components/TableColumns/TableColumns';
 import { IChartPanelRef } from 'types/components/ChartPanel/ChartPanel';
@@ -47,7 +50,6 @@ import { ITagInfo } from 'types/tags/Tags';
 
 import { HighlightEnum } from 'utils/d3';
 import { IRequestProgress } from 'utils/app/setRequestProgress';
-import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 export interface IMetricProps extends Partial<RouteChildrenProps> {
   tableRef: React.RefObject<ITableRef>;
@@ -122,6 +124,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onGroupingReset: (groupName: GroupNameEnum) => void;
   onGroupingApplyChange: (groupName: GroupNameEnum) => void;
   onGroupingPersistenceChange: (groupName: 'color' | 'stroke') => void;
+  onGroupingConditionsChange: (conditions: IGroupingCondition[]) => void;
   onBookmarkCreate: (params: IBookmarkFormState) => void;
   onBookmarkUpdate: (id: string) => void;
   onNotificationAdd: (notification: INotification) => void;

@@ -282,3 +282,9 @@ export interface LegendColumnDataType {
 export interface LegendsDataType {
   [key: string]: Record<string, LegendColumnDataType[]>;
 }
+
+export interface IGroupingCondition {
+  fieldName: string;
+  operator: IOperator;
+  value: string | number;
+}

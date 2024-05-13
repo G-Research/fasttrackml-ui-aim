@@ -190,6 +190,7 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onActivePointChange={metricAppModel.onActivePointChange}
         onGroupingApplyChange={metricAppModel.onGroupingApplyChange}
         onGroupingPersistenceChange={metricAppModel.onGroupingPersistenceChange}
+        onGroupingConditionsChange={metricAppModel.onGroupingConditionsChange}
         onBookmarkCreate={metricAppModel.onBookmarkCreate}
         onBookmarkUpdate={metricAppModel.onBookmarkUpdate}
         onNotificationAdd={metricAppModel.onNotificationAdd}
