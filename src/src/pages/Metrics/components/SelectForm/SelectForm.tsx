@@ -142,7 +142,11 @@ function SelectForm({
 
   const open: boolean = !!anchorEl;
   const id = open ? 'select-metric' : undefined;
-  let selectedCount = `${selectedMetricsData?.options?.length ?? 0}`;
+  let metricsButtonText = 'Metrics';
+  let selectedCount = selectedMetricsData?.options?.length ?? 0;
+  if (selectedCount > 0) {
+    metricsButtonText += ` (${selectedCount})`;
+  }
   return (
     <ErrorBoundary>
       <div className='Metrics__SelectForm'>
@@ -178,7 +182,7 @@ function SelectForm({
               className='Metrics__SelectForm__metricsButton'
             >
               <Icon name='plus' style={{ marginRight: '0.5rem' }} />
-              Metrics
+              {metricsButtonText}
             </Button>
             <SelectFormPopper
               id={id}
@@ -203,14 +207,11 @@ function SelectForm({
               orientation='vertical'
               flexItem
             />
-            <Text tint={50} size={8} weight={400}>
-              {selectedCount} selected
-            </Text>
-            <Divider
-              style={{ margin: '0 1rem' }}
-              orientation='vertical'
-              flexItem
-            />
+            {selectedMetricsData?.options.length === 0 && (
+              <Text tint={50} size={14} weight={400}>
+                No metrics are selected
+              </Text>
+            )}
             <Box
               className='Metrics__SelectForm__tags ScrollBar__hidden'
               flex={1}
