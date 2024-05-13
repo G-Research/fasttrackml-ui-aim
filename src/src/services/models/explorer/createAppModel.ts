@@ -16,6 +16,7 @@ import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
+import { UnselectedColumnState } from 'config/table/tableConfigs';
 
 import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
@@ -116,6 +117,7 @@ import onColorIndicatorChange from 'utils/app/onColorIndicatorChange';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
 import onCurveInterpolationChange from 'utils/app/onCurveInterpolationChange';
+import onDefaultColumnsVisibilityChange from 'utils/app/onDefaultColumnsVisibilityChange';
 import onGroupingApplyChange from 'utils/app/onGroupingApplyChange';
 import onGroupingModeChange from 'utils/app/onGroupingModeChange';
 import onGroupingPaletteChange from 'utils/app/onGroupingPaletteChange';
@@ -280,6 +282,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
             resizeMode: TABLE_DEFAULT_CONFIG.metrics.resizeMode,
             rowHeight: TABLE_DEFAULT_CONFIG.metrics.rowHeight,
             sortFields: [...TABLE_DEFAULT_CONFIG.metrics.sortFields],
+            unselectedColumnState:
+              TABLE_DEFAULT_CONFIG.metrics.unselectedColumnState,
             hiddenMetrics: [...TABLE_DEFAULT_CONFIG.metrics.hiddenMetrics],
             hiddenColumns: [...TABLE_DEFAULT_CONFIG.metrics.hiddenColumns],
             columnsWidths: { tags: 300 },
@@ -400,6 +404,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
         if (components?.table) {
           config.table = {
             rowHeight: TABLE_DEFAULT_CONFIG.runs.rowHeight,
+            unselectedColumnState:
+              TABLE_DEFAULT_CONFIG.runs.unselectedColumnState,
             hideSystemMetrics: TABLE_DEFAULT_CONFIG.runs.hideSystemMetrics,
             hiddenMetrics: TABLE_DEFAULT_CONFIG.runs.hiddenMetrics,
             hiddenColumns: TABLE_DEFAULT_CONFIG.runs.hiddenColumns,
@@ -448,6 +454,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
           if (components.charts.indexOf(ChartTypeEnum.ScatterPlot) !== -1) {
             config.table = {
               ...config?.table!,
+              unselectedColumnState:
+                TABLE_DEFAULT_CONFIG.scatters.unselectedColumnState,
               resizeMode: TABLE_DEFAULT_CONFIG.scatters.resizeMode,
             };
             config.chart = {
@@ -1310,6 +1318,39 @@ function createAppModel(appConfig: IAppInitialConfig) {
         groupingSelectOptions,
       );
 
+      const unselectedColumnState = configData.table?.unselectedColumnState;
+
+      if (unselectedColumnState !== UnselectedColumnState.DEFAULT) {
+        const selected = modelState?.config?.select?.options.map(
+          (option: ISelectOption) => option.label,
+        );
+        let hiddenColumns = configData.table?.hiddenColumns;
+
+        const defaultHiddenColumns =
+          TABLE_DEFAULT_CONFIG?.[AppNameEnum.METRICS]?.hiddenColumns;
+
+        if (unselectedColumnState === UnselectedColumnState.FORCE_HIDE) {
+          // Push unique values to hiddenColumns
+          hiddenColumns = _.uniq(
+            hiddenColumns?.concat(
+              params.filter((item: string) => !selected.includes(item)),
+            ),
+          );
+        } else {
+          // Remove unselected values from hiddenColumns
+          hiddenColumns = defaultHiddenColumns;
+        }
+
+        configData = {
+          ...configData,
+          table: {
+            ...configData.table,
+            rowHeight: modelState?.config?.table?.rowHeight!,
+            hiddenColumns,
+          },
+        };
+      }
+
       const tableColumns = getMetricsTableColumns(
         params,
         groupingSelectOptions,
@@ -2166,6 +2207,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onColumnsVisibilityChange(hiddenColumns: string[]): void {
           onColumnsVisibilityChange({
             hiddenColumns,
+            model,
+            appName,
+            updateModelData,
+          });
+        },
+        onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+          onDefaultColumnsVisibilityChange({
+            unselectedColumnState: state,
             model,
             appName,
             updateModelData,
@@ -3283,6 +3332,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
               updateModelData,
             });
           },
+          onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+            onDefaultColumnsVisibilityChange({
+              unselectedColumnState: state,
+              model,
+              appName,
+              updateModelData,
+            });
+          },
           onTableDiffShow(): void {
             onTableDiffShow({ model, appName, updateModelData });
           },
@@ -3944,6 +4001,53 @@ function createAppModel(appConfig: IAppInitialConfig) {
           groupingSelectOptions,
         );
         const sortFields = modelState?.config?.table.sortFields;
+
+        const unselectedColumnState = configData.table?.unselectedColumnState;
+
+        if (unselectedColumnState !== UnselectedColumnState.DEFAULT) {
+          const selected = modelState?.config?.select?.options.map(
+            (option: ISelectOption) => option.label,
+          );
+
+          let hiddenColumns = configData.table?.hiddenColumns;
+
+          const defaultHiddenColumns =
+            TABLE_DEFAULT_CONFIG?.[AppNameEnum.PARAMS]?.hiddenColumns;
+
+          if (unselectedColumnState === UnselectedColumnState.FORCE_HIDE) {
+            // Extract the combined keys from metricsColumns dictionary
+            const metricList = Object.keys(metricsColumns).reduce(
+              (acc: string[], key: string) => {
+                const metricKeys = Object.keys(metricsColumns[key]);
+                return acc.concat(
+                  metricKeys.map((metricKey) => `${key} ${metricKey}`.trim()),
+                );
+              },
+              [],
+            );
+
+            const metricsAndParams = metricList.concat(params);
+            hiddenColumns = _.uniq(
+              defaultHiddenColumns?.concat(
+                metricsAndParams.filter(
+                  (item: string) => !selected.includes(item),
+                ),
+              ),
+            );
+          } else {
+            // Remove unselected values from hiddenColumns
+            hiddenColumns = defaultHiddenColumns;
+          }
+
+          configData = {
+            ...configData,
+            table: {
+              ...configData.table,
+              rowHeight: modelState?.config?.table?.rowHeight!,
+              hiddenColumns,
+            },
+          };
+        }
 
         const tableColumns = getParamsTableColumns(
           sortOptions,
@@ -4896,6 +5000,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
               updateModelData,
             });
           },
+          onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+            onDefaultColumnsVisibilityChange({
+              unselectedColumnState: state,
+              model,
+              appName,
+              updateModelData,
+            });
+          },
           onTableResizeModeChange(mode: ResizeModeEnum): void {
             onTableResizeModeChange({ mode, model, appName });
           },
@@ -5062,6 +5174,54 @@ function createAppModel(appConfig: IAppInitialConfig) {
           groupingSelectOptions,
         );
         const sortFields = modelState?.config?.table.sortFields;
+
+        const unselectedColumnState = configData.table?.unselectedColumnState;
+
+        if (unselectedColumnState !== UnselectedColumnState.DEFAULT) {
+          const selected = modelState?.config?.select?.options.map(
+            (option: ISelectOption) => option.label,
+          );
+
+          let hiddenColumns = configData.table?.hiddenColumns;
+
+          const defaultHiddenColumns =
+            TABLE_DEFAULT_CONFIG?.[AppNameEnum.PARAMS]?.hiddenColumns;
+
+          if (unselectedColumnState === UnselectedColumnState.FORCE_HIDE) {
+            // Extract the combined keys from metricsColumns dictionary
+            const metricList = Object.keys(metricsColumns).reduce(
+              (acc: string[], key: string) => {
+                const metricKeys = Object.keys(metricsColumns[key]);
+                return acc.concat(
+                  metricKeys.map((metricKey) => `${key} ${metricKey}`.trim()),
+                );
+              },
+              [],
+            );
+
+            const metricsAndParams = metricList.concat(params);
+            hiddenColumns = _.uniq(
+              defaultHiddenColumns?.concat(
+                metricsAndParams.filter(
+                  (item: string) => !selected.includes(item),
+                ),
+              ),
+            );
+          } else {
+            // Remove unselected values from hiddenColumns
+            hiddenColumns = defaultHiddenColumns;
+          }
+
+          configData = {
+            ...configData,
+            table: {
+              ...configData.table,
+              rowHeight: modelState?.config?.table?.rowHeight!,
+              unselectedColumnState,
+              hiddenColumns,
+            },
+          };
+        }
 
         const tableColumns = getParamsTableColumns(
           sortOptions,
@@ -6395,6 +6555,14 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onColumnsVisibilityChange(hiddenColumns: string[]): void {
             onColumnsVisibilityChange({
               hiddenColumns,
+              model,
+              appName,
+              updateModelData,
+            });
+          },
+          onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+            onDefaultColumnsVisibilityChange({
+              unselectedColumnState: state,
               model,
               appName,
               updateModelData,

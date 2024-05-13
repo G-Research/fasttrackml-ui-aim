@@ -159,6 +159,9 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         hiddenMetrics={metricsData?.config?.table?.hiddenMetrics!}
         hideSystemMetrics={metricsData?.config?.table?.hideSystemMetrics!}
         hiddenColumns={metricsData?.config?.table?.hiddenColumns!}
+        unselectedColumnState={
+          metricsData?.config?.table?.unselectedColumnState!
+        }
         chartPanelOffsetHeight={chartPanelOffsetHeight}
         selectedRows={metricsData?.selectedRows!}
         groupingSelectOptions={metricsData?.groupingSelectOptions!}
@@ -210,6 +213,9 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onMetricVisibilityChange={metricAppModel.onMetricVisibilityChange}
         onColumnsOrderChange={metricAppModel.onColumnsOrderChange}
         onColumnsVisibilityChange={metricAppModel.onColumnsVisibilityChange}
+        onDefaultColumnsVisibilityChange={
+          metricAppModel.onDefaultColumnsVisibilityChange
+        }
         onTableDiffShow={metricAppModel.onTableDiffShow}
         onTableResizeModeChange={metricAppModel.onTableResizeModeChange}
         onRowsVisibilityChange={metricAppModel.onRowsVisibilityChange}
