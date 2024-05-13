@@ -214,6 +214,7 @@ function ExperimentSelectionPopover({
                   onChange={handleSearchInputChange}
                   inputProps={{ 'aria-label': 'search' }}
                   className='ExperimentSelectionPopover__searchContainer__inputBase'
+                  autoFocus={true}
                 />
                 <Tooltip title='Use Regular Expression'>
                   <ToggleButton
