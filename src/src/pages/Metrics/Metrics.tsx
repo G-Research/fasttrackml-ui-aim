@@ -30,6 +30,7 @@ import { AppNameEnum } from 'services/models/explorer';
 
 import { ILine } from 'types/components/LineChart/LineChart';
 import { IMetricProps } from 'types/pages/metrics/Metrics';
+import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
 import { ChartTypeEnum, CurveEnum } from 'utils/d3';
 
@@ -38,6 +39,8 @@ import Controls from './components/Controls/Controls';
 import SelectForm from './components/SelectForm/SelectForm';
 
 import './Metrics.scss';
+
+const MaxMetrics = 50;
 
 function Metrics(
   props: IMetricProps,
@@ -78,6 +81,18 @@ function Metrics(
     props.axesScaleRange,
   ]);
 
+  const metricsSelectChange = (selectedMetrics: ISelectOption[]): void => {
+    if (selectedMetrics.length > MaxMetrics) {
+      props.onNotificationAdd({
+        id: Date.now(),
+        severity: 'warning',
+        messages: [`Maximum number of metrics is ${MaxMetrics}`],
+      });
+      return;
+    }
+    props.onMetricsSelectChange(selectedMetrics);
+  };
+
   return (
     <ErrorBoundary>
       <div ref={props.wrapperElemRef} className='Metrics__container'>
@@ -102,7 +117,7 @@ function Metrics(
                 isDisabled={isProgressBarVisible}
                 selectFormData={props.selectFormData}
                 selectedMetricsData={props.selectedMetricsData}
-                onMetricsSelectChange={props.onMetricsSelectChange}
+                onMetricsSelectChange={metricsSelectChange}
                 onSelectRunQueryChange={props.onSelectRunQueryChange}
                 onSearchQueryCopy={props.onSearchQueryCopy}
               />
