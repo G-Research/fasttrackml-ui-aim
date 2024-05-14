@@ -246,8 +246,13 @@ function getParamsModelMethods(
     }
     const configData = { ...model.getState()?.config };
     const query = getQueryStringFromSelect(configData?.select, true);
-    runsRequestRef = runsService.getRunsData(query);
-    setRequestProgress(model);
+    const selectedExperimentNames = getSelectedExperiments().map((e) => e.name);
+    runsRequestRef = runsService.getRunsData(
+      query,
+      undefined,
+      undefined,
+      selectedExperimentNames,
+    );
     return {
       call: async () => {
         if (_.isEmpty(configData?.select?.options)) {

@@ -54,19 +54,11 @@ export default function getQueryStringFromSelect(
         : '';
     }
 
-    const selectedExperiments = getSelectedExperiments();
-
-    const experimentNames = `run.experiment in ["${selectedExperiments
-      .map((e) => e.name)
-      .join('", "')}"]`;
-
     if (simpleInput && selections) {
       query = `${simpleInput} and ${selections}`;
     } else {
       query = `${simpleInput}${selections}`;
     }
-
-    query = query ? `${query} and ${experimentNames}` : experimentNames;
   }
   return excludeMetrics ? query.trim() || '' : query.trim() || '()';
 }
