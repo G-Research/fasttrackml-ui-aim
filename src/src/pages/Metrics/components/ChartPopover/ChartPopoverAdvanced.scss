@@ -50,5 +50,9 @@
     &__p {
       font-family: 'Courier New', Courier, monospace;
     }
+
+    &__button {
+      min-width: 32px;
+    }
   }
 }

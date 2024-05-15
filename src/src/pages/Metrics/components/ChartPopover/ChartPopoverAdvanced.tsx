@@ -8,7 +8,7 @@ import {
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Button, Box } from '@material-ui/core';
 
-import { Text } from 'components/kit';
+import { Icon, Text } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary';
 
 import {
@@ -253,6 +253,7 @@ function ChartPopoverAdvanced({
                   {condition.fieldName} {condition.operator} {condition.value}
                 </Text>
                 <Button
+                  className='ChartPopoverAdvanced__conditionalFilter__box__button'
                   onClick={() => {
                     const newConditions = [...conditions];
                     newConditions.splice(index, 1);
@@ -261,10 +262,10 @@ function ChartPopoverAdvanced({
                       onGroupingConditionsChange(newConditions);
                     }
                   }}
-                  variant='contained'
+                  variant='text'
                   size='small'
                 >
-                  Remove
+                  <Icon name='close' fontSize={8} />
                 </Button>
               </Box>
             ))}
