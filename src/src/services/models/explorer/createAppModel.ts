@@ -3496,7 +3496,15 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
         const configData = { ...model.getState()?.config };
         const query = getQueryStringFromSelect(configData?.select, true);
-        runsRequestRef = runsService.getRunsData(query);
+        const selectedExperimentNames = getSelectedExperiments().map(
+          (e) => e.name,
+        );
+        runsRequestRef = runsService.getRunsData(
+          query,
+          undefined,
+          undefined,
+          selectedExperimentNames,
+        );
         setRequestProgress(model);
         return {
           call: async () => {
@@ -5998,7 +6006,15 @@ function createAppModel(appConfig: IAppInitialConfig) {
 
         const configData = { ...model.getState()?.config };
         const query = getQueryStringFromSelect(configData?.select, true);
-        runsRequestRef = runsService.getRunsData(query);
+        const selectedExperimentNames = getSelectedExperiments().map(
+          (e) => e.name,
+        );
+        runsRequestRef = runsService.getRunsData(
+          query,
+          undefined,
+          undefined,
+          selectedExperimentNames,
+        );
         setRequestProgress(model);
         return {
           call: async () => {

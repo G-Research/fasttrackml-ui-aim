@@ -1,5 +1,7 @@
 @use 'src/styles/abstracts' as *;
-
+.CustomChartPopover_content{
+  width: auto !important;
+}
 .ChartPopover {
   pointer-events: none;
   z-index: 5 !important;

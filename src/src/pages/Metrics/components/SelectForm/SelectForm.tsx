@@ -142,6 +142,11 @@ function SelectForm({
 
   const open: boolean = !!anchorEl;
   const id = open ? 'select-metric' : undefined;
+  let metricsButtonText = 'Metrics';
+  let selectedCount = selectedMetricsData?.options?.length ?? 0;
+  if (selectedCount > 0) {
+    metricsButtonText += ` (${selectedCount})`;
+  }
   return (
     <ErrorBoundary>
       <div className='Metrics__SelectForm'>
@@ -177,7 +182,7 @@ function SelectForm({
               className='Metrics__SelectForm__metricsButton'
             >
               <Icon name='plus' style={{ marginRight: '0.5rem' }} />
-              Metrics
+              {metricsButtonText}
             </Button>
             <SelectFormPopper
               id={id}
