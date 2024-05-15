@@ -55,13 +55,12 @@
       overflow: unset;
       .PopoverContent__boxWrapper {
         display: flex;
-        max-width: 20rem;
         flex: 1;
 
         &.pinned {
           flex-direction: column;
           overflow-y: auto;
-          width: toRem(250px);
+          width: auto;
           .PopoverContent__box {
             overflow-y: unset;
           }

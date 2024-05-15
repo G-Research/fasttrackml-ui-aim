@@ -152,11 +152,15 @@ function ChartPopover(props: IChartPopover): JSX.Element {
         }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
         classes={{
-          paper: classNames('ChartPopover__content', {
-            ChartPopover__content__active: props.focusedState?.active,
-            ChartPopover__content__pinned: isPopoverPinned,
-            hide: !popoverPos,
-          }),
+          paper: classNames(
+            'ChartPopover__content',
+            'CustomChartPopover_content',
+            {
+              ChartPopover__content__active: props.focusedState?.active,
+              ChartPopover__content__pinned: isPopoverPinned,
+              hide: !popoverPos,
+            },
+          ),
         }}
       >
         <ErrorBoundary>
