@@ -1480,15 +1480,19 @@ function createAppModel(appConfig: IAppInitialConfig) {
           const condition = conditions[j];
 
           // Get everything after the first dot in the field name
-          const fieldName = condition.fieldName.split('.').slice(1).join('.');
+          const fieldTypeAndName = condition.fieldName.split('.');
+          const fieldType = fieldTypeAndName[0];
+          const fieldName = fieldTypeAndName.slice(1).join('.');
 
           // Flatten default run attributes and store them in a single object
           const runAttributes = {
             ...data[i].run.params,
             ...data[i].run.props,
             hash: data[i].run.hash,
-            name: data[i].name,
+            name:
+              fieldType === 'metric' ? data[i].name : data[i].run.props.name,
             tags: data[i].run.params.tags,
+            experiment: data[i].run.props.experiment?.name,
           };
 
           // Get the relevant attribute's value
