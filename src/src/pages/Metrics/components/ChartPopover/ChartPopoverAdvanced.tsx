@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useMemo } from 'react';
 
 import { Checkbox, TextField } from '@material-ui/core';
 import {
@@ -33,104 +33,71 @@ function ChartPopoverAdvanced({
   groupingData,
   groupingSelectOptions,
 }: IGroupingPopoverAdvancedProps): React.FunctionComponentElement<React.ReactNode> {
-  // Current value for selectedField
-  const [inputValue, setInputValue] = React.useState('');
-
-  // Controls for the condition inputs
+  const [inputValue, setInputValue] = useState('');
   const [selectedField, setSelectedField] =
-    React.useState<IGroupingSelectOption | null>(null);
-
-  const [selectedOperator, setSelectedOperator] =
-    React.useState<IOperator | null>(IOperator['==']);
-
-  const [selectedValue, setSelectedValue] = React.useState<string>('');
-
-  // Array of grouping conditions
-  const [conditions, setConditions] = React.useState<IGroupingCondition[]>(
+    useState<IGroupingSelectOption | null>(null);
+  const [selectedOperator, setSelectedOperator] = useState<IOperator>(
+    IOperator['=='],
+  );
+  const [selectedValue, setSelectedValue] = useState<string>('');
+  const [conditions, setConditions] = useState<IGroupingCondition[]>(
     groupingData?.conditions || [],
   );
 
-  const operators = [
-    IOperator['=='],
-    IOperator['!='],
-    IOperator['>'],
-    IOperator['<'],
-    IOperator['>='],
-    IOperator['<='],
-  ];
-
-  function onAddCondition() {
-    // Create a new condition object
+  const onAddCondition = () => {
     const condition: IGroupingCondition = {
       fieldName: selectedField?.label || '',
       operator: selectedOperator ?? IOperator['=='],
       value: selectedValue,
     };
-
-    // If condition fieldName is not in array, add it, else replace
     const conditionIndex = conditions.findIndex(
       (c) => c.fieldName === condition.fieldName,
     );
-    if (conditionIndex === -1) {
-      const newConditions = [...conditions, condition];
-      setConditions(newConditions);
-      onGroupingConditionsChange?.(newConditions);
-    } else {
-      const newConditions = [...conditions];
-      newConditions[conditionIndex] = condition;
-      setConditions(newConditions);
-      onGroupingConditionsChange?.(newConditions);
-    }
-  }
+    const newConditions =
+      conditionIndex === -1
+        ? [...conditions, condition]
+        : conditions.map((c, index) =>
+            index === conditionIndex ? condition : c,
+          );
+    setConditions(newConditions);
+    onGroupingConditionsChange?.(newConditions);
+  };
 
-  function onChangeField(e: any, value: IGroupingSelectOption | null): void {
-    if (e?.code !== 'Backspace') {
+  const onChangeField = (e: any, value: IGroupingSelectOption | null): void => {
+    if (!e || e.code !== 'Backspace' || inputValue.length === 0)
       handleSelectField(value);
-    } else {
-      if (inputValue.length === 0) {
-        handleSelectField(value);
-      }
-    }
-  }
+  };
 
-  function onChangeOperator(e: any, value: IOperator): void {
+  const onChangeOperator = (e: any, value: IOperator): void => {
     handleSelectOperator(value || IOperator['==']);
-  }
+  };
 
-  function handleSelectField(value: IGroupingSelectOption | null) {
-    if (selectedField?.value === value?.value) {
-      setInputValue('');
-      setSelectedField(null);
-      return;
-    }
+  const handleSelectField = (value: IGroupingSelectOption | null) => {
+    const newSelectedField =
+      selectedField?.value === value?.value ? null : value;
+    setInputValue(newSelectedField?.label || '');
+    setSelectedField(newSelectedField);
+  };
 
-    setInputValue(value?.label || '');
-    setSelectedField(value);
-  }
-
-  function handleSelectOperator(value?: IOperator) {
+  const handleSelectOperator = (value?: IOperator) => {
     setSelectedOperator(value ?? IOperator['==']);
-  }
+  };
 
-  function handleSelectValue(value: string) {
+  const handleSelectValue = (value: string) => {
     setSelectedValue(value);
-  }
+  };
 
-  const options = React.useMemo(() => {
-    if (inputValue.trim() !== '') {
-      const filtered = groupingSelectOptions?.filter((item) => {
-        return item.label.indexOf(inputValue) !== -1;
-      });
-      if (!filtered) {
-        return [];
-      }
-      return filtered
-        .slice()
-        .sort(
-          (a, b) => a.label.indexOf(inputValue) - b.label.indexOf(inputValue),
-        );
-    }
-    return groupingSelectOptions || [];
+  const options = useMemo(() => {
+    const filteredOptions = groupingSelectOptions?.filter((item) =>
+      item.label.toLowerCase().includes(inputValue.toLowerCase()),
+    );
+    return (
+      filteredOptions?.sort(
+        (a, b) =>
+          a.label.toLowerCase().indexOf(inputValue.toLowerCase()) -
+          b.label.toLowerCase().indexOf(inputValue.toLowerCase()),
+      ) || []
+    );
   }, [groupingSelectOptions, inputValue]);
 
   return (
@@ -159,7 +126,7 @@ function ChartPopoverAdvanced({
               size='small'
               disableClearable={true}
               options={options}
-              value={selectedField ?? undefined}
+              value={selectedField || undefined}
               onChange={onChangeField}
               groupBy={(option) => option.group}
               getOptionLabel={(option) => option.label}
@@ -207,7 +174,7 @@ function ChartPopoverAdvanced({
               size='small'
               openOnFocus
               disableClearable={true}
-              options={operators}
+              options={Object.values(IOperator)}
               value={selectedOperator ?? IOperator['==']}
               onChange={onChangeOperator}
               placeholder='Select operator'
