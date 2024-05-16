@@ -138,7 +138,7 @@ const PopoverContent = React.forwardRef(function PopoverContent(
                 {context || null}
               </div>
               <div className='PopoverContent__value'>
-                Value: {focusedState?.yValue}
+                Value: {roundToSignificantDigits(Number(focusedState?.yValue))}
               </div>
             </div>
           </ErrorBoundary>
@@ -179,7 +179,7 @@ const PopoverContent = React.forwardRef(function PopoverContent(
                 <Text>Y: </Text>
                 <span className='PopoverContent__headerValue'>
                   <Text component='p' className='PopoverContent__axisValue'>
-                    {focusedState?.yValue}
+                    {roundToSignificantDigits(Number(focusedState?.yValue))}
                   </Text>
                 </span>
               </div>
@@ -187,7 +187,7 @@ const PopoverContent = React.forwardRef(function PopoverContent(
                 <Text>X: </Text>
                 <span className='PopoverContent__headerValue'>
                   <Text component='p' className='PopoverContent__axisValue'>
-                    {focusedState?.xValue}
+                    {roundToSignificantDigits(Number(focusedState?.xValue))}
                   </Text>
                 </span>
               </div>
