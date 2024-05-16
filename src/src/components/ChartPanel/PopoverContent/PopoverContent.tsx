@@ -59,6 +59,17 @@ const PopoverContent = React.forwardRef(function PopoverContent(
     [tooltipAppearance],
   );
 
+  const roundToSignificantDigits = (value: number, sig: number = 5) => {
+    if (value === 0) {
+      return 0;
+    }
+
+    const power = sig - Math.ceil(Math.log10(Math.abs(value)));
+    const magnitude = Math.pow(10, power);
+    const shifted = Math.round(value * magnitude);
+    return shifted / magnitude;
+  };
+
   function renderPopoverHeader(): React.ReactNode {
     switch (chartType) {
       case ChartTypeEnum.LineChart: {
@@ -75,7 +86,7 @@ const PopoverContent = React.forwardRef(function PopoverContent(
                     {contextToString(context)}
                   </Text>
                   <Text component='p' className='PopoverContent__axisValue'>
-                    {focusedState?.yValue}
+                    {roundToSignificantDigits(Number(focusedState?.yValue))}
                   </Text>
                 </span>
               </div>
