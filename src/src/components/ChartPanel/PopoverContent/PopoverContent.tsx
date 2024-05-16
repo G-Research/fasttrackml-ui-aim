@@ -27,6 +27,7 @@ import { formatSystemMetricName } from 'utils/formatSystemMetricName';
 import getValueByField from 'utils/getValueByField';
 import { isMetricHash } from 'utils/isMetricHash';
 import { decode } from 'utils/encoder/encoder';
+import { roundToSignificantDigits } from 'utils/roundToSignificantDigits';
 
 import './PopoverContent.scss';
 
@@ -58,17 +59,6 @@ const PopoverContent = React.forwardRef(function PopoverContent(
       tooltipAppearance === TooltipAppearanceEnum.Bottom,
     [tooltipAppearance],
   );
-
-  const roundToSignificantDigits = (value: number, sig: number = 5) => {
-    if (value === 0) {
-      return 0;
-    }
-
-    const power = sig - Math.ceil(Math.log10(Math.abs(value)));
-    const magnitude = Math.pow(10, power);
-    const shifted = Math.round(value * magnitude);
-    return shifted / magnitude;
-  };
 
   function renderPopoverHeader(): React.ReactNode {
     switch (chartType) {
