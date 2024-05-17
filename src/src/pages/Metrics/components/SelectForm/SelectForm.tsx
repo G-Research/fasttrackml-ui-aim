@@ -151,7 +151,7 @@ function SelectForm({
 
   let selectedRunHash = useLocation()?.runProps?.hash;
   let prefilledQuery = '';
-  if (selectedRunHash !== '') {
+  if (selectedRunHash !== undefined) {
     prefilledQuery = `run.hash == "${selectedRunHash}"`;
   }
 
