@@ -354,6 +354,22 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
                           Open in Classic UI
                         </div>
                       </MaterialLink>
+                      <NavLink
+                        to={{
+                          pathname: '/metrics',
+                          runProps: { hash: runHash },
+                        }}
+                        style={{ marginLeft: '2rem' }}
+                        className='MuiTypography-root MuiLink-root MuiLink-underlineHover MuiTypography-colorPrimary'
+                      >
+                        <div style={{ fontSize: '0.8rem' }}>
+                          <Icon
+                            name='metrics'
+                            style={{ marginRight: '0.3rem' }}
+                          />
+                          View in Metrics Explorer
+                        </div>
+                      </NavLink>
                     </>
                   ) : (
                     <Skeleton
