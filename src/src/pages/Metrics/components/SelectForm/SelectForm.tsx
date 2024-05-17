@@ -16,10 +16,7 @@ import metricAppModel from 'services/models/metrics/metricsAppModel';
 import { trackEvent } from 'services/analytics';
 
 import { ISelectFormProps } from 'types/pages/metrics/components/SelectForm/SelectForm';
-import {
-  ISelectOption,
-  ISelectConfig,
-} from 'types/services/models/explorer/createAppModel';
+import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
 import './SelectForm.scss';
 
