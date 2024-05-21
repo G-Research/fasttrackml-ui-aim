@@ -170,7 +170,7 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
     setActiveTab(newValue);
   }
 
-  function handkeOnClickViewInMetricsExplorer(experiment: any) {
+  function handleOnClickViewInMetricsExplorer(experiment: any) {
     if (experiment !== undefined) {
       const selectedExperiments = getSelectedExperiments();
       if (
@@ -377,7 +377,7 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
                         style={{ marginLeft: '2rem' }}
                         className='MuiTypography-root MuiLink-root MuiLink-underlineHover MuiTypography-colorPrimary'
                         onClick={() =>
-                          handkeOnClickViewInMetricsExplorer(
+                          handleOnClickViewInMetricsExplorer(
                             runData?.runInfo?.experiment,
                           )
                         }
