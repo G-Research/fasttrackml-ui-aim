@@ -45,6 +45,8 @@ import namespacesService from 'services/api/namespaces/namespacesService';
 
 import { setDocumentTitle } from 'utils/document/documentTitle';
 import { processDurationTime } from 'utils/processDurationTime';
+import onSelectExperimentChange from 'utils/app/onSelectExperimentsChange';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import RunSelectPopoverContent from './RunSelectPopoverContent';
 
@@ -166,6 +168,19 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
 
   function handleTabChange(event: React.ChangeEvent<{}>, newValue: string) {
     setActiveTab(newValue);
+  }
+
+  function handleOnClickViewInMetricsExplorer(experiment: any) {
+    if (experiment !== undefined) {
+      const selectedExperiments = getSelectedExperiments();
+      if (
+        !selectedExperiments.find(
+          (e) => e.id === experiment.id && e.name === experiment.name,
+        )
+      ) {
+        onSelectExperimentChange(experiment);
+      }
+    }
   }
 
   function onRunsSelectToggle() {
@@ -354,6 +369,27 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
                           Open in Classic UI
                         </div>
                       </MaterialLink>
+                      <NavLink
+                        to={{
+                          pathname: '/metrics',
+                          runProps: { hash: runHash },
+                        }}
+                        style={{ marginLeft: '2rem' }}
+                        className='MuiTypography-root MuiLink-root MuiLink-underlineHover MuiTypography-colorPrimary'
+                        onClick={() =>
+                          handleOnClickViewInMetricsExplorer(
+                            runData?.runInfo?.experiment,
+                          )
+                        }
+                      >
+                        <div style={{ fontSize: '0.8rem' }}>
+                          <Icon
+                            name='metrics'
+                            style={{ marginRight: '0.3rem' }}
+                          />
+                          View in Metrics Explorer
+                        </div>
+                      </NavLink>
                     </>
                   ) : (
                     <Skeleton
