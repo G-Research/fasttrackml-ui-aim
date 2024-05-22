@@ -1195,6 +1195,16 @@ function createAppModel(appConfig: IAppInitialConfig) {
           sequenceName: 'metric',
         }),
       ];
+      // Conditional grouping also allows grouping by regular select options and also metrics
+      const conditionalGroupingOptions = groupingSelectOptions.concat(
+        data.map((metric) => {
+          return {
+            group: 'metric',
+            label: `metric.${metric?.config?.name}`,
+            value: `${metric?.config?.name}`,
+          };
+        }),
+      );
       const sortOptions = [
         ...groupingSelectOptions,
         {
@@ -1261,6 +1271,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         tableColumns,
         sameValueColumns: tableData.sameValueColumns,
         groupingSelectOptions,
+        conditionalGroupingOptions,
         sortOptions,
         selectedRows,
       });
@@ -1293,6 +1304,16 @@ function createAppModel(appConfig: IAppInitialConfig) {
           sequenceName: 'metric',
         }),
       ];
+      // Conditional grouping also allows grouping by regular select options and also metrics
+      const conditionalGroupingOptions = groupingSelectOptions.concat(
+        data.map((metric) => {
+          return {
+            group: 'metric',
+            label: `metric.${metric?.config?.name}`,
+            value: `${metric?.config?.name}`,
+          };
+        }),
+      );
       const sortOptions = [
         ...groupingSelectOptions,
         {
@@ -1396,6 +1417,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         tableColumns: tableColumns,
         sameValueColumns: tableData.sameValueColumns,
         groupingSelectOptions,
+        conditionalGroupingOptions,
         sortOptions,
         selectedRows,
       });
@@ -1493,6 +1515,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
               fieldType === 'metric' ? data[i].name : data[i].run.props.name,
             tags: data[i].run.params.tags,
             experiment: data[i].run.props.experiment?.name,
+            [data[i].name]: data[i]?.lastValue,
           };
 
           // Get the relevant attribute's value
