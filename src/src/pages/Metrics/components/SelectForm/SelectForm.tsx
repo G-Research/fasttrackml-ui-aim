@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 
 import { Box, Divider, Tooltip } from '@material-ui/core';
@@ -147,6 +148,13 @@ function SelectForm({
   if (selectedCount > 0) {
     metricsButtonText += ` (${selectedCount})`;
   }
+
+  let selectedRunHash = useLocation()?.runProps?.hash;
+  let prefilledQuery = '';
+  if (selectedRunHash !== undefined) {
+    prefilledQuery = `run.hash == "${selectedRunHash}"`;
+  }
+
   return (
     <ErrorBoundary>
       <div className='Metrics__SelectForm'>
@@ -161,7 +169,9 @@ function SelectForm({
               <AutocompleteInput
                 refObject={autocompleteRef}
                 error={selectFormData.error}
-                value={selectedMetricsData?.query}
+                value={
+                  prefilledQuery ? prefilledQuery : selectedMetricsData?.query
+                }
                 context={selectFormData.suggestions}
                 onEnter={handleMetricSearch}
                 disabled={isDisabled}
