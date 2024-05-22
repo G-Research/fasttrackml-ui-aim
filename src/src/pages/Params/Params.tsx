@@ -223,6 +223,7 @@ const Params = ({
               isDisabled={isProgressBarVisible}
               groupingData={groupingData}
               groupingSelectOptions={groupingSelectOptions}
+              conditionalGroupingOptions={[]} // TODO: Add conditional grouping options
               onGroupingSelectChange={onGroupingSelectChange}
               onGroupingModeChange={onGroupingModeChange}
               onGroupingPaletteChange={onGroupingPaletteChange}

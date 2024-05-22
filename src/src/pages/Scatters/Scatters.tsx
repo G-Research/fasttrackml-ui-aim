@@ -86,6 +86,7 @@ function Scatters(
                 isDisabled={isProgressBarVisible}
                 groupingData={props.groupingData}
                 groupingSelectOptions={props.groupingSelectOptions}
+                conditionalGroupingOptions={[]} // TODO: Add conditional grouping options
                 onGroupingSelectChange={props.onGroupingSelectChange}
                 onGroupingModeChange={props.onGroupingModeChange}
                 onGroupingPaletteChange={props.onGroupingPaletteChange}
