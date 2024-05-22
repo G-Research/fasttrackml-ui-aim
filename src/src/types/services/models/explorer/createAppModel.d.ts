@@ -18,6 +18,7 @@ import {
   ITooltipConfig,
   ISmoothing,
   LegendsConfig,
+  IGroupingCondition,
 } from 'types/services/models/metrics/metricsAppModel';
 import { IParamsAppModelState } from 'types/services/models/params/paramsAppModel';
 import { IRunsAppModelState } from 'types/services/models/runs/runsAppModel';
@@ -90,6 +91,7 @@ export interface IGroupingConfig {
     stroke: number;
   };
   paletteIndex?: number;
+  conditions?: IGroupingCondition[];
 }
 
 export interface ISelectOption {
