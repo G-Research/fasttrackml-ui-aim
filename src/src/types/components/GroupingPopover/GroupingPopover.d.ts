@@ -13,6 +13,7 @@ export interface IGroupingPopoverProps {
   groupingData: IGroupingConfig;
   advancedComponent?: React.FunctionComponentElement<React.ReactNode> | null;
   groupingSelectOptions: IGroupingSelectOption[];
+  conditionalGroupingOptions?: IGroupingSelectOption[];
   onSelect: IMetricProps['onGroupingSelectChange'];
   onGroupingModeChange: IMetricProps['onGroupingModeChange'];
   inputLabel?: string;
@@ -26,6 +27,7 @@ export interface IGroupingPopoverAdvancedProps {
   onGroupingPaletteChange?: IMetricProps['onGroupingPaletteChange'];
   onShuffleChange: IMetricProps['onShuffleChange'];
   groupingSelectOptions?: IGroupingSelectOption[];
+  conditionalGroupingOptions?: IGroupingSelectOption[];
   onSelect?: IMetricProps['onGroupingSelectChange'];
   inputLabel?: string;
   onGroupingConditionsChange?: IMetricProps['onGroupingConditionsChange'];

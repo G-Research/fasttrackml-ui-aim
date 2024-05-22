@@ -165,6 +165,7 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         chartPanelOffsetHeight={chartPanelOffsetHeight}
         selectedRows={metricsData?.selectedRows!}
         groupingSelectOptions={metricsData?.groupingSelectOptions!}
+        conditionalGroupingOptions={metricsData?.conditionalGroupingOptions!}
         sortOptions={metricsData?.sortOptions!}
         resizeMode={metricsData?.config?.table?.resizeMode!}
         columnsWidths={metricsData?.config?.table?.columnsWidths!}
