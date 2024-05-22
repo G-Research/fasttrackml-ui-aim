@@ -20,6 +20,7 @@ export interface IGroupingProps {
   onGroupingApplyChange: IMetricProps['onGroupingApplyChange'];
   onGroupingPersistenceChange: IMetricProps['onGroupingPersistenceChange'];
   onShuffleChange: IMetricProps['onShuffleChange'];
+  onGroupingConditionsChange?: IMetricProps['onGroupingConditionsChange'];
   groupingPopovers?: IGroupingPopovers[];
   isDisabled?: boolean;
 }

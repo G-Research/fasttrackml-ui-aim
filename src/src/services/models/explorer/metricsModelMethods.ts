@@ -52,6 +52,7 @@ import {
   ISmoothing,
   ITooltip,
   LegendsConfig,
+  IGroupingCondition,
 } from 'types/services/models/metrics/metricsAppModel';
 import {
   IMetricTrace,
@@ -91,7 +92,9 @@ import onChangeTooltip from 'utils/app/onChangeTooltip';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
 import onDefaultColumnsVisibilityChange from 'utils/app/onDefaultColumnsVisibilityChange';
+import evaluateCondition from 'utils/app/evaluateCondition';
 import onGroupingApplyChange from 'utils/app/onGroupingApplyChange';
+import onGroupingConditionsChange from 'utils/app/onGroupingConditionsChange';
 import onGroupingModeChange from 'utils/app/onGroupingModeChange';
 import onGroupingPaletteChange from 'utils/app/onGroupingPaletteChange';
 import onGroupingPersistenceChange from 'utils/app/onGroupingPersistenceChange';
@@ -1059,6 +1062,12 @@ function getMetricsAppModelMethods(
     const configData = model.getState()!.config;
     const grouping = configData!.grouping;
     const { paletteIndex = 0 } = grouping || {};
+
+    const conditions: IGroupingCondition[] = grouping.conditions || [];
+    const conditionStrings = conditions.map(
+      (condition) =>
+        `${condition.fieldName} ${condition.operator} ${condition.value}`,
+    );
     const groupByColor = getFilteredGroupingOptions({
       groupName: GroupNameEnum.COLOR,
       model,
@@ -1067,10 +1076,11 @@ function getMetricsAppModelMethods(
       groupName: GroupNameEnum.STROKE,
       model,
     });
+
     const groupByChart = getFilteredGroupingOptions({
       groupName: GroupNameEnum.CHART,
       model,
-    });
+    }).concat(conditionStrings);
     if (
       groupByColor.length === 0 &&
       groupByStroke.length === 0 &&
@@ -1096,10 +1106,39 @@ function getMetricsAppModelMethods(
     );
 
     for (let i = 0; i < data.length; i++) {
-      const groupValue: { [key: string]: string } = {};
+      const groupValue: { [key: string]: any } = {};
       groupingFields.forEach((field) => {
         groupValue[field] = getValue(data[i], field);
       });
+
+      // Evaluate the conditions and update the row
+      conditionStrings.forEach((conditionString, j) => {
+        // Evaluate the condition
+        const condition = conditions[j];
+
+        // Get everything after the first dot in the field name
+        const fieldTypeAndName = condition.fieldName.split('.');
+        const fieldType = fieldTypeAndName[0];
+        const fieldName = fieldTypeAndName.slice(1).join('.');
+
+        // Flatten default run attributes and store them in a single object
+        const runAttributes = {
+          ...data[i].run.params,
+          ...data[i].run.props,
+          hash: data[i].run.hash,
+          name: fieldType === 'metric' ? data[i].name : data[i].run.props.name,
+          tags: data[i].run.params.tags,
+          experiment: data[i].run.props.experiment?.name,
+        };
+
+        // Get the relevant attribute's value
+        const attributeValue = getValue(runAttributes, fieldName);
+        groupValue[conditionString] = evaluateCondition(
+          attributeValue,
+          condition,
+        );
+      });
+
       const groupKey = encode(groupValue);
       if (groupValues.hasOwnProperty(groupKey)) {
         groupValues[groupKey].data.push(data[i]);
@@ -1680,6 +1719,14 @@ function getMetricsAppModelMethods(
           appName,
           updateModelData,
           setAggregationEnabled,
+        });
+      },
+      onGroupingConditionsChange(conditions: IGroupingCondition[]): void {
+        onGroupingConditionsChange({
+          conditions,
+          model,
+          appName,
+          updateModelData,
         });
       },
       onShuffleChange(name: 'color' | 'stroke'): void {
