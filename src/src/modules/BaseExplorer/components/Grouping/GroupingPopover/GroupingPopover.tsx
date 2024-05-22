@@ -253,6 +253,7 @@ function GroupingPopover(props: IGroupingPopoverProps) {
                     </Text>
                   </AccordionSummary>
                   <AccordionDetails style={{ padding: 0 }}>
+                    {/* Add the advancedComponent and give it the engine as props */}
                     {advancedComponent}
                   </AccordionDetails>
                 </Accordion>

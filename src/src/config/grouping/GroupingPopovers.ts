@@ -1,3 +1,4 @@
+import ChartPopoverAdvanced from 'pages/Metrics/components/ChartPopover/ChartPopoverAdvanced';
 import ColorPopoverAdvanced from 'pages/Metrics/components/ColorPopoverAdvanced/ColorPopoverAdvanced';
 import StrokePopoverAdvanced from 'pages/Metrics/components/StrokePopover/StrokePopoverAdvanced';
 
@@ -24,7 +25,7 @@ const GroupingPopovers: IGroupingPopovers[] = [
   {
     groupName: GroupNameEnum.CHART,
     title: 'Divide into charts',
-    inputLabel: 'Select fields to divide into charts',
+    AdvancedComponent: ChartPopoverAdvanced,
   },
   {
     groupName: GroupNameEnum.ROW,
