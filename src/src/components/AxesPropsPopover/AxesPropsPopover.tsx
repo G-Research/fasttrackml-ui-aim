@@ -126,8 +126,9 @@ function AxesPropsPopover({
           max: true,
           [key]: metadata.isValid,
         });
+        const currentIndex = 2;
         if (metadata.isValid) {
-          onAxesScaleRangeChange({
+          onAxesScaleRangeChange(currentIndex, {
             [axisType]: { ...scaleRange, [key]: value },
           });
         }
@@ -138,7 +139,8 @@ function AxesPropsPopover({
 
   const onResetRange = React.useCallback(
     (axisType: 'xAxis' | 'yAxis') => {
-      onAxesScaleRangeChange({
+      const currentIndex = 2;
+      onAxesScaleRangeChange(currentIndex, {
         [axisType]: { min: undefined, max: undefined },
       });
     },

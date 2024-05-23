@@ -310,6 +310,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
                 yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
                 xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
               },
+              axesScaleRanges: [
+                {
+                  yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
+                  xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
+                },
+              ],
               smoothing: {
                 algorithm: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.algorithm,
                 factor: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.factor,
@@ -1348,6 +1354,21 @@ function createAppModel(appConfig: IAppInitialConfig) {
         };
       }
 
+      const chartData = getDataAsLines(data);
+
+      const newAxesScaleRanges = chartData.map((chartDataItem, index) => ({
+        yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
+        xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
+      }));
+
+      configData = {
+        ...configData,
+        chart: {
+          ...configData.chart,
+          axesScaleRanges: newAxesScaleRanges,
+        },
+      };
+
       const tableColumns = getMetricsTableColumns(
         params,
         groupingSelectOptions,
@@ -1375,7 +1396,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         selectFormData: {
           ...modelState?.selectFormData,
         },
-        lineChartData: getDataAsLines(data),
+        lineChartData: chartData,
         chartTitleData: getChartTitleData<
           IMetric,
           Partial<IMetricAppModelState>
@@ -2129,8 +2150,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
             appName,
           });
         },
-        onAxesScaleRangeChange(range: Partial<IAxesScaleRange>): void {
-          onAxesScaleRangeChange({ range, model, appName });
+        onAxesScaleRangeChange(
+          chartId: number,
+          range: Partial<IAxesScaleRange>,
+        ): void {
+          onAxesScaleRangeChange({ chartId, range, model, appName });
         },
         onDensityTypeChange(type: DensityOptions): Promise<void> {
           return onDensityTypeChange({ type, model, appName, getMetricsData });

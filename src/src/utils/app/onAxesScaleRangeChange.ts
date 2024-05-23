@@ -9,31 +9,42 @@ import { IModel, State } from 'types/services/models/model';
 import updateURL from './updateURL';
 
 const onAxesScaleRangeChange = <M extends State>({
+  chartId,
   range,
   model,
   appName,
 }: {
+  chartId: number;
   range: Partial<IAxesScaleRange>;
   model: IModel<M>;
   appName: string;
 }): void => {
   let configData = model?.getState()?.config;
   if (configData?.chart) {
+    console.log(configData.chart.axesScaleRanges);
+    const updatedAxesScaleRanges = configData.chart.axesScaleRanges.map(
+      (axesScaleRange: { yAxis: any; xAxis: any }, index: any) => {
+        if (index === chartId) {
+          return {
+            yAxis: {
+              ...axesScaleRange.yAxis,
+              ...(range.yAxis || {}),
+            },
+            xAxis: {
+              ...axesScaleRange.xAxis,
+              ...(range.xAxis || {}),
+            },
+          };
+        }
+        return axesScaleRange;
+      },
+    );
+
     configData = {
       ...configData,
       chart: {
         ...configData.chart,
-        axesScaleRange: {
-          ...configData.chart.axesScaleRange,
-          yAxis: {
-            ...configData.chart.axesScaleRange.yAxis,
-            ...(range.yAxis || {}),
-          },
-          xAxis: {
-            ...configData.chart.axesScaleRange.xAxis,
-            ...(range.xAxis || {}),
-          },
-        },
+        axesScaleRanges: updatedAxesScaleRanges,
       },
     };
     model.setState({ config: configData });

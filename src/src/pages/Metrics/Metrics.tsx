@@ -48,23 +48,25 @@ function Metrics(
   const [isProgressBarVisible, setIsProgressBarVisible] =
     React.useState<boolean>(false);
   const chartProps = React.useMemo(() => {
-    return (props.lineChartData || []).map((chartData: ILine[]) => ({
-      axesScaleType: props.axesScaleType,
-      axesScaleRange: props.axesScaleRange,
-      curveInterpolation: props.smoothing.isApplied
-        ? props.smoothing.curveInterpolation
-        : CurveEnum.Linear,
-      ignoreOutliers: props.ignoreOutliers,
-      highlightMode: props.highlightMode,
-      aggregatedData: props.aggregatedData?.filter(
-        (data) => data.chartIndex === chartData[0]?.chartIndex,
-      ),
-      zoom: props.zoom,
-      chartTitle: props.chartTitleData[chartData[0]?.chartIndex!],
-      aggregationConfig: props.aggregationConfig,
-      alignmentConfig: props.alignmentConfig,
-      onZoomChange: props.onZoomChange,
-    }));
+    return (props.lineChartData || []).map(
+      (chartData: ILine[], index: number) => ({
+        axesScaleType: props.axesScaleType,
+        axesScaleRange: props.axesScaleRanges[index],
+        curveInterpolation: props.smoothing.isApplied
+          ? props.smoothing.curveInterpolation
+          : CurveEnum.Linear,
+        ignoreOutliers: props.ignoreOutliers,
+        highlightMode: props.highlightMode,
+        aggregatedData: props.aggregatedData?.filter(
+          (data) => data.chartIndex === chartData[0]?.chartIndex,
+        ),
+        zoom: props.zoom,
+        chartTitle: props.chartTitleData[chartData[0]?.chartIndex!],
+        aggregationConfig: props.aggregationConfig,
+        alignmentConfig: props.alignmentConfig,
+        onZoomChange: props.onZoomChange,
+      }),
+    );
   }, [
     props.lineChartData,
     props.axesScaleType,
@@ -78,7 +80,7 @@ function Metrics(
     props.aggregationConfig,
     props.alignmentConfig,
     props.onZoomChange,
-    props.axesScaleRange,
+    props.axesScaleRanges,
   ]);
 
   const metricsSelectChange = (selectedMetrics: ISelectOption[]): void => {
@@ -205,7 +207,7 @@ function Metrics(
                             highlightMode={props.highlightMode}
                             aggregationConfig={props.aggregationConfig}
                             axesScaleType={props.axesScaleType}
-                            axesScaleRange={props.axesScaleRange}
+                            axesScaleRange={props.axesScaleRanges[0]}
                             alignmentConfig={props.alignmentConfig}
                             onChangeTooltip={props.onChangeTooltip}
                             onIgnoreOutliersChange={

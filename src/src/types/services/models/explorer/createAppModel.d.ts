@@ -162,6 +162,7 @@ export interface ILineChartConfig {
   zoom: IChartZoom;
   axesScaleType: IAxesScaleState;
   axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   smoothing: ISmoothing;
   aggregationConfig: IAggregationConfig;
   densityType: DensityOptions;

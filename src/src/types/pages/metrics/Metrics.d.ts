@@ -70,6 +70,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   densityType: DensityOptions;
   axesScaleType: IAxesScaleState;
   axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   smoothing: ISmoothing;
   focusedState: IFocusedState;
   highlightMode: HighlightEnum;
@@ -113,7 +114,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onTableRowHover: (rowKey?: string) => void;
   onTableRowClick: (rowKey?: string) => void;
   onAxesScaleTypeChange: (params: IAxesScaleState) => void;
-  onAxesScaleRangeChange: (range: Partial<IAxesScaleRange>) => void;
+  onAxesScaleRangeChange: (chartId: number, range: Partial<IAxesScaleRange>) => void;
   onAggregationConfigChange: (
     aggregationConfig: Partial<IAggregationConfig>,
   ) => void;
