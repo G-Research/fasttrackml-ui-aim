@@ -11,7 +11,7 @@ import ZoomOutPopover from 'components/ZoomOutPopover/ZoomOutPopover';
 import HighlightModePopover from 'components/HighlightModesPopover/HighlightModesPopover';
 import ControlPopover from 'components/ControlPopover/ControlPopover';
 import AxesScalePopover from 'components/AxesScalePopover/AxesScalePopover';
-import AlignmentPopover from 'components/AxesPropsPopover/AxesPropsPopover';
+import AlignmentPopover from 'components/MultipleAxesPropsPopover/MultipleAxesPropsPopover';
 import TooltipContentPopover from 'components/TooltipContentPopover/TooltipContentPopover';
 import { Icon } from 'components/kit';
 import ExportPreview from 'components/ExportPreview';
@@ -75,6 +75,20 @@ function Controls(
     setOpenExportModal((state) => !state);
   }, [setOpenExportModal]);
 
+  const ids = [
+    {
+      label: '0',
+      value: 0,
+    },
+    {
+      label: '1',
+      value: 1,
+    },
+    {
+      label: '2',
+      value: 2,
+    },
+  ];
   return (
     <ErrorBoundary>
       <div className='Controls__container ScrollBar__hidden'>
@@ -158,6 +172,7 @@ function Controls(
               )}
               component={
                 <AlignmentPopover
+                  idsOptions={ids}
                   selectFormOptions={props.selectFormOptions}
                   alignmentConfig={props.alignmentConfig}
                   axesScaleRange={props.axesScaleRange}

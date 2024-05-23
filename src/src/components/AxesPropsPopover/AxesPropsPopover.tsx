@@ -29,6 +29,7 @@ import {
 import './AxesPropsPopover.scss';
 
 function AxesPropsPopover({
+  getChartId,
   onAlignmentTypeChange,
   onAlignmentMetricChange,
   onAxesScaleRangeChange,
@@ -126,9 +127,8 @@ function AxesPropsPopover({
           max: true,
           [key]: metadata.isValid,
         });
-        const currentIndex = 2;
         if (metadata.isValid) {
-          onAxesScaleRangeChange(currentIndex, {
+          onAxesScaleRangeChange(getChartId()!, {
             [axisType]: { ...scaleRange, [key]: value },
           });
         }
@@ -139,8 +139,7 @@ function AxesPropsPopover({
 
   const onResetRange = React.useCallback(
     (axisType: 'xAxis' | 'yAxis') => {
-      const currentIndex = 2;
-      onAxesScaleRangeChange(currentIndex, {
+      onAxesScaleRangeChange(getChartId()!, {
         [axisType]: { min: undefined, max: undefined },
       });
     },
