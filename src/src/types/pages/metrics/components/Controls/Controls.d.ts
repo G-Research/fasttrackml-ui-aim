@@ -33,7 +33,7 @@ export interface IControlProps {
   highlightMode: HighlightEnum;
   aggregationConfig: IAggregationConfig;
   axesScaleType: IAxesScaleState;
-  axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   smoothing: ISmoothing;
   alignmentConfig: IAlignmentConfig;
   densityType: DensityOptions;

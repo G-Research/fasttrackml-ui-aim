@@ -7,12 +7,12 @@ export interface IBaseAxesPopoverProps {
   onAlignmentTypeChange: IMetricProps['onAlignmentTypeChange'];
   alignmentConfig: IAlignmentConfig;
   selectFormOptions: ISelectOption[];
-  axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   onAxesScaleRangeChange: IMetricProps['onAxesScaleRangeChange'];
 }
 
 export interface IAxesPropsPopoverProps extends IBaseAxesPopoverProps {
-  getChartId: () => number | null;
+  selectedIds: number[];
 }
 
 export interface IAxesScaleRange {

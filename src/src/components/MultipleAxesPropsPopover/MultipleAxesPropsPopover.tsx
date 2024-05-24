@@ -1,11 +1,16 @@
 import React, { useCallback, useState } from 'react';
 import _ from 'lodash-es';
+import Select from 'react-select';
+
+import { Divider } from '@material-ui/core';
 
 import AlignmentPopover from 'components/AxesPropsPopover/AxesPropsPopover';
 import { Text, SelectDropdown } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
 import { IMultipleAxesPropsPopoverProps } from './';
+
+import './MultipleAxesPropsPopover.scss';
 
 function MultipleAxesPropsPopover({
   idsOptions,
@@ -14,33 +19,67 @@ function MultipleAxesPropsPopover({
   onAxesScaleRangeChange,
   alignmentConfig,
   selectFormOptions,
-  axesScaleRange,
+  axesScaleRanges,
 }: IMultipleAxesPropsPopoverProps): React.FunctionComponentElement<React.ReactNode> {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const handleAlignmentChange = useCallback((option): void => {
-    setSelectedId(option.value);
-  }, []);
+  const options = idsOptions.map((option: { value: any; label: any }) => ({
+    value: option.value,
+    label: option.label,
+  }));
 
-  function getChartId() {
-    return selectedId;
-  }
+  const selectAllOption = { value: '*', label: 'Select All' };
+
+  const handleAlignmentChange = useCallback(
+    (selectedOptions) => {
+      if (
+        selectedOptions.some(
+          (option: { value: string }) => option.value === '*',
+        )
+      ) {
+        if (selectedIds.length === idsOptions.length) {
+          setSelectedIds([]);
+        } else {
+          setSelectedIds(
+            idsOptions.map((option: { value: any }) => option.value),
+          );
+        }
+      } else {
+        setSelectedIds(
+          selectedOptions.map((option: { value: any }) => option.value),
+        );
+      }
+    },
+    [idsOptions, selectedIds],
+  );
+
+  const selectedOptions = options.filter((option: { value: number }) =>
+    selectedIds.includes(option.value),
+  );
+
   return (
     <ErrorBoundary>
-      <div>
+      <div className='MultipleAxesPropsPopover'>
         <Text component='p' tint={50}>
           CHART ID:
         </Text>
-        <SelectDropdown
-          selectOptions={idsOptions}
-          handleSelect={handleAlignmentChange}
+        <Select
+          isMulti
+          value={selectedOptions}
+          options={[selectAllOption, ...options]}
+          onChange={handleAlignmentChange}
+          classNamePrefix='react-select'
+          closeMenuOnSelect={false}
+          hideSelectedOptions={false}
+          className='react-select-container'
         />
+        <Divider className='MultipleAxesPropsPopover__divider' />
       </div>
       <AlignmentPopover
-        getChartId={getChartId}
+        selectedIds={selectedIds}
         selectFormOptions={selectFormOptions}
         alignmentConfig={alignmentConfig}
-        axesScaleRange={axesScaleRange}
+        axesScaleRanges={axesScaleRanges}
         onAlignmentMetricChange={onAlignmentMetricChange}
         onAlignmentTypeChange={onAlignmentTypeChange}
         onAxesScaleRangeChange={onAxesScaleRangeChange}

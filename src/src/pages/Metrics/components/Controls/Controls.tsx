@@ -23,6 +23,8 @@ import { CONTROLS_DEFAULT_CONFIG } from 'config/controls/controlsDefaultConfig';
 
 import { IControlProps } from 'types/pages/metrics/components/Controls/Controls';
 
+import { chartTitleToText } from 'utils/d3/utils';
+
 import './Controls.scss';
 
 function Controls(
@@ -56,11 +58,11 @@ function Controls(
   }, [props.alignmentConfig, props.densityType]);
 
   const axesRangeChanged: boolean = React.useMemo(() => {
-    return !_.isEqual(
-      props.axesScaleRange,
-      CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange,
+    // check if any range of any chart has been changed
+    return !props.axesScaleRanges.every((r) =>
+      _.isEqual(r, CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange),
     );
-  }, [props.axesScaleRange]);
+  }, [props.axesScaleRanges]);
 
   const tooltipChanged: boolean = React.useMemo(() => {
     return (
@@ -75,20 +77,14 @@ function Controls(
     setOpenExportModal((state) => !state);
   }, [setOpenExportModal]);
 
-  const ids = [
-    {
-      label: '0',
-      value: 0,
-    },
-    {
-      label: '1',
-      value: 1,
-    },
-    {
-      label: '2',
-      value: 2,
-    },
-  ];
+  const ids: { label: string; value: number }[] = [];
+  props.chartProps.forEach((prop: any, index: number) => {
+    const titleText = chartTitleToText(prop.chartTitle);
+    ids.push({
+      label: `${index + 1} - ${titleText}`,
+      value: index,
+    });
+  });
   return (
     <ErrorBoundary>
       <div className='Controls__container ScrollBar__hidden'>
@@ -175,7 +171,7 @@ function Controls(
                   idsOptions={ids}
                   selectFormOptions={props.selectFormOptions}
                   alignmentConfig={props.alignmentConfig}
-                  axesScaleRange={props.axesScaleRange}
+                  axesScaleRanges={props.axesScaleRanges}
                   onAlignmentMetricChange={props.onAlignmentMetricChange}
                   onAlignmentTypeChange={props.onAlignmentTypeChange}
                   onAxesScaleRangeChange={props.onAxesScaleRangeChange}

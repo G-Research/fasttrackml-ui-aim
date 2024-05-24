@@ -207,7 +207,7 @@ function Metrics(
                             highlightMode={props.highlightMode}
                             aggregationConfig={props.aggregationConfig}
                             axesScaleType={props.axesScaleType}
-                            axesScaleRange={props.axesScaleRanges[0]}
+                            axesScaleRanges={props.axesScaleRanges}
                             alignmentConfig={props.alignmentConfig}
                             onChangeTooltip={props.onChangeTooltip}
                             onIgnoreOutliersChange={

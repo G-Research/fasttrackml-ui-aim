@@ -29,13 +29,13 @@ import {
 import './AxesPropsPopover.scss';
 
 function AxesPropsPopover({
-  getChartId,
+  selectedIds,
   onAlignmentTypeChange,
   onAlignmentMetricChange,
   onAxesScaleRangeChange,
   alignmentConfig,
   selectFormOptions,
-  axesScaleRange,
+  axesScaleRanges,
 }: IAxesPropsPopoverProps): React.FunctionComponentElement<React.ReactNode> {
   const [yScaleRange, setYScaleRange] = React.useState<IAxesRangeValue>({});
   const [isYScaleRangeValid, setIsYScaleRangeValid] =
@@ -128,8 +128,10 @@ function AxesPropsPopover({
           [key]: metadata.isValid,
         });
         if (metadata.isValid) {
-          onAxesScaleRangeChange(getChartId()!, {
-            [axisType]: { ...scaleRange, [key]: value },
+          selectedIds.forEach((selectedId) => {
+            onAxesScaleRangeChange(selectedId, {
+              [axisType]: { ...scaleRange, [key]: value },
+            });
           });
         }
       }
@@ -139,11 +141,13 @@ function AxesPropsPopover({
 
   const onResetRange = React.useCallback(
     (axisType: 'xAxis' | 'yAxis') => {
-      onAxesScaleRangeChange(getChartId()!, {
-        [axisType]: { min: undefined, max: undefined },
+      selectedIds.forEach((selectedId) => {
+        onAxesScaleRangeChange(selectedId, {
+          [axisType]: { min: undefined, max: undefined },
+        });
       });
     },
-    [onAxesScaleRangeChange],
+    [onAxesScaleRangeChange, selectedIds],
   );
 
   const validationPatterns = React.useMemo(
@@ -167,17 +171,19 @@ function AxesPropsPopover({
   );
 
   React.useEffect(() => {
-    setXScaleRange((prevState) =>
-      _.isEqual(axesScaleRange.xAxis, prevState)
-        ? prevState
-        : axesScaleRange.xAxis,
-    );
-    setYScaleRange((prevState) =>
-      _.isEqual(axesScaleRange.yAxis, prevState)
-        ? prevState
-        : axesScaleRange.yAxis,
-    );
-  }, [axesScaleRange]);
+    selectedIds.forEach((selectedId) => {
+      setXScaleRange((prevState) =>
+        _.isEqual(axesScaleRanges[selectedId].xAxis, prevState)
+          ? prevState
+          : axesScaleRanges[selectedId].xAxis,
+      );
+      setYScaleRange((prevState) =>
+        _.isEqual(axesScaleRanges[selectedId].yAxis, prevState)
+          ? prevState
+          : axesScaleRanges[selectedId].yAxis,
+      );
+    });
+  }, [selectedIds, axesScaleRanges]);
 
   const xResetBtnDisabled = React.useMemo(
     () => xScaleRange.min === undefined && xScaleRange.max === undefined,
