@@ -30,7 +30,7 @@ function MultipleAxesPropsPopover({
 
   const selectAllOption = { value: '*', label: 'Select All' };
 
-  const handleAlignmentChange = useCallback(
+  const handleChange = useCallback(
     (selectedOptions) => {
       if (
         selectedOptions.some(
@@ -67,7 +67,7 @@ function MultipleAxesPropsPopover({
           isMulti
           value={selectedOptions}
           options={[selectAllOption, ...options]}
-          onChange={handleAlignmentChange}
+          onChange={handleChange}
           classNamePrefix='react-select'
           closeMenuOnSelect={false}
           hideSelectedOptions={false}

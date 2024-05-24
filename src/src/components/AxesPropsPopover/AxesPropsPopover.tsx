@@ -185,6 +185,13 @@ function AxesPropsPopover({
     });
   }, [selectedIds, axesScaleRanges]);
 
+  React.useEffect(() => {
+    if (selectedIds.length > 1) {
+      onResetRange('xAxis');
+      onResetRange('yAxis');
+    }
+  }, [selectedIds]);
+
   const xResetBtnDisabled = React.useMemo(
     () => xScaleRange.min === undefined && xScaleRange.max === undefined,
     [xScaleRange],
