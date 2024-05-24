@@ -2135,8 +2135,17 @@ function createAppModel(appConfig: IAppInitialConfig) {
             setModelData,
           });
         },
-        onAlignmentTypeChange(type: AlignmentOptionsEnum): void {
-          onAlignmentTypeChange({ type, model, appName, updateModelData });
+        onAlignmentTypeChange(
+          chartId: number,
+          type: AlignmentOptionsEnum,
+        ): void {
+          onAlignmentTypeChange({
+            chartId,
+            type,
+            model,
+            appName,
+            updateModelData,
+          });
         },
         onChangeTooltip(tooltip: Partial<ITooltip>): void {
           onChangeTooltip({

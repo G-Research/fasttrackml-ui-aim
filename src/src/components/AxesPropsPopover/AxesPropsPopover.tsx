@@ -56,11 +56,16 @@ function AxesPropsPopover({
         if (option.group === 'METRIC') {
           onAlignmentMetricChange(option.value);
         } else {
-          onAlignmentTypeChange(option.value as AlignmentOptionsEnum);
+          selectedIds.forEach((selectedId) => {
+            onAlignmentTypeChange(
+              selectedId,
+              option.value as AlignmentOptionsEnum,
+            );
+          });
         }
       }
     },
-    [onAlignmentMetricChange, onAlignmentTypeChange],
+    [onAlignmentMetricChange, onAlignmentTypeChange, selectedIds],
   );
 
   const alignmentOptions: ISelectOption[] = React.useMemo(() => {

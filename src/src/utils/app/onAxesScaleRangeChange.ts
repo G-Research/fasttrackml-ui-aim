@@ -21,7 +21,6 @@ const onAxesScaleRangeChange = <M extends State>({
 }): void => {
   let configData = model?.getState()?.config;
   if (configData?.chart) {
-    console.log(configData.chart.axesScaleRanges);
     const updatedAxesScaleRanges = configData.chart.axesScaleRanges.map(
       (axesScaleRange: { yAxis: any; xAxis: any }, index: any) => {
         if (index === chartId) {

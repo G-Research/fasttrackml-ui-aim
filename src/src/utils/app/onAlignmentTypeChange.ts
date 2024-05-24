@@ -9,11 +9,13 @@ import { IAppModelConfig } from 'types/services/models/explorer/createAppModel';
 import { AlignmentOptionsEnum } from '../d3';
 
 export default function onAlignmentTypeChange<M extends State>({
+  chartId,
   type,
   model,
   appName,
   updateModelData,
 }: {
+  chartId: number;
   type: AlignmentOptionsEnum;
   model: IModel<M>;
   appName: string;
@@ -24,17 +26,28 @@ export default function onAlignmentTypeChange<M extends State>({
 }): void {
   const configData = model.getState()?.config;
   if (configData?.chart) {
-    const alignmentConfig = { ...configData.chart.alignmentConfig, type };
+    const updatedAlignmentConfigs = configData.chart.alignmentConfigs.map(
+      (alignmentConfig: any, index: number) => {
+        if (index === chartId) {
+          const newAlignmentConfig = { ...alignmentConfig, type };
 
-    if (type !== AlignmentOptionsEnum.CUSTOM_METRIC) {
-      alignmentConfig.metric = '';
-    }
+          if (type !== AlignmentOptionsEnum.CUSTOM_METRIC) {
+            newAlignmentConfig.metric = '';
+          }
+
+          return newAlignmentConfig;
+        }
+        return alignmentConfig;
+      },
+    );
+
     configData.chart = {
       ...configData.chart,
-      alignmentConfig,
-      axesScaleRange: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange,
+      alignmentConfigs: updatedAlignmentConfigs,
+      axesScaleRanges: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRanges,
       zoom: { ...configData.chart.zoom, history: [] },
     };
+
     updateModelData(configData, true);
   }
   analytics.trackEvent(
