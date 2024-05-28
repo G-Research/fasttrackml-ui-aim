@@ -139,6 +139,7 @@ function SelectForm({
 
   const open: boolean = !!anchorEl;
   const id = open ? 'select-metric' : undefined;
+  const isSearchDisabled = selectedParamsData?.options.length === 0;
   return (
     <ErrorBoundary>
       <div className='SelectForm__container'>
@@ -259,7 +260,10 @@ function SelectForm({
                   fontSize={requestIsPending ? 12 : 14}
                 />
               }
-              className='Params__SelectForm__search__button'
+              className={classNames('Params__SelectForm__search__button', {
+                disabled: isSearchDisabled,
+              })}
+              disabled={isSearchDisabled}
               onClick={
                 requestIsPending ? handleRequestAbort : handleParamsSearch
               }
