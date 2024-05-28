@@ -227,13 +227,7 @@ Here is what they look like with the GitHub API at the time of writing:
         }
       }
     ],
-    "bypass_actors": [
-      {
-        "actor_id": 355730,
-        "actor_type": "Integration",
-        "bypass_mode": "always"
-      }
-    ]
+    "bypass_actors": []
   }
 ]
 ```
