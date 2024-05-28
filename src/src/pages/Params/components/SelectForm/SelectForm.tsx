@@ -139,7 +139,7 @@ function SelectForm({
 
   const open: boolean = !!anchorEl;
   const id = open ? 'select-metric' : undefined;
-  const isSearchDisabled = selectedParamsData?.options.length === 0;
+  let isSearchDisabled = selectedParamsData?.options.length === 0;
   return (
     <ErrorBoundary>
       <div className='SelectForm__container'>
