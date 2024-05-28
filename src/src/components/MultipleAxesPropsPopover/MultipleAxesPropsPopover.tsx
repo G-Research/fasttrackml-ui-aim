@@ -17,7 +17,7 @@ function MultipleAxesPropsPopover({
   onAlignmentTypeChange,
   onAlignmentMetricChange,
   onAxesScaleRangeChange,
-  alignmentConfig,
+  alignmentConfigs,
   selectFormOptions,
   axesScaleRanges,
 }: IMultipleAxesPropsPopoverProps): React.FunctionComponentElement<React.ReactNode> {
@@ -78,7 +78,7 @@ function MultipleAxesPropsPopover({
       <AlignmentPopover
         selectedIds={selectedIds}
         selectFormOptions={selectFormOptions}
-        alignmentConfig={alignmentConfig}
+        alignmentConfigs={alignmentConfigs}
         axesScaleRanges={axesScaleRanges}
         onAlignmentMetricChange={onAlignmentMetricChange}
         onAlignmentTypeChange={onAlignmentTypeChange}

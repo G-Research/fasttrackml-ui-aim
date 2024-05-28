@@ -48,14 +48,15 @@ function Controls(
   }, [props.axesScaleType]);
 
   const alignmentChanged: boolean = React.useMemo(() => {
-    return (
-      props.alignmentConfig.metric !==
-        CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric ||
-      props.alignmentConfig.type !==
-        CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type ||
-      props.densityType !== CONTROLS_DEFAULT_CONFIG.metrics.densityType
+    return !props.alignmentConfigs.every(
+      (alignmentConfig) =>
+        alignmentConfig.metric !==
+          CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric ||
+        alignmentConfig.type !==
+          CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type ||
+        props.densityType !== CONTROLS_DEFAULT_CONFIG.metrics.densityType,
     );
-  }, [props.alignmentConfig, props.densityType]);
+  }, [props.alignmentConfigs, props.densityType]);
 
   const axesRangeChanged: boolean = React.useMemo(() => {
     // check if any range of any chart has been changed
@@ -170,7 +171,7 @@ function Controls(
                 <AlignmentPopover
                   idsOptions={ids}
                   selectFormOptions={props.selectFormOptions}
-                  alignmentConfig={props.alignmentConfig}
+                  alignmentConfigs={props.alignmentConfigs}
                   axesScaleRanges={props.axesScaleRanges}
                   onAlignmentMetricChange={props.onAlignmentMetricChange}
                   onAlignmentTypeChange={props.onAlignmentTypeChange}

@@ -152,7 +152,7 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         notifyData={metricsData?.notifyData!}
         tooltip={metricsData?.tooltip!}
         aggregationConfig={metricsData?.config?.chart?.aggregationConfig!}
-        alignmentConfig={metricsData?.config?.chart?.alignmentConfig!}
+        alignmentConfigs={metricsData?.config?.chart?.alignmentConfigs!}
         densityType={metricsData?.config?.chart?.densityType!}
         selectedMetricsData={metricsData?.config?.select!}
         tableRowHeight={metricsData?.config?.table?.rowHeight!}

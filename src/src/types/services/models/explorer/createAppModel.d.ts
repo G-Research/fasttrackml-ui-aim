@@ -166,7 +166,7 @@ export interface ILineChartConfig {
   smoothing: ISmoothing;
   aggregationConfig: IAggregationConfig;
   densityType: DensityOptions;
-  alignmentConfig: IAlignmentConfig;
+  alignmentConfigs: IAlignmentConfig[];
   focusedState: IFocusedState;
   tooltip: ITooltipConfig;
   legends: LegendsConfig;

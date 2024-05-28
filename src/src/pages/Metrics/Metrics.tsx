@@ -63,7 +63,7 @@ function Metrics(
         zoom: props.zoom,
         chartTitle: props.chartTitleData[chartData[0]?.chartIndex!],
         aggregationConfig: props.aggregationConfig,
-        alignmentConfig: props.alignmentConfig,
+        alignmentConfig: props.alignmentConfigs[index],
         onZoomChange: props.onZoomChange,
       }),
     );
@@ -78,7 +78,7 @@ function Metrics(
     props.chartTitleData,
     props.aggregatedData,
     props.aggregationConfig,
-    props.alignmentConfig,
+    props.alignmentConfigs,
     props.onZoomChange,
     props.axesScaleRanges,
   ]);
@@ -183,7 +183,7 @@ function Metrics(
                         focusedState={props.focusedState}
                         tooltip={props.tooltip}
                         legends={props.legends}
-                        alignmentConfig={props.alignmentConfig}
+                        alignmentConfigs={props.alignmentConfigs}
                         zoom={props.zoom}
                         chartProps={chartProps}
                         resizeMode={props.resizeMode}
@@ -208,7 +208,7 @@ function Metrics(
                             aggregationConfig={props.aggregationConfig}
                             axesScaleType={props.axesScaleType}
                             axesScaleRanges={props.axesScaleRanges}
-                            alignmentConfig={props.alignmentConfig}
+                            alignmentConfigs={props.alignmentConfigs}
                             onChangeTooltip={props.onChangeTooltip}
                             onIgnoreOutliersChange={
                               props.onIgnoreOutliersChange

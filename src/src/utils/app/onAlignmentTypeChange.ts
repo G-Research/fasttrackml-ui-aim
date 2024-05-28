@@ -44,7 +44,6 @@ export default function onAlignmentTypeChange<M extends State>({
     configData.chart = {
       ...configData.chart,
       alignmentConfigs: updatedAlignmentConfigs,
-      axesScaleRanges: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRanges,
       zoom: { ...configData.chart.zoom, history: [] },
     };
 

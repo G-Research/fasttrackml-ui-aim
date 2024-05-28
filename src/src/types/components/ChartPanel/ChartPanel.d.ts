@@ -30,7 +30,7 @@ export interface IChartPanelProps {
   tooltip: ITooltip;
   legends?: LegendsConfig;
   aggregationConfig?: IAggregationConfig;
-  alignmentConfig?: IAlignmentConfig;
+  alignmentConfigs?: IAlignmentConfig[];
   zoom?: Partial<IChartZoom>;
   chartPanelOffsetHeight?: number;
   // chartProps: Omit<

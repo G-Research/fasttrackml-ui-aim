@@ -323,10 +323,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
                   CONTROLS_DEFAULT_CONFIG.metrics.smoothing.curveInterpolation,
                 isApplied: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.isApplied,
               },
-              alignmentConfig: {
-                metric: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
-                type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
-              },
+              alignmentConfigs: [
+                {
+                  metric:
+                    CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
+                  type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
+                },
+              ],
               densityType: CONTROLS_DEFAULT_CONFIG.metrics.densityType,
               aggregationConfig: {
                 methods: {
@@ -1361,11 +1364,17 @@ function createAppModel(appConfig: IAppInitialConfig) {
         xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
       }));
 
+      const newAlignmentConfigs = chartData.map((chartDataItem, index) => ({
+        metric: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
+        type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
+      }));
+
       configData = {
         ...configData,
         chart: {
           ...configData.chart,
           axesScaleRanges: newAxesScaleRanges,
+          alignmentConfigs: newAlignmentConfigs,
         },
       };
 

@@ -5,7 +5,7 @@ import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 export interface IBaseAxesPopoverProps {
   onAlignmentMetricChange: IMetricProps['onAlignmentMetricChange'];
   onAlignmentTypeChange: IMetricProps['onAlignmentTypeChange'];
-  alignmentConfig: IAlignmentConfig;
+  alignmentConfigs: IAlignmentConfig[];
   selectFormOptions: ISelectOption[];
   axesScaleRanges: IAxesScaleRange[];
   onAxesScaleRangeChange: IMetricProps['onAxesScaleRangeChange'];
