@@ -148,7 +148,7 @@ function SelectForm({
   if (selectedCount > 0) {
     metricsButtonText += ` (${selectedCount})`;
   }
-
+  let isSearchDisabled = selectedCount < 1;
   let selectedRunHash = useLocation()?.runProps?.hash;
   let prefilledQuery = '';
   if (selectedRunHash !== undefined) {
@@ -293,7 +293,10 @@ function SelectForm({
                 fontSize={requestIsPending ? 12 : 14}
               />
             }
-            className='Metrics__SelectForm__search__button'
+            className={classNames('Metrics__SelectForm__search__button', {
+              disabled: isSearchDisabled,
+            })}
+            disabled={isSearchDisabled}
             onClick={requestIsPending ? handleRequestAbort : handleMetricSearch}
           >
             {requestIsPending ? 'Cancel' : 'Search'}
