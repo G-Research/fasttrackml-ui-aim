@@ -23,6 +23,7 @@ function Grouping({
   onGroupingPersistenceChange,
   onGroupingApplyChange,
   onShuffleChange,
+  onGroupingConditionsChange,
   groupingPopovers = GroupingPopovers,
   isDisabled = false,
 }: IGroupingProps): React.FunctionComponentElement<React.ReactNode> {
@@ -63,6 +64,9 @@ function Grouping({
                           onGroupingPaletteChange,
                           paletteIndex: groupingData?.paletteIndex,
                         })}
+                        groupingSelectOptions={groupingSelectOptions}
+                        onSelect={onGroupingSelectChange}
+                        onGroupingConditionsChange={onGroupingConditionsChange}
                       />
                     )
                   }

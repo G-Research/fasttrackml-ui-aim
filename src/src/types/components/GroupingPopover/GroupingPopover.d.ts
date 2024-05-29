@@ -25,4 +25,8 @@ export interface IGroupingPopoverAdvancedProps {
   onPersistenceChange: IMetricProps['onGroupingPersistenceChange'];
   onGroupingPaletteChange?: IMetricProps['onGroupingPaletteChange'];
   onShuffleChange: IMetricProps['onShuffleChange'];
+  groupingSelectOptions?: IGroupingSelectOption[];
+  onSelect?: IMetricProps['onGroupingSelectChange'];
+  inputLabel?: string;
+  onGroupingConditionsChange?: IMetricProps['onGroupingConditionsChange'];
 }
