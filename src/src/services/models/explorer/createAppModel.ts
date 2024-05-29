@@ -774,8 +774,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
           if (metricsCollection.config !== null) {
             const groupConfigData: { [key: string]: unknown } = {};
             for (let key in metricsCollection.config) {
-              groupConfigData[getValueByField(groupingSelectOptions, key)] =
-                metricsCollection.config[key];
+              groupConfigData[
+                getValueByField(groupingSelectOptions, key) || key
+              ] = metricsCollection.config[key];
             }
             const groupHeaderRow = {
               meta: {
