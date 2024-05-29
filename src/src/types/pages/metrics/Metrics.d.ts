@@ -69,7 +69,6 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   zoom: IChartZoom;
   densityType: DensityOptions;
   axesScaleType: IAxesScaleState;
-  axesScaleRange: IAxesScaleRange;
   axesScaleRanges: IAxesScaleRange[];
   smoothing: ISmoothing;
   focusedState: IFocusedState;

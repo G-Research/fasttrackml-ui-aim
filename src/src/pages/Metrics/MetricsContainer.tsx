@@ -145,7 +145,6 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         zoom={metricsData?.config?.chart?.zoom!}
         highlightMode={metricsData?.config?.chart?.highlightMode!}
         axesScaleType={metricsData?.config?.chart?.axesScaleType!}
-        axesScaleRange={metricsData?.config?.chart?.axesScaleRange!}
         axesScaleRanges={metricsData?.config?.chart?.axesScaleRanges!}
         smoothing={metricsData?.config?.chart?.smoothing!}
         focusedState={metricsData?.config?.chart?.focusedState!}
