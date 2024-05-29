@@ -145,13 +145,13 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         zoom={metricsData?.config?.chart?.zoom!}
         highlightMode={metricsData?.config?.chart?.highlightMode!}
         axesScaleType={metricsData?.config?.chart?.axesScaleType!}
-        axesScaleRange={metricsData?.config?.chart?.axesScaleRange!}
+        axesScaleRanges={metricsData?.config?.chart?.axesScaleRanges!}
         smoothing={metricsData?.config?.chart?.smoothing!}
         focusedState={metricsData?.config?.chart?.focusedState!}
         notifyData={metricsData?.notifyData!}
         tooltip={metricsData?.tooltip!}
         aggregationConfig={metricsData?.config?.chart?.aggregationConfig!}
-        alignmentConfig={metricsData?.config?.chart?.alignmentConfig!}
+        alignmentConfigs={metricsData?.config?.chart?.alignmentConfigs!}
         densityType={metricsData?.config?.chart?.densityType!}
         selectedMetricsData={metricsData?.config?.select!}
         tableRowHeight={metricsData?.config?.table?.rowHeight!}

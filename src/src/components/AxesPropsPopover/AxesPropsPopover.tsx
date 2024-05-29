@@ -29,12 +29,13 @@ import {
 import './AxesPropsPopover.scss';
 
 function AxesPropsPopover({
+  selectedIds,
   onAlignmentTypeChange,
   onAlignmentMetricChange,
   onAxesScaleRangeChange,
-  alignmentConfig,
+  alignmentConfigs,
   selectFormOptions,
-  axesScaleRange,
+  axesScaleRanges,
 }: IAxesPropsPopoverProps): React.FunctionComponentElement<React.ReactNode> {
   const [yScaleRange, setYScaleRange] = React.useState<IAxesRangeValue>({});
   const [isYScaleRangeValid, setIsYScaleRangeValid] =
@@ -55,11 +56,16 @@ function AxesPropsPopover({
         if (option.group === 'METRIC') {
           onAlignmentMetricChange(option.value);
         } else {
-          onAlignmentTypeChange(option.value as AlignmentOptionsEnum);
+          selectedIds.forEach((selectedId) => {
+            onAlignmentTypeChange(
+              selectedId,
+              option.value as AlignmentOptionsEnum,
+            );
+          });
         }
       }
     },
-    [onAlignmentMetricChange, onAlignmentTypeChange],
+    [onAlignmentMetricChange, onAlignmentTypeChange, selectedIds],
   );
 
   const alignmentOptions: ISelectOption[] = React.useMemo(() => {
@@ -83,10 +89,19 @@ function AxesPropsPopover({
   }, [selectFormOptions]);
 
   const selected = React.useMemo(() => {
-    return alignmentConfig?.type === AlignmentOptionsEnum.CUSTOM_METRIC
-      ? alignmentConfig.metric
-      : alignmentConfig.type;
-  }, [alignmentConfig]);
+    const filtered = alignmentConfigs.filter((alignment, index) =>
+      selectedIds.includes(index),
+    );
+    if (filtered.length === 0) {
+      return null;
+    }
+    return filtered.every(
+      (alignmentConfig) =>
+        alignmentConfig?.type === AlignmentOptionsEnum.CUSTOM_METRIC,
+    )
+      ? filtered[0].metric
+      : filtered[0].type;
+  }, [alignmentConfigs, selectedIds]);
 
   const axesProps = React.useMemo(
     () => ({
@@ -127,8 +142,10 @@ function AxesPropsPopover({
           [key]: metadata.isValid,
         });
         if (metadata.isValid) {
-          onAxesScaleRangeChange({
-            [axisType]: { ...scaleRange, [key]: value },
+          selectedIds.forEach((selectedId) => {
+            onAxesScaleRangeChange(selectedId, {
+              [axisType]: { ...scaleRange, [key]: value },
+            });
           });
         }
       }
@@ -138,11 +155,13 @@ function AxesPropsPopover({
 
   const onResetRange = React.useCallback(
     (axisType: 'xAxis' | 'yAxis') => {
-      onAxesScaleRangeChange({
-        [axisType]: { min: undefined, max: undefined },
+      selectedIds.forEach((selectedId) => {
+        onAxesScaleRangeChange(selectedId, {
+          [axisType]: { min: undefined, max: undefined },
+        });
       });
     },
-    [onAxesScaleRangeChange],
+    [onAxesScaleRangeChange, selectedIds],
   );
 
   const validationPatterns = React.useMemo(
@@ -166,17 +185,34 @@ function AxesPropsPopover({
   );
 
   React.useEffect(() => {
-    setXScaleRange((prevState) =>
-      _.isEqual(axesScaleRange.xAxis, prevState)
-        ? prevState
-        : axesScaleRange.xAxis,
-    );
-    setYScaleRange((prevState) =>
-      _.isEqual(axesScaleRange.yAxis, prevState)
-        ? prevState
-        : axesScaleRange.yAxis,
-    );
-  }, [axesScaleRange]);
+    selectedIds.forEach((selectedId) => {
+      setXScaleRange((prevState) => {
+        if (axesScaleRanges[selectedId] !== undefined) {
+          return _.isEqual(axesScaleRanges[selectedId].xAxis, prevState)
+            ? prevState
+            : axesScaleRanges[selectedId].xAxis;
+        } else {
+          return prevState;
+        }
+      });
+      setYScaleRange((prevState) => {
+        if (axesScaleRanges[selectedId] !== undefined) {
+          return _.isEqual(axesScaleRanges[selectedId].yAxis, prevState)
+            ? prevState
+            : axesScaleRanges[selectedId].yAxis;
+        } else {
+          return prevState;
+        }
+      });
+    });
+  }, [selectedIds, axesScaleRanges]);
+
+  React.useEffect(() => {
+    if (selectedIds.length > 1) {
+      onResetRange('xAxis');
+      onResetRange('yAxis');
+    }
+  }, [selectedIds]);
 
   const xResetBtnDisabled = React.useMemo(
     () => xScaleRange.min === undefined && xScaleRange.max === undefined,
@@ -186,6 +222,7 @@ function AxesPropsPopover({
     () => yScaleRange.min === undefined && yScaleRange.max === undefined,
     [yScaleRange],
   );
+  const isDisabled = selectedIds.length === 0;
   return (
     <ErrorBoundary>
       <div className='AxesPropsPopover'>
@@ -195,11 +232,12 @@ function AxesPropsPopover({
           </Text>
           <SelectDropdown
             selectOptions={alignmentOptions}
-            selected={selected}
             handleSelect={handleAlignmentChange}
             ListboxProps={{
               style: { height: DROPDOWN_LIST_HEIGHT, padding: 0 },
             }}
+            disabled={isDisabled}
+            selected={selected}
           />
         </div>
         <Divider className='AxesPropsPopover__divider' />
@@ -227,6 +265,7 @@ function AxesPropsPopover({
               onChange={onScaleRangeChange}
               validationPatterns={validationPatterns.min(xScaleRange.max)}
               isValid={isXScaleRangeValid.min}
+              disabled={isDisabled}
             />
             <InputWrapper
               id='xAxis-max'
@@ -244,6 +283,7 @@ function AxesPropsPopover({
               onChange={onScaleRangeChange}
               validationPatterns={validationPatterns.max(xScaleRange.min)}
               isValid={isXScaleRangeValid.max}
+              disabled={isDisabled}
             />
             <Button
               disabled={xResetBtnDisabled}
@@ -274,6 +314,7 @@ function AxesPropsPopover({
               onChange={onScaleRangeChange}
               validationPatterns={validationPatterns.min(yScaleRange.max)}
               isValid={isYScaleRangeValid.min}
+              disabled={isDisabled}
             />
             <InputWrapper
               id='yAxis-max'
@@ -291,6 +332,7 @@ function AxesPropsPopover({
               onChange={onScaleRangeChange}
               validationPatterns={validationPatterns.max(yScaleRange.min)}
               isValid={isYScaleRangeValid.max}
+              disabled={isDisabled}
             />
             <Button
               disabled={yResetBtnDisabled}

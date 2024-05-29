@@ -205,7 +205,7 @@ const ChartPanel = React.forwardRef(function ChartPanel(
                         tooltipContent={props?.tooltip?.content || {}}
                         tooltipAppearance={props?.tooltip?.appearance}
                         focusedState={props.focusedState}
-                        alignmentConfig={props.alignmentConfig}
+                        alignmentConfig={props.alignmentConfigs![0]}
                         selectOptions={props.selectOptions}
                         onChangeTooltip={props.onChangeTooltip}
                       />
