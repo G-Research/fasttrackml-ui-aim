@@ -2,13 +2,17 @@ import { IMetricProps } from 'types/pages/metrics/Metrics';
 import { IAlignmentConfig } from 'types/services/models/metrics/metricsAppModel';
 import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
-export interface IAxesPropsPopoverProps {
+export interface IBaseAxesPopoverProps {
   onAlignmentMetricChange: IMetricProps['onAlignmentMetricChange'];
   onAlignmentTypeChange: IMetricProps['onAlignmentTypeChange'];
-  alignmentConfig: IAlignmentConfig;
+  alignmentConfigs: IAlignmentConfig[];
   selectFormOptions: ISelectOption[];
-  axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   onAxesScaleRangeChange: IMetricProps['onAxesScaleRangeChange'];
+}
+
+export interface IAxesPropsPopoverProps extends IBaseAxesPopoverProps {
+  selectedIds: number[];
 }
 
 export interface IAxesScaleRange {
