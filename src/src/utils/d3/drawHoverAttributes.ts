@@ -16,6 +16,7 @@ import { IFocusedState } from 'types/services/models/metrics/metricsAppModel';
 
 import { AggregationAreaMethods } from 'utils/aggregateGroupData';
 import getRoundedValue from 'utils/roundValue';
+import { roundToSignificantDigits } from 'utils/roundToSignificantDigits';
 
 import { formatValueByAlignment } from '../formatByAlignment';
 
@@ -183,12 +184,13 @@ function drawHoverAttributes(args: IDrawHoverAttributesArgs): void {
         }
 
         const x = attrRef.current.xScale(xValue);
+        // prettier-ignore
         const left =
           x - xAxisValueWidth / 2 < 0
             ? axisLeftEdge + xAxisValueWidth / 2
             : x + axisLeftEdge + xAxisValueWidth / 2 > axisRightEdge
-            ? axisRightEdge - xAxisValueWidth / 2
-            : x + axisLeftEdge;
+              ? axisRightEdge - xAxisValueWidth / 2
+              : x + axisLeftEdge;
         const top = height - margin.bottom + 1;
 
         if (xAxisLabelNodeRef.current && xAxisValueWidth) {
@@ -235,34 +237,36 @@ function drawHoverAttributes(args: IDrawHoverAttributesArgs): void {
         const yAxisValueHeight =
           yAxisLabelNodeRef.current?.node()?.offsetHeight || 0;
         const y = attrRef.current.yScale(yValue);
+        // prettier-ignore
         const top =
           y - yAxisValueHeight / 2 < 0
             ? axisTopEdge + yAxisValueHeight / 2
             : y + axisTopEdge + yAxisValueHeight / 2 > axisBottomEdge
-            ? axisBottomEdge - yAxisValueHeight / 2
-            : y + axisTopEdge;
+              ? axisBottomEdge - yAxisValueHeight / 2
+              : y + axisTopEdge;
 
         const right = width - margin.left;
         const maxWidth = margin.left - 5;
+        const yValueRounded = roundToSignificantDigits(Number(yValue));
 
         if (yAxisLabelNodeRef.current && yAxisValueHeight) {
           // update y-axis label
           yAxisLabelNodeRef.current
-            .attr('title', yValue)
+            .attr('title', yValueRounded)
             .style('top', `${top}px`)
             .style('right', `${right}px`)
             .style('max-width', `${maxWidth}px`)
-            .text(yValue);
+            .text(yValueRounded);
         } else {
           // create y-axis label
           yAxisLabelNodeRef.current = visArea
             .append('div')
             .attr('class', 'ChartMouseValue ChartMouseValueYAxis')
-            .attr('title', yValue)
+            .attr('title', yValueRounded)
             .style('top', `${top}px`)
             .style('right', `${right}px`)
             .style('max-width', `${maxWidth}px`)
-            .text(yValue);
+            .text(yValueRounded);
         }
       }
     }
