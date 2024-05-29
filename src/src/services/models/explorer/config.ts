@@ -111,6 +111,12 @@ function initializeAppModel(appConfig: IAppInitialConfig): InitialAppModelType {
                 yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
                 xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
               },
+              axesScaleRanges: [
+                {
+                  yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
+                  xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
+                },
+              ],
               smoothing: {
                 algorithm: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.algorithm,
                 factor: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.factor,
@@ -118,10 +124,13 @@ function initializeAppModel(appConfig: IAppInitialConfig): InitialAppModelType {
                   CONTROLS_DEFAULT_CONFIG.metrics.smoothing.curveInterpolation,
                 isApplied: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.isApplied,
               },
-              alignmentConfig: {
-                metric: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
-                type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
-              },
+              alignmentConfigs: [
+                {
+                  metric:
+                    CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
+                  type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
+                },
+              ],
               densityType: CONTROLS_DEFAULT_CONFIG.metrics.densityType,
               aggregationConfig: {
                 methods: {

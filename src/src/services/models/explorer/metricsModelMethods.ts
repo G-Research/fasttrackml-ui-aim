@@ -5,6 +5,7 @@ import _ from 'lodash-es';
 import { IAxesScaleRange } from 'components/AxesPropsPopover';
 
 import COLORS from 'config/colors/colors';
+import { CONTROLS_DEFAULT_CONFIG } from 'config/controls/controlsDefaultConfig';
 import DASH_ARRAYS from 'config/dash-arrays/dashArrays';
 import { ResizeModeEnum } from 'config/enums/tableEnums';
 import {
@@ -990,6 +991,27 @@ function getMetricsAppModelMethods(
       groupingSelectOptions,
     );
 
+    const chartData = getDataAsLines(data);
+
+    const newAxesScaleRanges = chartData.map((chartDataItem, index) => ({
+      yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
+      xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
+    }));
+
+    const newAlignmentConfigs = chartData.map((chartDataItem, index) => ({
+      metric: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
+      type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
+    }));
+
+    configData = {
+      ...configData,
+      chart: {
+        ...configData.chart,
+        axesScaleRanges: newAxesScaleRanges,
+        alignmentConfigs: newAlignmentConfigs,
+      },
+    };
+
     const tableColumns = getMetricsTableColumns(
       params,
       groupingSelectOptions,
@@ -1017,7 +1039,7 @@ function getMetricsAppModelMethods(
       selectFormData: {
         ...modelState?.selectFormData,
       },
-      lineChartData: getDataAsLines(data),
+      lineChartData: chartData,
       chartTitleData: getChartTitleData<IMetric, Partial<IMetricAppModelState>>(
         {
           processedData: data,
@@ -1795,8 +1817,14 @@ function getMetricsAppModelMethods(
           setModelData,
         });
       },
-      onAlignmentTypeChange(type: AlignmentOptionsEnum): void {
-        onAlignmentTypeChange({ type, model, appName, updateModelData });
+      onAlignmentTypeChange(chartId: number, type: AlignmentOptionsEnum): void {
+        onAlignmentTypeChange({
+          chartId,
+          type,
+          model,
+          appName,
+          updateModelData,
+        });
       },
       onChangeTooltip(tooltip: Partial<ITooltip>): void {
         onChangeTooltip({
@@ -1810,8 +1838,11 @@ function getMetricsAppModelMethods(
           appName,
         });
       },
-      onAxesScaleRangeChange(range: Partial<IAxesScaleRange>): void {
-        onAxesScaleRangeChange({ range, model, appName });
+      onAxesScaleRangeChange(
+        chartId: number,
+        range: Partial<IAxesScaleRange>,
+      ): void {
+        onAxesScaleRangeChange({ chartId, range, model, appName });
       },
       onDensityTypeChange(type: DensityOptions): Promise<void> {
         return onDensityTypeChange({ type, model, appName, getMetricsData });

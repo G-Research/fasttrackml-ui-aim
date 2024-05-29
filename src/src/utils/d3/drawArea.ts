@@ -2,9 +2,9 @@ import * as d3 from 'd3';
 
 import { IDrawAreaArgs } from 'types/utils/d3/drawArea';
 
-import { formatSystemMetricName } from 'utils/formatSystemMetricName';
-import { isSystemMetric } from 'utils/isSystemMetric';
 import { toTextEllipsis } from 'utils/helper';
+
+import { chartTitleToText } from './utils';
 
 import { CircleEnum } from './index';
 
@@ -111,14 +111,7 @@ function drawArea(args: IDrawAreaArgs): void {
     .attr('width', offsetWidth + 2 * CircleEnum.Radius)
     .attr('height', offsetHeight + 2 * CircleEnum.Radius);
 
-  const titleText = Object.entries(chartTitle || {})
-    .map(
-      ([key, value]) =>
-        `${key}=${
-          isSystemMetric(value) ? formatSystemMetricName(value) : value
-        }`,
-    )
-    .join(', ');
+  const titleText = chartTitleToText(chartTitle);
 
   const title = {
     x: margin.left / 6,

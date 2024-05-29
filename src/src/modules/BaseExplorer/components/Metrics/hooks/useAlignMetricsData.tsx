@@ -24,7 +24,6 @@ function useAlignMetricsData(
   const config: IAxesPropsConfig = engine.useStore(
     vizEngine.controls.axesProperties.stateSelector,
   );
-
   const alignedData = React.useMemo(() => {
     const items = [];
     for (let item of data) {
