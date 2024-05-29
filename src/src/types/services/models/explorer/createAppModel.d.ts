@@ -164,10 +164,11 @@ export interface ILineChartConfig {
   zoom: IChartZoom;
   axesScaleType: IAxesScaleState;
   axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   smoothing: ISmoothing;
   aggregationConfig: IAggregationConfig;
   densityType: DensityOptions;
-  alignmentConfig: IAlignmentConfig;
+  alignmentConfigs: IAlignmentConfig[];
   focusedState: IFocusedState;
   tooltip: ITooltipConfig;
   legends: LegendsConfig;

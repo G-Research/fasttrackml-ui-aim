@@ -33,6 +33,12 @@ export const CONTROLS_DEFAULT_CONFIG = {
       yAxis: { min: undefined, max: undefined },
       xAxis: { min: undefined, max: undefined },
     },
+    axesScaleRanges: [
+      {
+        yAxis: { min: undefined, max: undefined },
+        xAxis: { min: undefined, max: undefined },
+      },
+    ],
     alignmentConfig: {
       type: AlignmentOptionsEnum.STEP,
       metric: '',

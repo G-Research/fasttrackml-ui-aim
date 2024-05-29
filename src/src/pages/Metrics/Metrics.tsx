@@ -48,23 +48,25 @@ function Metrics(
   const [isProgressBarVisible, setIsProgressBarVisible] =
     React.useState<boolean>(false);
   const chartProps = React.useMemo(() => {
-    return (props.lineChartData || []).map((chartData: ILine[]) => ({
-      axesScaleType: props.axesScaleType,
-      axesScaleRange: props.axesScaleRange,
-      curveInterpolation: props.smoothing.isApplied
-        ? props.smoothing.curveInterpolation
-        : CurveEnum.Linear,
-      ignoreOutliers: props.ignoreOutliers,
-      highlightMode: props.highlightMode,
-      aggregatedData: props.aggregatedData?.filter(
-        (data) => data.chartIndex === chartData[0]?.chartIndex,
-      ),
-      zoom: props.zoom,
-      chartTitle: props.chartTitleData[chartData[0]?.chartIndex!],
-      aggregationConfig: props.aggregationConfig,
-      alignmentConfig: props.alignmentConfig,
-      onZoomChange: props.onZoomChange,
-    }));
+    return (props.lineChartData || []).map(
+      (chartData: ILine[], index: number) => ({
+        axesScaleType: props.axesScaleType,
+        axesScaleRange: props.axesScaleRanges[index],
+        curveInterpolation: props.smoothing.isApplied
+          ? props.smoothing.curveInterpolation
+          : CurveEnum.Linear,
+        ignoreOutliers: props.ignoreOutliers,
+        highlightMode: props.highlightMode,
+        aggregatedData: props.aggregatedData?.filter(
+          (data) => data.chartIndex === chartData[0]?.chartIndex,
+        ),
+        zoom: props.zoom,
+        chartTitle: props.chartTitleData[chartData[0]?.chartIndex!],
+        aggregationConfig: props.aggregationConfig,
+        alignmentConfig: props.alignmentConfigs[index],
+        onZoomChange: props.onZoomChange,
+      }),
+    );
   }, [
     props.lineChartData,
     props.axesScaleType,
@@ -76,9 +78,9 @@ function Metrics(
     props.chartTitleData,
     props.aggregatedData,
     props.aggregationConfig,
-    props.alignmentConfig,
+    props.alignmentConfigs,
     props.onZoomChange,
-    props.axesScaleRange,
+    props.axesScaleRanges,
   ]);
 
   const metricsSelectChange = (selectedMetrics: ISelectOption[]): void => {
@@ -182,7 +184,7 @@ function Metrics(
                         focusedState={props.focusedState}
                         tooltip={props.tooltip}
                         legends={props.legends}
-                        alignmentConfig={props.alignmentConfig}
+                        alignmentConfigs={props.alignmentConfigs}
                         zoom={props.zoom}
                         chartProps={chartProps}
                         resizeMode={props.resizeMode}
@@ -206,8 +208,8 @@ function Metrics(
                             highlightMode={props.highlightMode}
                             aggregationConfig={props.aggregationConfig}
                             axesScaleType={props.axesScaleType}
-                            axesScaleRange={props.axesScaleRange}
-                            alignmentConfig={props.alignmentConfig}
+                            axesScaleRanges={props.axesScaleRanges}
+                            alignmentConfigs={props.alignmentConfigs}
                             onChangeTooltip={props.onChangeTooltip}
                             onIgnoreOutliersChange={
                               props.onIgnoreOutliersChange

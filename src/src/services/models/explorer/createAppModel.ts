@@ -313,6 +313,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
                 yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
                 xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
               },
+              axesScaleRanges: [
+                {
+                  yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
+                  xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
+                },
+              ],
               smoothing: {
                 algorithm: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.algorithm,
                 factor: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.factor,
@@ -320,10 +326,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
                   CONTROLS_DEFAULT_CONFIG.metrics.smoothing.curveInterpolation,
                 isApplied: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.isApplied,
               },
-              alignmentConfig: {
-                metric: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
-                type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
-              },
+              alignmentConfigs: [
+                {
+                  metric:
+                    CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
+                  type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
+                },
+              ],
               densityType: CONTROLS_DEFAULT_CONFIG.metrics.densityType,
               aggregationConfig: {
                 methods: {
@@ -765,8 +774,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
           if (metricsCollection.config !== null) {
             const groupConfigData: { [key: string]: unknown } = {};
             for (let key in metricsCollection.config) {
-              groupConfigData[getValueByField(groupingSelectOptions, key)] =
-                metricsCollection.config[key];
+              groupConfigData[
+                getValueByField(groupingSelectOptions, key) || key
+              ] = metricsCollection.config[key];
             }
             const groupHeaderRow = {
               meta: {
@@ -1351,6 +1361,27 @@ function createAppModel(appConfig: IAppInitialConfig) {
         };
       }
 
+      const chartData = getDataAsLines(data);
+
+      const newAxesScaleRanges = chartData.map((chartDataItem, index) => ({
+        yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
+        xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
+      }));
+
+      const newAlignmentConfigs = chartData.map((chartDataItem, index) => ({
+        metric: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
+        type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
+      }));
+
+      configData = {
+        ...configData,
+        chart: {
+          ...configData.chart,
+          axesScaleRanges: newAxesScaleRanges,
+          alignmentConfigs: newAlignmentConfigs,
+        },
+      };
+
       const tableColumns = getMetricsTableColumns(
         params,
         groupingSelectOptions,
@@ -1378,7 +1409,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         selectFormData: {
           ...modelState?.selectFormData,
         },
-        lineChartData: getDataAsLines(data),
+        lineChartData: chartData,
         chartTitleData: getChartTitleData<
           IMetric,
           Partial<IMetricAppModelState>
@@ -2163,8 +2194,17 @@ function createAppModel(appConfig: IAppInitialConfig) {
             setModelData,
           });
         },
-        onAlignmentTypeChange(type: AlignmentOptionsEnum): void {
-          onAlignmentTypeChange({ type, model, appName, updateModelData });
+        onAlignmentTypeChange(
+          chartId: number,
+          type: AlignmentOptionsEnum,
+        ): void {
+          onAlignmentTypeChange({
+            chartId,
+            type,
+            model,
+            appName,
+            updateModelData,
+          });
         },
         onChangeTooltip(tooltip: Partial<ITooltip>): void {
           onChangeTooltip({
@@ -2178,8 +2218,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
             appName,
           });
         },
-        onAxesScaleRangeChange(range: Partial<IAxesScaleRange>): void {
-          onAxesScaleRangeChange({ range, model, appName });
+        onAxesScaleRangeChange(
+          chartId: number,
+          range: Partial<IAxesScaleRange>,
+        ): void {
+          onAxesScaleRangeChange({ chartId, range, model, appName });
         },
         onDensityTypeChange(type: DensityOptions): Promise<void> {
           return onDensityTypeChange({ type, model, appName, getMetricsData });
