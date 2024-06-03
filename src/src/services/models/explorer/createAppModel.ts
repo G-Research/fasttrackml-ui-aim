@@ -1079,7 +1079,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
               x_axis_iters,
             } = filterMetricsData(
               trace,
-              configData?.chart?.alignmentConfig.type,
+              configData?.chart?.alignmentConfigs[0].type,
               configData?.chart?.axesScaleType,
             );
 
@@ -1435,7 +1435,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
     function alignData(
       data: IMetricsCollection<IMetric>[],
       type: AlignmentOptionsEnum = model.getState()!.config!.chart
-        ?.alignmentConfig.type,
+        ?.alignmentConfigs[0].type,
+      chartId: number = 0,
     ): IMetricsCollection<IMetric>[] {
       const alignmentObj: { [key: string]: Function } = {
         [AlignmentOptionsEnum.STEP]: alignByStep,
@@ -1447,7 +1448,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
           throw new Error('Unknown value for X axis alignment');
         },
       };
-      const alignment = alignmentObj[type] || alignmentObj.default;
+      const alignmentConfig =
+        model.getState()!.config!.chart?.alignmentConfigs[chartId];
+      const alignment =
+        alignmentObj[alignmentConfig.type] || alignmentObj.default;
+
       return alignment(data, model);
     }
 
