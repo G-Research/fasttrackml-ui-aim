@@ -1,10 +1,19 @@
 import { RequestOptions } from 'https';
 import create from 'zustand';
 
+import { getPrefix } from 'config/config';
+
+import { ErrorCode } from 'services/NetworkService';
+
 export interface IResourceState<T> {
   data: T | null;
   loading: boolean;
   error: any;
+}
+
+interface CreateResourceError {
+  error_code: string;
+  message: string;
 }
 
 const defaultState = {
@@ -18,8 +27,15 @@ function createResource<T, GetterArgs = RequestOptions | any>(getter: any) {
 
   async function fetchData(args?: GetterArgs) {
     state.setState({ loading: true });
-    const data = await getter(args);
-    state.setState({ data, loading: false });
+    try {
+      const data = await getter(args);
+      state.setState({ data, loading: false });
+    } catch (error: CreateResourceError | any) {
+      if (error?.error_code === ErrorCode.RESOURCE_DOES_NOT_EXIST) {
+        window.location.href = getPrefix();
+      }
+      state.setState({ error, loading: false });
+    }
   }
   function destroy() {
     state.destroy();

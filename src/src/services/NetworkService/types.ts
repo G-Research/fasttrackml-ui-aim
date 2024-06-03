@@ -18,6 +18,11 @@ export enum HttpErrorMessages {
   INVALID_RESPONSE_DATA = 'Invalid Response Data',
   SERVER_IS_UNAVAILABLE = 'The server is unavailable.',
   RESPONSE_PARSING_ERROR = 'Unable to parse response.',
+  RESOURCE_DOES_NOT_EXIST = 'Resource does not exist.',
+}
+
+export enum ErrorCode {
+  RESOURCE_DOES_NOT_EXIST = 'RESOURCE_DOES_NOT_EXIST',
 }
 
 export type RequestOptions = {
