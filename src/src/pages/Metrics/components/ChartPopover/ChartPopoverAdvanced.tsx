@@ -11,6 +11,8 @@ import { Button, Box } from '@material-ui/core';
 import { Icon, Text } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary';
 
+import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
+
 import {
   IGroupingCondition,
   IGroupingSelectOption,
@@ -41,7 +43,7 @@ function ChartPopoverAdvanced({
   );
   const [selectedValue, setSelectedValue] = useState<string>('');
   const [conditions, setConditions] = useState<IGroupingCondition[]>(
-    groupingData?.conditions || [],
+    groupingData?.conditions?.chart || [],
   );
 
   const onAddCondition = () => {
@@ -60,7 +62,7 @@ function ChartPopoverAdvanced({
             index === conditionIndex ? condition : c,
           );
     setConditions(newConditions);
-    onGroupingConditionsChange?.(newConditions);
+    onGroupingConditionsChange?.(newConditions, GroupNameEnum.CHART);
   };
 
   const onChangeField = (e: any, value: IGroupingSelectOption | null): void => {
@@ -226,7 +228,10 @@ function ChartPopoverAdvanced({
                     newConditions.splice(index, 1);
                     setConditions(newConditions);
                     if (onGroupingConditionsChange) {
-                      onGroupingConditionsChange(newConditions);
+                      onGroupingConditionsChange(
+                        newConditions,
+                        GroupNameEnum.CHART,
+                      );
                     }
                   }}
                   variant='text'

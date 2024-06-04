@@ -1,3 +1,5 @@
+import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
+
 import * as analytics from 'services/analytics';
 
 import { IModel, State } from 'types/services/models/model';
@@ -8,11 +10,13 @@ import resetChartZoom from './resetChartZoom';
 
 export default function onGroupingConditionsChange<M extends State>({
   conditions,
+  groupName,
   model,
   appName,
   updateModelData,
 }: {
   conditions: IGroupingCondition[];
+  groupName: GroupNameEnum;
   model: IModel<M>;
   appName: string;
   updateModelData: (
@@ -23,7 +27,10 @@ export default function onGroupingConditionsChange<M extends State>({
   let configData = model.getState()?.config;
 
   if (configData?.grouping) {
-    configData.grouping = { ...configData.grouping, conditions };
+    configData.grouping.conditions = {
+      ...configData.grouping.conditions,
+      [groupName]: conditions,
+    };
     configData = resetChartZoom({ configData, appName });
     updateModelData(configData, true);
   }

@@ -275,6 +275,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
               stroke: 10,
             },
             paletteIndex: 0,
+            conditions: {
+              color: [],
+              stroke: [],
+              chart: [],
+            },
           };
         }
         if (components?.table) {
@@ -2090,9 +2095,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
             setAggregationEnabled,
           });
         },
-        onGroupingConditionsChange(conditions: IGroupingCondition[]): void {
+        onGroupingConditionsChange(
+          conditions: IGroupingCondition[],
+          groupName: GroupNameEnum,
+        ): void {
           onGroupingConditionsChange({
             conditions,
+            groupName,
             model,
             appName,
             updateModelData,
