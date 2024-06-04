@@ -74,7 +74,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   zoom: IChartZoom;
   densityType: DensityOptions;
   axesScaleType: IAxesScaleState;
-  axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   smoothing: ISmoothing;
   focusedState: IFocusedState;
   highlightMode: HighlightEnum;
@@ -82,7 +82,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   notifyData: IMetricAppModelState['notifyData'];
   tooltip: ITooltip;
   aggregationConfig: IAggregationConfig;
-  alignmentConfig: IAlignmentConfig;
+  alignmentConfigs: IAlignmentConfig[];
   selectedMetricsData: ISelectConfig;
   tableRowHeight: RowHeightSize;
   selectedRows: { [key: string]: any };
@@ -118,7 +118,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onTableRowHover: (rowKey?: string) => void;
   onTableRowClick: (rowKey?: string) => void;
   onAxesScaleTypeChange: (params: IAxesScaleState) => void;
-  onAxesScaleRangeChange: (range: Partial<IAxesScaleRange>) => void;
+  onAxesScaleRangeChange: (chartId: number, range: Partial<IAxesScaleRange>) => void;
   onAggregationConfigChange: (
     aggregationConfig: Partial<IAggregationConfig>,
   ) => void;
@@ -138,7 +138,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onNotificationDelete: (id: number) => void;
   onResetConfigData: () => void;
   onAlignmentMetricChange: (metric: string) => void;
-  onAlignmentTypeChange: (type: XAlignmentEnum) => void;
+  onAlignmentTypeChange: (chartId: number, type: XAlignmentEnum) => void;
   onDensityTypeChange: (type: DensityOptions) => void;
   onMetricsSelectChange: (options: ISelectOption[]) => void;
   onSelectExperimentsChange: (experiment: IExperimentDataShort) => void;
