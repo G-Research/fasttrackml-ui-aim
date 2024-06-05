@@ -1090,15 +1090,30 @@ function getMetricsAppModelMethods(
     const grouping = configData!.grouping;
     const { paletteIndex = 0 } = grouping || {};
 
-    const conditions: IGroupingCondition[] = grouping.conditions || [];
-    const conditionStrings = conditions.map(
+    const chartConditions: IGroupingCondition[] =
+      grouping.conditions?.chart || [];
+    const chartConditionStrings = chartConditions.map(
       (condition) =>
         `${condition.fieldName} ${condition.operator} ${condition.value}`,
     );
+
+    const strokeConditions: IGroupingCondition[] =
+      grouping.conditions?.stroke || [];
+    const strokeConditionStrings = strokeConditions.map(
+      (condition) =>
+        `${condition.fieldName} ${condition.operator} ${condition.value}`,
+    );
+
+    const allConditions = chartConditions.concat(strokeConditions);
+    const allConditionStrings = allConditions.map(
+      (condition) =>
+        `${condition.fieldName} ${condition.operator} ${condition.value}`,
+    );
+
     const groupByColor = getFilteredGroupingOptions({
       groupName: GroupNameEnum.COLOR,
       model,
-    });
+    }).concat(strokeConditionStrings);
     const groupByStroke = getFilteredGroupingOptions({
       groupName: GroupNameEnum.STROKE,
       model,
@@ -1107,7 +1122,7 @@ function getMetricsAppModelMethods(
     const groupByChart = getFilteredGroupingOptions({
       groupName: GroupNameEnum.CHART,
       model,
-    }).concat(conditionStrings);
+    }).concat(chartConditionStrings);
     if (
       groupByColor.length === 0 &&
       groupByStroke.length === 0 &&
@@ -1139,9 +1154,9 @@ function getMetricsAppModelMethods(
       });
 
       // Evaluate the conditions and update the row
-      conditionStrings.forEach((conditionString, j) => {
+      allConditionStrings.forEach((conditionString, j) => {
         // Evaluate the condition
-        const condition = conditions[j];
+        const condition = allConditions[j];
 
         // Get everything after the first dot in the field name
         const fieldTypeAndName = condition.fieldName.split('.');
@@ -1748,9 +1763,13 @@ function getMetricsAppModelMethods(
           setAggregationEnabled,
         });
       },
-      onGroupingConditionsChange(conditions: IGroupingCondition[]): void {
+      onGroupingConditionsChange(
+        conditions: IGroupingCondition[],
+        groupName: GroupNameEnum,
+      ): void {
         onGroupingConditionsChange({
           conditions,
+          groupName,
           model,
           appName,
           updateModelData,

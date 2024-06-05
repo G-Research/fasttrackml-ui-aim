@@ -1,5 +1,8 @@
 import { MetricsValueKeyEnum, ResizeModeEnum } from 'config/enums/tableEnums';
-import { RowHeightSize, UnselectedColumnState } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { DensityOptions } from 'config/enums/densityEnum';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
@@ -91,7 +94,11 @@ export interface IGroupingConfig {
     stroke: number;
   };
   paletteIndex?: number;
-  conditions?: IGroupingCondition[];
+  conditions?: {
+    color: IGroupingCondition[];
+    stroke: IGroupingCondition[];
+    chart: IGroupingCondition[];
+  };
 }
 
 export interface ISelectOption {

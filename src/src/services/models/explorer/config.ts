@@ -73,6 +73,11 @@ function initializeAppModel(appConfig: IAppInitialConfig): InitialAppModelType {
               stroke: 10,
             },
             paletteIndex: 0,
+            conditions: {
+              color: [],
+              stroke: [],
+              chart: [],
+            },
           };
         }
         if (components?.table) {
