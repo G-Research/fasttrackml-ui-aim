@@ -275,6 +275,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
               stroke: 10,
             },
             paletteIndex: 0,
+            conditions: {
+              color: [],
+              stroke: [],
+              chart: [],
+            },
           };
         }
         if (components?.table) {
@@ -1461,11 +1466,26 @@ function createAppModel(appConfig: IAppInitialConfig) {
       const grouping = configData!.grouping;
       const { paletteIndex = 0 } = grouping || {};
 
-      const conditions: IGroupingCondition[] = grouping.conditions || [];
-      const conditionStrings = conditions.map(
+      const chartConditions: IGroupingCondition[] =
+        grouping.conditions?.chart || [];
+      const chartConditionStrings = chartConditions.map(
         (condition) =>
           `${condition.fieldName} ${condition.operator} ${condition.value}`,
       );
+
+      const strokeConditions: IGroupingCondition[] =
+        grouping.conditions?.stroke || [];
+      const strokeConditionStrings = strokeConditions.map(
+        (condition) =>
+          `${condition.fieldName} ${condition.operator} ${condition.value}`,
+      );
+
+      const allConditions = chartConditions.concat(strokeConditions);
+      const allConditionStrings = allConditions.map(
+        (condition) =>
+          `${condition.fieldName} ${condition.operator} ${condition.value}`,
+      );
+
       const groupByColor = getFilteredGroupingOptions({
         groupName: GroupNameEnum.COLOR,
         model,
@@ -1473,12 +1493,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
       const groupByStroke = getFilteredGroupingOptions({
         groupName: GroupNameEnum.STROKE,
         model,
-      });
-
+      }).concat(strokeConditionStrings);
       const groupByChart = getFilteredGroupingOptions({
         groupName: GroupNameEnum.CHART,
         model,
-      }).concat(conditionStrings);
+      }).concat(chartConditionStrings);
 
       if (
         groupByColor.length === 0 &&
@@ -1511,9 +1530,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
         });
 
         // Evaluate the conditions and update the row
-        conditionStrings.forEach((conditionString, j) => {
+        allConditionStrings.forEach((conditionString, j) => {
           // Evaluate the condition
-          const condition = conditions[j];
+          const condition = allConditions[j];
 
           // Get everything after the first dot in the field name
           const fieldTypeAndName = condition.fieldName.split('.');
@@ -2125,9 +2144,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
             setAggregationEnabled,
           });
         },
-        onGroupingConditionsChange(conditions: IGroupingCondition[]): void {
+        onGroupingConditionsChange(
+          conditions: IGroupingCondition[],
+          groupName: GroupNameEnum,
+        ): void {
           onGroupingConditionsChange({
             conditions,
+            groupName,
             model,
             appName,
             updateModelData,
