@@ -31,7 +31,7 @@ export default function getChartTitleData<D, M extends State>({
   let chartTitleData: IChartTitleData = {};
 
   // Get the list of conditions as strings
-  const conditions: IGroupingCondition[] = groupData.conditions?.map(
+  const conditions: IGroupingCondition[] = groupData.conditions?.chart?.map(
     (condition: IGroupingCondition) =>
       `${condition.fieldName} ${condition.operator} ${condition.value}`,
   );
