@@ -3,6 +3,7 @@
 .StrokePopoverAdvanced {
   &__container {
     padding: 1rem;
+    border-bottom: $border-main;
     &__p {
       margin: 1rem 0;
     }
