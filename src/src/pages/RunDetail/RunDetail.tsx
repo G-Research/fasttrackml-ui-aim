@@ -58,7 +58,7 @@ const RunDetailParamsTab = React.lazy(
     import(/* webpackChunkName: "RunDetailParamsTab" */ './RunDetailParamsTab'),
 );
 const RunLogsTab = React.lazy(
-  () => import(/* webpackChunkName: "RunDetailParamsTab" */ './RunLogsTab'),
+  () => import(/* webpackChunkName: "RunLogsTab" */ './RunLogsTab'),
 );
 const RunDetailSettingsTab = React.lazy(
   () =>
