@@ -67,7 +67,16 @@ export const getSuggestionsByExplorer = (
   explorerName: AppNameEnum,
   data: Record<any, any>,
 ): Record<any, any> => {
-  const defaultSuggestions = {
+  const metricNames = data?.metric ? Object.keys(data.metric) : [];
+
+  const metricDict: Record<string, any> = metricNames.reduce(
+    (acc: Record<string, any>, metricName: string) => {
+      acc[metricName] = { last: 0 };
+      return acc;
+    },
+    {},
+  );
+  const defaultSuggestions: Record<string, any> = {
     run: {
       active: false,
       hash: '',
@@ -78,6 +87,7 @@ export const getSuggestionsByExplorer = (
       created_at: 0,
       finalized_at: 0,
       duration: 0,
+      metrics: metricDict,
       ...(data?.params || {}),
     },
   };
