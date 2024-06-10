@@ -17,4 +17,8 @@ test.describe('Dashboard', () => {
     // Check if there is a textbox with the value 'runs.active == True' (do not use toHaveSelector or toHaveText)
     await page.getByRole('code', { name: 'runs.active == True' });
   });
+
+  test('failing test for testing purposes', async ({ page }) => {
+    await expect(page).toHaveTitle('FastTrackML (modern) - Failing test');
+  });
 });
