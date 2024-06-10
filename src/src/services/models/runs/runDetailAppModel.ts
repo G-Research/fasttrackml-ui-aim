@@ -64,6 +64,7 @@ function getExperimentsData() {
 }
 
 function getRunInfo(runHash: string): IApiRequest<void> {
+  const DESCRIPTION_TAG = 'mlflow.note.content';
   if (getRunsInfoRequestRef) {
     getRunsInfoRequestRef.abort();
   }
@@ -74,6 +75,10 @@ function getRunInfo(runHash: string): IApiRequest<void> {
       const data = await getRunsInfoRequestRef.call((detail: any) => {
         exceptionHandler({ detail, model });
       });
+      data.props.description =
+        DESCRIPTION_TAG in data.params.tags
+          ? data.params.tags[DESCRIPTION_TAG]
+          : '';
       model.setState({
         runParams: data.params,
         runTraces: data.traces,
@@ -333,7 +338,7 @@ function editRunNameAndDescription(
             description,
           },
         });
-        if (res.id) {
+        if (res.ID) {
           onNotificationAdd({
             id: Date.now(),
             severity: 'success',
