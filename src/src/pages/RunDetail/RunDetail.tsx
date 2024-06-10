@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash-es';
 import classNames from 'classnames';
 import moment from 'moment';
 import {
@@ -56,6 +57,9 @@ const RunDetailParamsTab = React.lazy(
   () =>
     import(/* webpackChunkName: "RunDetailParamsTab" */ './RunDetailParamsTab'),
 );
+const RunLogsTab = React.lazy(
+  () => import(/* webpackChunkName: "RunLogsTab" */ './RunLogsTab'),
+);
 const RunDetailSettingsTab = React.lazy(
   () =>
     import(
@@ -75,6 +79,7 @@ const RunOverviewTab = React.lazy(
 const tabs: Record<string, string> = {
   overview: 'Overview',
   run_parameters: 'Run Params',
+  logs: 'Logs',
   metrics: 'Metrics',
   system: 'System',
   settings: 'Settings',
@@ -124,6 +129,15 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
       <RunDetailParamsTab
         runParams={runData?.runParams}
         isRunInfoLoading={runData?.isRunInfoLoading}
+      />
+    ),
+    logs: (
+      <RunLogsTab
+        runHash={runHash}
+        runLogs={runData?.runLogs}
+        inProgress={_.isNil(runData?.runInfo?.end_time)}
+        updatedLogsCount={runData?.updatedLogsCount}
+        isRunLogsLoading={runData?.isRunLogsLoading}
       />
     ),
     metrics: (
