@@ -275,6 +275,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
               stroke: 10,
             },
             paletteIndex: 0,
+            conditions: {
+              color: [],
+              stroke: [],
+              chart: [],
+            },
           };
         }
         if (components?.table) {
@@ -313,6 +318,12 @@ function createAppModel(appConfig: IAppInitialConfig) {
                 yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
                 xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
               },
+              axesScaleRanges: [
+                {
+                  yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
+                  xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
+                },
+              ],
               smoothing: {
                 algorithm: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.algorithm,
                 factor: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.factor,
@@ -320,10 +331,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
                   CONTROLS_DEFAULT_CONFIG.metrics.smoothing.curveInterpolation,
                 isApplied: CONTROLS_DEFAULT_CONFIG.metrics.smoothing.isApplied,
               },
-              alignmentConfig: {
-                metric: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
-                type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
-              },
+              alignmentConfigs: [
+                {
+                  metric:
+                    CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
+                  type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
+                },
+              ],
               densityType: CONTROLS_DEFAULT_CONFIG.metrics.densityType,
               aggregationConfig: {
                 methods: {
@@ -765,8 +779,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
           if (metricsCollection.config !== null) {
             const groupConfigData: { [key: string]: unknown } = {};
             for (let key in metricsCollection.config) {
-              groupConfigData[getValueByField(groupingSelectOptions, key)] =
-                metricsCollection.config[key];
+              groupConfigData[
+                getValueByField(groupingSelectOptions, key) || key
+              ] = metricsCollection.config[key];
             }
             const groupHeaderRow = {
               meta: {
@@ -1069,7 +1084,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
               x_axis_iters,
             } = filterMetricsData(
               trace,
-              configData?.chart?.alignmentConfig.type,
+              configData?.chart?.alignmentConfigs[0].type,
               configData?.chart?.axesScaleType,
             );
 
@@ -1372,6 +1387,27 @@ function createAppModel(appConfig: IAppInitialConfig) {
         };
       }
 
+      const chartData = getDataAsLines(data);
+
+      const newAxesScaleRanges = chartData.map((chartDataItem, index) => ({
+        yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
+        xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
+      }));
+
+      const newAlignmentConfigs = chartData.map((chartDataItem, index) => ({
+        metric: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
+        type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
+      }));
+
+      configData = {
+        ...configData,
+        chart: {
+          ...configData.chart,
+          axesScaleRanges: newAxesScaleRanges,
+          alignmentConfigs: newAlignmentConfigs,
+        },
+      };
+
       const tableColumns = getMetricsTableColumns(
         params,
         groupingSelectOptions,
@@ -1399,7 +1435,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         selectFormData: {
           ...modelState?.selectFormData,
         },
-        lineChartData: getDataAsLines(data),
+        lineChartData: chartData,
         chartTitleData: getChartTitleData<
           IMetric,
           Partial<IMetricAppModelState>
@@ -1426,7 +1462,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
     function alignData(
       data: IMetricsCollection<IMetric>[],
       type: AlignmentOptionsEnum = model.getState()!.config!.chart
-        ?.alignmentConfig.type,
+        ?.alignmentConfigs[0].type,
+      chartId: number = 0,
     ): IMetricsCollection<IMetric>[] {
       const alignmentObj: { [key: string]: Function } = {
         [AlignmentOptionsEnum.STEP]: alignByStep,
@@ -1438,7 +1475,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
           throw new Error('Unknown value for X axis alignment');
         },
       };
-      const alignment = alignmentObj[type] || alignmentObj.default;
+      const alignmentConfig =
+        model.getState()!.config!.chart?.alignmentConfigs[chartId];
+      const alignment =
+        alignmentObj[alignmentConfig.type] || alignmentObj.default;
+
       return alignment(data, model);
     }
 
@@ -1447,11 +1488,26 @@ function createAppModel(appConfig: IAppInitialConfig) {
       const grouping = configData!.grouping;
       const { paletteIndex = 0 } = grouping || {};
 
-      const conditions: IGroupingCondition[] = grouping.conditions || [];
-      const conditionStrings = conditions.map(
+      const chartConditions: IGroupingCondition[] =
+        grouping.conditions?.chart || [];
+      const chartConditionStrings = chartConditions.map(
         (condition) =>
           `${condition.fieldName} ${condition.operator} ${condition.value}`,
       );
+
+      const strokeConditions: IGroupingCondition[] =
+        grouping.conditions?.stroke || [];
+      const strokeConditionStrings = strokeConditions.map(
+        (condition) =>
+          `${condition.fieldName} ${condition.operator} ${condition.value}`,
+      );
+
+      const allConditions = chartConditions.concat(strokeConditions);
+      const allConditionStrings = allConditions.map(
+        (condition) =>
+          `${condition.fieldName} ${condition.operator} ${condition.value}`,
+      );
+
       const groupByColor = getFilteredGroupingOptions({
         groupName: GroupNameEnum.COLOR,
         model,
@@ -1459,12 +1515,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
       const groupByStroke = getFilteredGroupingOptions({
         groupName: GroupNameEnum.STROKE,
         model,
-      });
-
+      }).concat(strokeConditionStrings);
       const groupByChart = getFilteredGroupingOptions({
         groupName: GroupNameEnum.CHART,
         model,
-      }).concat(conditionStrings);
+      }).concat(chartConditionStrings);
 
       if (
         groupByColor.length === 0 &&
@@ -1497,9 +1552,9 @@ function createAppModel(appConfig: IAppInitialConfig) {
         });
 
         // Evaluate the conditions and update the row
-        conditionStrings.forEach((conditionString, j) => {
+        allConditionStrings.forEach((conditionString, j) => {
           // Evaluate the condition
-          const condition = conditions[j];
+          const condition = allConditions[j];
 
           // Get everything after the first dot in the field name
           const fieldTypeAndName = condition.fieldName.split('.');
@@ -2112,9 +2167,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
             setAggregationEnabled,
           });
         },
-        onGroupingConditionsChange(conditions: IGroupingCondition[]): void {
+        onGroupingConditionsChange(
+          conditions: IGroupingCondition[],
+          groupName: GroupNameEnum,
+        ): void {
           onGroupingConditionsChange({
             conditions,
+            groupName,
             model,
             appName,
             updateModelData,
@@ -2186,8 +2245,17 @@ function createAppModel(appConfig: IAppInitialConfig) {
             setModelData,
           });
         },
-        onAlignmentTypeChange(type: AlignmentOptionsEnum): void {
-          onAlignmentTypeChange({ type, model, appName, updateModelData });
+        onAlignmentTypeChange(
+          chartId: number,
+          type: AlignmentOptionsEnum,
+        ): void {
+          onAlignmentTypeChange({
+            chartId,
+            type,
+            model,
+            appName,
+            updateModelData,
+          });
         },
         onChangeTooltip(tooltip: Partial<ITooltip>): void {
           onChangeTooltip({
@@ -2201,8 +2269,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
             appName,
           });
         },
-        onAxesScaleRangeChange(range: Partial<IAxesScaleRange>): void {
-          onAxesScaleRangeChange({ range, model, appName });
+        onAxesScaleRangeChange(
+          chartId: number,
+          range: Partial<IAxesScaleRange>,
+        ): void {
+          onAxesScaleRangeChange({ chartId, range, model, appName });
         },
         onDensityTypeChange(type: DensityOptions): Promise<void> {
           return onDensityTypeChange({ type, model, appName, getMetricsData });

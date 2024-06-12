@@ -1,5 +1,8 @@
 import { ResizeModeEnum } from 'config/enums/tableEnums';
-import { RowHeightSize, UnselectedColumnState } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { DensityOptions } from 'config/enums/densityEnum';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
@@ -91,7 +94,11 @@ export interface IGroupingConfig {
     stroke: number;
   };
   paletteIndex?: number;
-  conditions?: IGroupingCondition[];
+  conditions?: {
+    color: IGroupingCondition[];
+    stroke: IGroupingCondition[];
+    chart: IGroupingCondition[];
+  };
 }
 
 export interface ISelectOption {
@@ -164,10 +171,11 @@ export interface ILineChartConfig {
   zoom: IChartZoom;
   axesScaleType: IAxesScaleState;
   axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   smoothing: ISmoothing;
   aggregationConfig: IAggregationConfig;
   densityType: DensityOptions;
-  alignmentConfig: IAlignmentConfig;
+  alignmentConfigs: IAlignmentConfig[];
   focusedState: IFocusedState;
   tooltip: ITooltipConfig;
   legends: LegendsConfig;

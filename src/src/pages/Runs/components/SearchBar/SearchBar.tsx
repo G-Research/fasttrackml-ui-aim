@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import { Divider } from '@material-ui/core';
 
@@ -12,6 +13,7 @@ import runAppModel from 'services/models/runs/runsAppModel';
 import { trackEvent } from 'services/analytics';
 
 import exceptionHandler from 'utils/app/exceptionHandler';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import './SearchBar.scss';
 
@@ -30,6 +32,8 @@ function SearchBar({
     };
   }, []);
 
+  const selectedExperimentCount = getSelectedExperiments().length;
+  let isSearchDisabled = selectedExperimentCount === 0;
   const handleRunSearch = React.useCallback(() => {
     if (isRunsDataLoading) {
       return;
@@ -73,7 +77,10 @@ function SearchBar({
         </form>
         <Divider style={{ margin: '0 1em' }} orientation='vertical' flexItem />
         <Button
-          className='Runs_Search_Bar__Button'
+          className={classNames('Runs__SearchBar__button', {
+            disabled: isSearchDisabled,
+          })}
+          disabled={isSearchDisabled}
           color='primary'
           onClick={isRunsDataLoading ? handleRequestAbort : handleRunSearch}
           variant={isRunsDataLoading ? 'outlined' : 'contained'}

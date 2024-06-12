@@ -11,7 +11,7 @@ import ZoomOutPopover from 'components/ZoomOutPopover/ZoomOutPopover';
 import HighlightModePopover from 'components/HighlightModesPopover/HighlightModesPopover';
 import ControlPopover from 'components/ControlPopover/ControlPopover';
 import AxesScalePopover from 'components/AxesScalePopover/AxesScalePopover';
-import AlignmentPopover from 'components/AxesPropsPopover/AxesPropsPopover';
+import AlignmentPopover from 'components/MultipleAxesPropsPopover/MultipleAxesPropsPopover';
 import TooltipContentPopover from 'components/TooltipContentPopover/TooltipContentPopover';
 import { Icon } from 'components/kit';
 import ExportPreview from 'components/ExportPreview';
@@ -22,6 +22,8 @@ import ChartLegends from 'components/ChartPanel/ChartLegends';
 import { CONTROLS_DEFAULT_CONFIG } from 'config/controls/controlsDefaultConfig';
 
 import { IControlProps } from 'types/pages/metrics/components/Controls/Controls';
+
+import { chartTitleToText } from 'utils/d3/utils';
 
 import './Controls.scss';
 
@@ -46,21 +48,22 @@ function Controls(
   }, [props.axesScaleType]);
 
   const alignmentChanged: boolean = React.useMemo(() => {
-    return (
-      props.alignmentConfig.metric !==
-        CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric ||
-      props.alignmentConfig.type !==
-        CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type ||
-      props.densityType !== CONTROLS_DEFAULT_CONFIG.metrics.densityType
+    return !props.alignmentConfigs.every(
+      (alignmentConfig) =>
+        alignmentConfig.metric !==
+          CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric ||
+        alignmentConfig.type !==
+          CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type ||
+        props.densityType !== CONTROLS_DEFAULT_CONFIG.metrics.densityType,
     );
-  }, [props.alignmentConfig, props.densityType]);
+  }, [props.alignmentConfigs, props.densityType]);
 
   const axesRangeChanged: boolean = React.useMemo(() => {
-    return !_.isEqual(
-      props.axesScaleRange,
-      CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange,
+    // check if any range of any chart has been changed
+    return !props.axesScaleRanges.every((r) =>
+      _.isEqual(r, CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange),
     );
-  }, [props.axesScaleRange]);
+  }, [props.axesScaleRanges]);
 
   const tooltipChanged: boolean = React.useMemo(() => {
     return (
@@ -75,6 +78,14 @@ function Controls(
     setOpenExportModal((state) => !state);
   }, [setOpenExportModal]);
 
+  const ids: { label: string; value: number }[] = [];
+  props.chartProps.forEach((prop: any, index: number) => {
+    const titleText = chartTitleToText(prop.chartTitle);
+    ids.push({
+      label: `${index + 1} - ${titleText}`,
+      value: index,
+    });
+  });
   return (
     <ErrorBoundary>
       <div className='Controls__container ScrollBar__hidden'>
@@ -158,9 +169,10 @@ function Controls(
               )}
               component={
                 <AlignmentPopover
+                  idsOptions={ids}
                   selectFormOptions={props.selectFormOptions}
-                  alignmentConfig={props.alignmentConfig}
-                  axesScaleRange={props.axesScaleRange}
+                  alignmentConfigs={props.alignmentConfigs}
+                  axesScaleRanges={props.axesScaleRanges}
                   onAlignmentMetricChange={props.onAlignmentMetricChange}
                   onAlignmentTypeChange={props.onAlignmentTypeChange}
                   onAxesScaleRangeChange={props.onAxesScaleRangeChange}
