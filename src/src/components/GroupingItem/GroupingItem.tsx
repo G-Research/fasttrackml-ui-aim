@@ -9,6 +9,8 @@ import { Icon } from 'components/kit';
 import { IconName } from 'components/kit/Icon';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
+import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
+
 import { IGroupingItemProps } from 'types/pages/components/GroupingItem/GroupingItem';
 
 import './GroupingItem.scss';
@@ -50,7 +52,9 @@ function GroupingItem({
               <div
                 className={`GroupingItem__icon__box ${opened ? 'active' : ''} ${
                   groupingSelectOptions?.length &&
-                  groupingData?.[groupName]?.length
+                  (groupingData?.[groupName]?.length ||
+                    (groupName !== GroupNameEnum.ROW &&
+                      groupingData?.conditions?.[groupName].length))
                     ? 'outlined'
                     : ''
                 }`}
