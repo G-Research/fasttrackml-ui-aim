@@ -39,7 +39,7 @@ function getLegendsData(
 
     const groupConfig = groupingConfig[groupName];
     const groupedItemPropKeys =
-      groupName === GroupNameEnum.ROW || groupName === GroupNameEnum.COLOR
+      groupName === GroupNameEnum.ROW
         ? groupConfig || []
         : groupConfig?.concat(
             groupingConfig.conditions?.[groupName].map(
