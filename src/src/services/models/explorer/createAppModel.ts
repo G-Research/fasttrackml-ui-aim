@@ -1210,15 +1210,18 @@ function createAppModel(appConfig: IAppInitialConfig) {
           sequenceName: 'metric',
         }),
       ];
-      // Conditional grouping also allows grouping by regular select options and also metrics
+      // Conditional grouping allows grouping by regular select options and also metrics
       const conditionalGroupingOptions = groupingSelectOptions.concat(
-        data.map((metric) => {
-          return {
-            group: 'metric',
-            label: `metric.${metric?.config?.name}`,
-            value: `${metric?.config?.name}`,
-          };
-        }),
+        _.uniqBy(
+          data.map((metric) => {
+            return {
+              group: 'metric',
+              label: `metric.${metric?.config?.name}`,
+              value: `${metric?.config?.name}`,
+            };
+          }),
+          'value',
+        ),
       );
       const sortOptions = [
         ...groupingSelectOptions,
@@ -1319,15 +1322,18 @@ function createAppModel(appConfig: IAppInitialConfig) {
           sequenceName: 'metric',
         }),
       ];
-      // Conditional grouping also allows grouping by regular select options and also metrics
+      // Conditional grouping allows grouping by regular select options and also metrics
       const conditionalGroupingOptions = groupingSelectOptions.concat(
-        data.map((metric) => {
-          return {
-            group: 'metric',
-            label: `metric.${metric?.config?.name}`,
-            value: `${metric?.config?.name}`,
-          };
-        }),
+        _.uniqBy(
+          data.map((metric) => {
+            return {
+              group: 'metric',
+              label: `metric.${metric?.config?.name}`,
+              value: `${metric?.config?.name}`,
+            };
+          }),
+          'value',
+        ),
       );
       const sortOptions = [
         ...groupingSelectOptions,
@@ -1571,6 +1577,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
             tags: data[i].run.params.tags,
             experiment: data[i].run.props.experiment?.name,
             [data[i].name]: data[i]?.lastValue,
+            context: data[i].context,
           };
 
           // Get the relevant attribute's value
