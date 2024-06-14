@@ -34,7 +34,7 @@ jobs:
     - name: Build and run backend
       run: |
         cd fasttrackml
-        docker-compose up -d
+        docker run --rm -p 5000:5000 -ti gresearch/fasttrackml
 
     - name: Wait for backend to be ready
       run: |
