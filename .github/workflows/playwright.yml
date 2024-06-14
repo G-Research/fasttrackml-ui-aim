@@ -34,10 +34,7 @@ jobs:
     - name: Build and run backend
       run: |
         cd fasttrackml
-        docker run --rm -p 5000:5000 gresearch/fasttrackml
-
-    - name: Wait for backend to be ready
-      run: |
+        docker run --rm -p 5000:5000 gresearch/fasttrackml &
         npx wait-on http://localhost:5000
 
     - name: Start frontend dev server and run E2E tests
