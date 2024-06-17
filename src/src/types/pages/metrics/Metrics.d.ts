@@ -93,6 +93,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   unselectedColumnState: UnselectedColumnState;
   sameValueColumns?: string[] | [];
   groupingSelectOptions: IGroupingSelectOption[];
+  conditionalGroupingOptions: IGroupingSelectOption[];
   sortOptions: IGroupingSelectOption[];
   requestStatus: RequestStatusEnum;
   requestProgress: IRequestProgress;

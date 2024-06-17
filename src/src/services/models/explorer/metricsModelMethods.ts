@@ -843,6 +843,19 @@ function getMetricsAppModelMethods(
         sequenceName: 'metric',
       }),
     ];
+    // Conditional grouping allows grouping by regular select options and also metrics
+    const conditionalGroupingOptions = groupingSelectOptions.concat(
+      _.uniqBy(
+        data.map((metric) => {
+          return {
+            group: 'metric',
+            label: `metric.${metric?.config?.name}`,
+            value: `${metric?.config?.name}`,
+          };
+        }),
+        'value',
+      ),
+    );
     const sortOptions = [
       ...groupingSelectOptions,
       {
@@ -942,6 +955,7 @@ function getMetricsAppModelMethods(
       tableColumns,
       sameValueColumns: tableData.sameValueColumns,
       groupingSelectOptions,
+      conditionalGroupingOptions,
       sortOptions,
       selectedRows,
     });
@@ -968,6 +982,19 @@ function getMetricsAppModelMethods(
         sequenceName: 'metric',
       }),
     ];
+    // Conditional grouping allows grouping by regular select options and also metrics
+    const conditionalGroupingOptions = groupingSelectOptions.concat(
+      _.uniqBy(
+        data.map((metric) => {
+          return {
+            group: 'metric',
+            label: `metric.${metric?.config?.name}`,
+            value: `${metric?.config?.name}`,
+          };
+        }),
+        'value',
+      ),
+    );
     const sortOptions = [
       ...groupingSelectOptions,
       {
@@ -1058,6 +1085,7 @@ function getMetricsAppModelMethods(
       tableColumns: tableColumns,
       sameValueColumns: tableData.sameValueColumns,
       groupingSelectOptions,
+      conditionalGroupingOptions,
       sortOptions,
       selectedRows,
     });
