@@ -16,6 +16,7 @@ import './Grouping.scss';
 function Grouping({
   groupingData,
   groupingSelectOptions,
+  conditionalGroupingOptions,
   onGroupingSelectChange,
   onGroupingModeChange,
   onGroupingPaletteChange,
@@ -46,6 +47,7 @@ function Grouping({
                   groupName={groupName as GroupNameEnum}
                   groupingData={groupingData}
                   groupingSelectOptions={groupingSelectOptions}
+                  conditionalGroupingOptions={conditionalGroupingOptions}
                   onSelect={onGroupingSelectChange}
                   onGroupingModeChange={onGroupingModeChange}
                   isDisabled={isDisabled}
@@ -65,6 +67,7 @@ function Grouping({
                           paletteIndex: groupingData?.paletteIndex,
                         })}
                         groupingSelectOptions={groupingSelectOptions}
+                        conditionalGroupingOptions={conditionalGroupingOptions}
                         onSelect={onGroupingSelectChange}
                         onGroupingConditionsChange={onGroupingConditionsChange}
                       />

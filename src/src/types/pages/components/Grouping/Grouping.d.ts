@@ -13,6 +13,7 @@ import { IMetricProps } from 'types/pages/metrics/Metrics';
 export interface IGroupingProps {
   groupingData: IGroupingConfig;
   groupingSelectOptions: IGroupingSelectOption[];
+  conditionalGroupingOptions?: IGroupingSelectOption[];
   onGroupingSelectChange: IMetricProps['onGroupingSelectChange'];
   onGroupingModeChange: IMetricProps['onGroupingModeChange'];
   onGroupingPaletteChange: IMetricProps['onGroupingPaletteChange'];
