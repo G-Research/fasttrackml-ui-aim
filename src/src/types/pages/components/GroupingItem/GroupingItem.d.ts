@@ -14,6 +14,7 @@ export interface IGroupingItemProps extends IGroupingPopoverProps {
   groupingData: IGroupingConfig;
   advancedComponent?: React.FunctionComponentElement<React.ReactNode>;
   groupingSelectOptions: IGroupingSelectOption[];
+  conditionalGroupingOptions?: IGroupingSelectOption[];
   onReset: () => void;
   onVisibilityChange: () => void;
 }

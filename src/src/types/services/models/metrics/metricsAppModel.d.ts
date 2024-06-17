@@ -56,6 +56,7 @@ export interface IMetricAppModelState {
   params: string[];
   notifyData: INotification[];
   groupingSelectOptions: IGroupingSelectOption[];
+  conditionalGroupingOptions: IGroupingSelectOption[];
   sortOptions: IGroupingSelectOption[];
   selectFormData?: {
     options: ISelectOption[];

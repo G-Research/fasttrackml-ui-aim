@@ -45,6 +45,7 @@ export function generateGroupValues(
         name: fieldType === 'metric' ? data[i].name : data[i].run.props.name,
         tags: data[i].run.params.tags,
         experiment: data[i].run.props.experiment?.name,
+        context: data[i].context,
       };
 
       // Get the relevant attribute's value

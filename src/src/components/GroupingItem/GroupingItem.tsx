@@ -31,6 +31,7 @@ function GroupingItem({
   onSelect,
   onGroupingModeChange,
   groupingSelectOptions,
+  conditionalGroupingOptions,
   isDisabled,
 }: IGroupingItemProps): React.FunctionComponentElement<React.ReactNode> {
   return (
@@ -70,6 +71,7 @@ function GroupingItem({
             inputLabel={inputLabel}
             groupingData={groupingData}
             groupingSelectOptions={groupingSelectOptions}
+            conditionalGroupingOptions={conditionalGroupingOptions}
             advancedComponent={advancedComponent}
             onSelect={onSelect}
             onGroupingModeChange={onGroupingModeChange}

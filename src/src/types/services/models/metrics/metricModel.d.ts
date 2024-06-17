@@ -18,4 +18,5 @@ export interface IMetric {
   x_axis_iters?: Float64Array;
   x_axis_values?: Float64Array;
   isHidden: boolean;
+  lastValue?: number;
 }
