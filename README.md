@@ -26,6 +26,18 @@ An embed directory will be created with the built UI, ready to be embedded in th
 
 Once you're happy with them, create a pull request **against the `release/vX.Y.Z` branch*** that you started from (***not `main`!***). Once merged, the CI will run and build the UI. It will then push it to a new tag that is compatible with the Go module rules. For example, the first customization to `v3.16.2` of Aim will end up in a tag named `v0.31602.1`.
 
+### How to run E2E tests?
+
+The E2E tests can be run locally by following these steps:
+1. Start the FastTrackML server
+2. Run the Aim UI in development mode (on localhost:3000)
+3. In another terminal, run `cd src/e2e`
+4. Run `npx playwright test` to run the test suite
+
+New tests can be added directly to the `src/e2e` directory. You may also run `npx playwright show-report` to see the test results.
+
+For a guide on how to write a test, see [Playwright's example tests](https://github.com/microsoft/playwright/blob/main/examples/todomvc/tests/integration.spec.ts).
+
 ### How is this all enforced?
 
 A GitHub app has been created with the `contents:write` permissions on this repo. Its App ID and private key are stored as secrets under the `restricted` environment. This environment is limited to the `main` and `release/v*` branches
@@ -239,3 +251,4 @@ do
   gh api /repos/G-Research/fasttrackml-ui-aim/rulesets/$rule | jq '[{name: .name, target: .target, conditions: .conditions, rules: .rules, bypass_actors: .bypass_actors}]'
 done | jq -s add
 ```
+
