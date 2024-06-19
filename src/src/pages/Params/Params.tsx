@@ -223,6 +223,7 @@ const Params = ({
               isDisabled={isProgressBarVisible}
               groupingData={groupingData}
               groupingSelectOptions={groupingSelectOptions}
+              conditionalGroupingOptions={groupingSelectOptions} // jescalada: TODO: Implement conditional grouping (Params/Scatters)
               onGroupingSelectChange={onGroupingSelectChange}
               onGroupingModeChange={onGroupingModeChange}
               onGroupingPaletteChange={onGroupingPaletteChange}
