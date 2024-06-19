@@ -30,7 +30,6 @@ jobs:
 
     - name: Build and run backend
       run: |
-        cd fasttrackml
         docker run --rm -p 5000:5000 -e FML_DEV_MODE=true gresearch/fasttrackml:latest:main &
         npx wait-on http://localhost:5000
 
