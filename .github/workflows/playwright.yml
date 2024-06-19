@@ -44,7 +44,7 @@ jobs:
 
     - name: Seed database with k6
       run: |
-        cd fasttrackml/docs/example
+        wget https://raw.githubusercontent.com/G-Research/fasttrackml/main/docs/example/k6_load.js
         k6 run k6_load.js
 
     - name: Start frontend dev server and run E2E tests
