@@ -53,4 +53,22 @@ test.describe('Dashboard', () => {
     const runCount = await secondRow?.$eval('p', (el) => el.textContent);
     expect(runCount).toBe('2');
   });
+
+  test('experiment search bar filters table experiments', async ({ page }) => {
+    const searchInput = await page.$('.SearchBar input#search');
+    await searchInput?.fill('Default');
+    const value = await searchInput?.inputValue();
+    expect(value).toBe('Default');
+
+    const table = await page.$('.BaseTable__body');
+    const rows = await table?.$$('.BaseTable__row');
+    expect(rows?.length).toBe(1);
+
+    const firstRow = rows?.[0];
+    const experimentName = await firstRow?.$eval(
+      '.ExperimentNameBox__experimentName a',
+      (el) => el.textContent,
+    );
+    expect(experimentName).toBe('Default');
+  });
 });
