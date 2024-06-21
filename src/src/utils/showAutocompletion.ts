@@ -126,12 +126,16 @@ function getSuggestions(monaco: Monaco, options: Record<string, string>) {
       }
       // flatten strings of array of accessible options paths without example type
       const filteredOptions = getObjectPaths(options, options).map((option) => {
+        const remappedOption = option.replace(
+          /\.metrics\.([^."]+)(\.[^.]+)?$/,
+          '.metrics["$1"]$2',
+        );
         const indexOf =
-          option.indexOf('.__example_type__') !== -1 ||
-          option[option.length - 1] === '.'
-            ? option.indexOf('.__example_type__')
-            : option.length;
-        return option.slice(0, indexOf);
+          remappedOption.indexOf('.__example_type__') !== -1 ||
+          remappedOption[option.length - 1] === '.'
+            ? remappedOption.indexOf('.__example_type__')
+            : remappedOption.length;
+        return remappedOption.slice(0, indexOf);
       });
       // If the last character typed is a period then we need to look at member objects of the `options` object
       const isMember = activeTyping.charAt(activeTyping.length - 1) === '.';
@@ -168,13 +172,19 @@ function getSuggestions(monaco: Monaco, options: Record<string, string>) {
         endColumn: word.endColumn,
       };
 
+      // Check if the prefix ends with ".metrics"
+      const metricsContextRegex = /\.metrics.$/;
+
       // Get all the child properties of the last token
       for (const prop in lastToken) {
         // Do not show properites that begin with "__"
         if (lastToken.hasOwnProperty(prop) && !prop.startsWith('__')) {
           // Create completion object
 
-          const key = !jsValidVariableRegex.test(prop) ? `["${prop}"]` : prop;
+          const key =
+            !jsValidVariableRegex.test(prop) || metricsContextRegex.test(prefix)
+              ? `["${prop}"]`
+              : prop;
 
           let detailType = getDetailType(getValue(options, prefix + key));
           const completionItem = {

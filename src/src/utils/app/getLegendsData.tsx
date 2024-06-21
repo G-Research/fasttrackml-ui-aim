@@ -39,10 +39,10 @@ function getLegendsData(
 
     const groupConfig = groupingConfig[groupName];
     const groupedItemPropKeys =
-      groupName !== GroupNameEnum.CHART
+      groupName === GroupNameEnum.ROW
         ? groupConfig || []
         : groupConfig?.concat(
-            groupingConfig.conditions?.map(
+            groupingConfig.conditions?.[groupName].map(
               (condition) =>
                 `${condition.fieldName} ${condition.operator} ${condition.value}`,
             ) || [],

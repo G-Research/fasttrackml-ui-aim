@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 
-import { Checkbox, TextField } from '@material-ui/core';
+import { Checkbox, TextField, Tooltip } from '@material-ui/core';
 import {
   CheckBox as CheckBoxIcon,
   CheckBoxOutlineBlank,
@@ -10,6 +10,8 @@ import { Button, Box } from '@material-ui/core';
 
 import { Icon, Text } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary';
+
+import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
 import {
   IGroupingCondition,
@@ -31,7 +33,7 @@ export enum IOperator {
 function ChartPopoverAdvanced({
   onGroupingConditionsChange,
   groupingData,
-  groupingSelectOptions,
+  conditionalGroupingOptions,
 }: IGroupingPopoverAdvancedProps): React.FunctionComponentElement<React.ReactNode> {
   const [inputValue, setInputValue] = useState('');
   const [selectedField, setSelectedField] =
@@ -41,7 +43,7 @@ function ChartPopoverAdvanced({
   );
   const [selectedValue, setSelectedValue] = useState<string>('');
   const [conditions, setConditions] = useState<IGroupingCondition[]>(
-    groupingData?.conditions || [],
+    groupingData?.conditions?.chart || [],
   );
 
   const onAddCondition = () => {
@@ -60,7 +62,7 @@ function ChartPopoverAdvanced({
             index === conditionIndex ? condition : c,
           );
     setConditions(newConditions);
-    onGroupingConditionsChange?.(newConditions);
+    onGroupingConditionsChange?.(newConditions, GroupNameEnum.CHART);
   };
 
   const onChangeField = (e: any, value: IGroupingSelectOption | null): void => {
@@ -88,7 +90,7 @@ function ChartPopoverAdvanced({
   };
 
   const options = useMemo(() => {
-    const filteredOptions = groupingSelectOptions?.filter((item) =>
+    const filteredOptions = conditionalGroupingOptions?.filter((item) =>
       item.label.toLowerCase().includes(inputValue.toLowerCase()),
     );
     return (
@@ -98,7 +100,7 @@ function ChartPopoverAdvanced({
           b.label.toLowerCase().indexOf(inputValue.toLowerCase()),
       ) || []
     );
-  }, [groupingSelectOptions, inputValue]);
+  }, [conditionalGroupingOptions, inputValue]);
 
   return (
     <ErrorBoundary>
@@ -106,20 +108,32 @@ function ChartPopoverAdvanced({
         <div className='ChartPopoverAdvanced__conditionalFilter'>
           <Text component='h3' size={12} tint={50}>
             group by condition
+            <Tooltip
+              title='Conditional filtering for metrics is based on the last value logged.'
+              placement='top'
+            >
+              <div style={{ display: 'inline' }}>
+                <Icon
+                  name='circle-question'
+                  fontSize={14}
+                  className='ChartPopoverAdvanced__conditionalFilter__icon'
+                />
+              </div>
+            </Tooltip>
           </Text>
           <Text
             component='p'
             size={14}
             className='ChartPopoverAdvanced__conditionalFilter__p'
           >
-            Group charts by conditions such as{' '}
+            Group charts by conditions, e.g.{' '}
             <span style={{ fontFamily: 'Courier New' }}>
               run.epochs &gt; 30
             </span>
             .
           </Text>
           <div className='flex fac'>
-            {/* Add textbox to allow grouping by condition */}
+            {/* Textbox for selecting fields */}
             <Autocomplete
               className='ChartPopoverAdvanced__container__select__fieldName'
               openOnFocus
@@ -145,7 +159,7 @@ function ChartPopoverAdvanced({
                   }}
                   className='TextField__OutLined__Small'
                   variant='outlined'
-                  placeholder='Select fields'
+                  placeholder='Select field'
                 />
               )}
               renderTags={() => null} // No tags for single selection
@@ -212,7 +226,7 @@ function ChartPopoverAdvanced({
                 key={index}
                 className='ChartPopoverAdvanced__conditionalFilter__box flex fac fjb'
               >
-                {/* Show condition and button in same line */}
+                {/* Show condition and Remove button in same line */}
                 <Text
                   size={14}
                   className='ChartPopoverAdvanced__conditionalFilter__box__p'
@@ -226,7 +240,10 @@ function ChartPopoverAdvanced({
                     newConditions.splice(index, 1);
                     setConditions(newConditions);
                     if (onGroupingConditionsChange) {
-                      onGroupingConditionsChange(newConditions);
+                      onGroupingConditionsChange(
+                        newConditions,
+                        GroupNameEnum.CHART,
+                      );
                     }
                   }}
                   variant='text'

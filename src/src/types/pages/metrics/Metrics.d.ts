@@ -1,7 +1,10 @@
 import React from 'react';
 import { RouteChildrenProps } from 'react-router-dom';
 
-import { RowHeightSize, UnselectedColumnState } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { ResizeModeEnum } from 'config/enums/tableEnums';
 import { DensityOptions } from 'config/enums/densityEnum';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
@@ -90,6 +93,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   unselectedColumnState: UnselectedColumnState;
   sameValueColumns?: string[] | [];
   groupingSelectOptions: IGroupingSelectOption[];
+  conditionalGroupingOptions: IGroupingSelectOption[];
   sortOptions: IGroupingSelectOption[];
   requestStatus: RequestStatusEnum;
   requestProgress: IRequestProgress;
@@ -125,7 +129,10 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onGroupingReset: (groupName: GroupNameEnum) => void;
   onGroupingApplyChange: (groupName: GroupNameEnum) => void;
   onGroupingPersistenceChange: (groupName: 'color' | 'stroke') => void;
-  onGroupingConditionsChange: (conditions: IGroupingCondition[]) => void;
+  onGroupingConditionsChange: (
+    conditions: IGroupingCondition[],
+    groupName: GroupNameEnum,
+  ) => void;
   onBookmarkCreate: (params: IBookmarkFormState) => void;
   onBookmarkUpdate: (id: string) => void;
   onNotificationAdd: (notification: INotification) => void;

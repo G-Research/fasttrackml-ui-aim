@@ -14,6 +14,11 @@
   &__conditionalFilter {
     padding: 1rem;
     border-bottom: $border-main;
+
+    &__icon {
+      margin-left: 0.5rem;
+      color: $text-color;
+    }
   }
 
   &__conditionalFilter__p {

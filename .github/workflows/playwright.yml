@@ -1,0 +1,63 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, release/* ]
+  pull_request:
+    branches: [ main, release/* ]
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 16
+
+    - name: Install frontend dependencies
+      run: cd src && npm ci --legacy-peer-deps
+
+    - name: Install wait-on
+      run: npm install -g wait-on
+
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+
+    - name: Build and run backend
+      run: |
+        docker run --rm -p 5000:5000 -e FML_DEV_MODE=true gresearch/fasttrackml:main &
+        npx wait-on http://localhost:5000
+
+    - name: Install k6
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gnupg software-properties-common ca-certificates curl
+        curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
+        echo "deb https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+        sudo apt-get update
+        sudo apt-get install -y k6
+
+    - name: Seed database with k6
+      run: |
+        wget https://raw.githubusercontent.com/G-Research/fasttrackml/main/docs/example/k6_load.js
+        k6 run k6_load.js
+
+    - name: Start frontend dev server and run E2E tests
+      run: |
+        cd src
+        npm start &
+        npx wait-on http://localhost:3000
+        npx playwright test src/e2e
+
+    - name: Upload Playwright report
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30

@@ -212,7 +212,8 @@ import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
 import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
-import evaluateCondition from 'utils/app/evaluateCondition';
+import { generateGroupValues } from 'utils/app/generateGroupValues';
+import { getConditionStrings } from 'utils/app/getConditionStrings';
 
 import { AppDataTypeEnum, AppNameEnum } from './index';
 
@@ -275,6 +276,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
               stroke: 10,
             },
             paletteIndex: 0,
+            conditions: {
+              color: [],
+              stroke: [],
+              chart: [],
+            },
           };
         }
         if (components?.table) {
@@ -1079,7 +1085,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
               x_axis_iters,
             } = filterMetricsData(
               trace,
-              configData?.chart?.alignmentConfig.type,
+              configData?.chart?.alignmentConfigs[0].type,
               configData?.chart?.axesScaleType,
             );
 
@@ -1205,6 +1211,19 @@ function createAppModel(appConfig: IAppInitialConfig) {
           sequenceName: 'metric',
         }),
       ];
+      // Conditional grouping allows grouping by regular select options and also metrics
+      const conditionalGroupingOptions = groupingSelectOptions.concat(
+        _.uniqBy(
+          data.map((metric) => {
+            return {
+              group: 'metric',
+              label: `metric.${metric?.config?.name}`,
+              value: `${metric?.config?.name}`,
+            };
+          }),
+          'value',
+        ),
+      );
       const sortOptions = [
         ...groupingSelectOptions,
         {
@@ -1271,6 +1290,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         tableColumns,
         sameValueColumns: tableData.sameValueColumns,
         groupingSelectOptions,
+        conditionalGroupingOptions,
         sortOptions,
         selectedRows,
       });
@@ -1303,6 +1323,19 @@ function createAppModel(appConfig: IAppInitialConfig) {
           sequenceName: 'metric',
         }),
       ];
+      // Conditional grouping allows grouping by regular select options and also metrics
+      const conditionalGroupingOptions = groupingSelectOptions.concat(
+        _.uniqBy(
+          data.map((metric) => {
+            return {
+              group: 'metric',
+              label: `metric.${metric?.config?.name}`,
+              value: `${metric?.config?.name}`,
+            };
+          }),
+          'value',
+        ),
+      );
       const sortOptions = [
         ...groupingSelectOptions,
         {
@@ -1427,6 +1460,7 @@ function createAppModel(appConfig: IAppInitialConfig) {
         tableColumns: tableColumns,
         sameValueColumns: tableData.sameValueColumns,
         groupingSelectOptions,
+        conditionalGroupingOptions,
         sortOptions,
         selectedRows,
       });
@@ -1435,7 +1469,8 @@ function createAppModel(appConfig: IAppInitialConfig) {
     function alignData(
       data: IMetricsCollection<IMetric>[],
       type: AlignmentOptionsEnum = model.getState()!.config!.chart
-        ?.alignmentConfig.type,
+        ?.alignmentConfigs[0].type,
+      chartId: number = 0,
     ): IMetricsCollection<IMetric>[] {
       const alignmentObj: { [key: string]: Function } = {
         [AlignmentOptionsEnum.STEP]: alignByStep,
@@ -1447,7 +1482,11 @@ function createAppModel(appConfig: IAppInitialConfig) {
           throw new Error('Unknown value for X axis alignment');
         },
       };
-      const alignment = alignmentObj[type] || alignmentObj.default;
+      const alignmentConfig =
+        model.getState()!.config!.chart?.alignmentConfigs[chartId];
+      const alignment =
+        alignmentObj[alignmentConfig.type] || alignmentObj.default;
+
       return alignment(data, model);
     }
 
@@ -1456,24 +1495,29 @@ function createAppModel(appConfig: IAppInitialConfig) {
       const grouping = configData!.grouping;
       const { paletteIndex = 0 } = grouping || {};
 
-      const conditions: IGroupingCondition[] = grouping.conditions || [];
-      const conditionStrings = conditions.map(
-        (condition) =>
-          `${condition.fieldName} ${condition.operator} ${condition.value}`,
+      const colorConditions = grouping.conditions?.color || [];
+      const colorConditionStrings = getConditionStrings(colorConditions);
+      const strokeConditions = grouping.conditions?.stroke || [];
+      const strokeConditionStrings = getConditionStrings(strokeConditions);
+      const chartConditions = grouping.conditions?.chart || [];
+      const chartConditionStrings = getConditionStrings(chartConditions);
+      const allConditions = colorConditions.concat(
+        strokeConditions,
+        chartConditions,
       );
+
       const groupByColor = getFilteredGroupingOptions({
         groupName: GroupNameEnum.COLOR,
         model,
-      });
+      }).concat(colorConditionStrings);
       const groupByStroke = getFilteredGroupingOptions({
         groupName: GroupNameEnum.STROKE,
         model,
-      });
-
+      }).concat(strokeConditionStrings);
       const groupByChart = getFilteredGroupingOptions({
         groupName: GroupNameEnum.CHART,
         model,
-      }).concat(conditionStrings);
+      }).concat(chartConditionStrings);
 
       if (
         groupByColor.length === 0 &&
@@ -1491,63 +1535,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
         ]);
       }
 
-      const groupValues: {
-        [key: string]: IMetricsCollection<IMetric>;
-      } = {};
-
       const groupingFields = _.uniq(
         groupByColor.concat(groupByStroke).concat(groupByChart),
       );
 
-      for (let i = 0; i < data.length; i++) {
-        const groupValue: { [key: string]: any } = {};
-        groupingFields.forEach((field) => {
-          groupValue[field] = getValue(data[i], field);
-        });
-
-        // Evaluate the conditions and update the row
-        conditionStrings.forEach((conditionString, j) => {
-          // Evaluate the condition
-          const condition = conditions[j];
-
-          // Get everything after the first dot in the field name
-          const fieldTypeAndName = condition.fieldName.split('.');
-          const fieldType = fieldTypeAndName[0];
-          const fieldName = fieldTypeAndName.slice(1).join('.');
-
-          // Flatten default run attributes and store them in a single object
-          const runAttributes = {
-            ...data[i].run.params,
-            ...data[i].run.props,
-            hash: data[i].run.hash,
-            name:
-              fieldType === 'metric' ? data[i].name : data[i].run.props.name,
-            tags: data[i].run.params.tags,
-            experiment: data[i].run.props.experiment?.name,
-          };
-
-          // Get the relevant attribute's value
-          const attributeValue = getValue(runAttributes, fieldName);
-          groupValue[conditionString] = evaluateCondition(
-            attributeValue,
-            condition,
-          );
-        });
-
-        const groupKey = encode(groupValue);
-        if (groupValues.hasOwnProperty(groupKey)) {
-          groupValues[groupKey].data.push(data[i]);
-        } else {
-          groupValues[groupKey] = {
-            key: groupKey,
-            config: groupValue,
-            color: null,
-            dasharray: null,
-            chartIndex: 0,
-            data: [data[i]],
-          };
-        }
-      }
+      const groupValues: {
+        [key: string]: IMetricsCollection<IMetric>;
+      } = generateGroupValues(data, allConditions, groupingFields);
 
       let colorIndex = 0;
       let dasharrayIndex = 0;
@@ -2120,9 +2114,13 @@ function createAppModel(appConfig: IAppInitialConfig) {
             setAggregationEnabled,
           });
         },
-        onGroupingConditionsChange(conditions: IGroupingCondition[]): void {
+        onGroupingConditionsChange(
+          conditions: IGroupingCondition[],
+          groupName: GroupNameEnum,
+        ): void {
           onGroupingConditionsChange({
             conditions,
+            groupName,
             model,
             appName,
             updateModelData,
