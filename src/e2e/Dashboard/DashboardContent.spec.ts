@@ -56,9 +56,9 @@ test.describe('Dashboard', () => {
 
   test('experiment search bar filters table experiments', async ({ page }) => {
     const searchInput = await page.$('.SearchBar input#search');
-    await searchInput?.fill('Default');
+    await searchInput?.fill('experiment-');
     const value = await searchInput?.inputValue();
-    expect(value).toBe('Default');
+    expect(value).toBe('experiment-');
 
     const table = await page.$('.BaseTable__body');
     const rows = await table?.$$('.BaseTable__row');
@@ -69,6 +69,38 @@ test.describe('Dashboard', () => {
       '.ExperimentNameBox__experimentName a',
       (el) => el.textContent,
     );
-    expect(experimentName).toBe('Default');
+    expect(experimentName).toContain('experiment-');
+  });
+
+  test("contributions heatmap has runs on the generated experiment's day", async ({
+    page,
+  }) => {
+    // Get the current date in format MMM DD, YYYY based on the generated experiment's timestamp
+    const rows = await page.$$('.BaseTable__row');
+    const secondRow = rows?.[1];
+    const experimentName = await secondRow?.$eval(
+      '.ExperimentNameBox__experimentName a',
+      (el) => el.textContent,
+    );
+
+    const timestamp = experimentName?.split('-')[1] ?? '';
+    const currentDate = new Date(parseInt(timestamp)).toLocaleDateString(
+      'en-US',
+      {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      },
+    );
+
+    // Cells are colored on a scale from 0 to 4, and we only have one active day in the test data
+    const heatmap = await page.$('.CalendarHeatmap');
+    const currentDayCell = await heatmap?.$('.CalendarHeatmap__cell--scale-4');
+    expect(currentDayCell).not.toBeNull();
+
+    const tooltip = await currentDayCell?.getAttribute('title');
+    expect(tooltip).toContain(currentDate);
+  });
+
   });
 });
