@@ -102,5 +102,42 @@ test.describe('Dashboard', () => {
     expect(tooltip).toContain(currentDate);
   });
 
+  test("clicking on the heatmap cell queries that day's runs", async ({
+    page,
+  }) => {
+    // Get the current timestamp from the generated experiment to construct the expected query
+    const rows = await page.$$('.BaseTable__row');
+    const secondRow = rows?.[1];
+
+    const experimentName = await secondRow?.$eval(
+      '.ExperimentNameBox__experimentName a',
+      (el) => el.textContent,
+    );
+    const timestamp = experimentName?.split('-')[1].trim() ?? '';
+
+    const date = new Date(parseInt(timestamp));
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1; // getUTCMonth() is zero-based
+    const day = date.getUTCDate();
+
+    const expectedText = `datetime(${year},${month},${day})<=run.created_at<datetime(${year},${month},${
+      day + 1
+    })`;
+
+    // Locate and click the current day cell in the heatmap
+    const heatmap = await page.$('.CalendarHeatmap');
+    const currentDayCell = await heatmap?.$('.CalendarHeatmap__cell--scale-4');
+    await currentDayCell?.click();
+
+    await page.waitForLoadState('networkidle');
+
+    const textBox = await page.locator('.view-lines.monaco-mouse-cursor-text');
+
+    const textContent = await textBox.evaluate((el) => el.innerText);
+
+    // Remove tabs and newlines that might be present in the text content
+    const trimmedTextContent = textContent.replace(/\s/g, '');
+
+    expect(trimmedTextContent).toContain(expectedText);
   });
 });
