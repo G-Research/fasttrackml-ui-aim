@@ -16,7 +16,7 @@ test.describe('Dashboard', () => {
     await page.waitForLoadState('networkidle');
 
     const expectedText = 'run.active==True';
-    const textBox = await page.locator('.view-lines.monaco-mouse-cursor-text');
+    const textBox = page.locator('.view-lines.monaco-mouse-cursor-text');
     const textContent = await textBox.evaluate((el) => el.innerText);
     const trimmedTextContent = textContent.replace(/\s/g, '');
 
@@ -28,7 +28,7 @@ test.describe('Dashboard', () => {
     await page.waitForLoadState('networkidle');
 
     const expectedText = 'run.archived==True';
-    const textBox = await page.locator('.view-lines.monaco-mouse-cursor-text');
+    const textBox = page.locator('.view-lines.monaco-mouse-cursor-text');
     const textContent = await textBox.evaluate((el) => el.innerText);
     const trimmedTextContent = textContent.replace(/\s/g, '');
 
@@ -43,7 +43,7 @@ test.describe('Dashboard', () => {
     // Example: datetime(2024, 6, 3) <= run.created_at < datetime(2024, 6, 10)
     const queryRegex =
       /datetime\(\d+,\d+,\d+\)<=run\.created_at<datetime\(\d+,\d+,\d+\)/;
-    const textBox = await page.locator('.view-lines.monaco-mouse-cursor-text');
+    const textBox = page.locator('.view-lines.monaco-mouse-cursor-text');
     const textContent = await textBox.evaluate((el) => el.innerText);
     const trimmedTextContent = textContent.replace(/\s/g, '');
 

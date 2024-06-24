@@ -131,7 +131,7 @@ test.describe('Dashboard', () => {
 
     await page.waitForLoadState('networkidle');
 
-    const textBox = await page.locator('.view-lines.monaco-mouse-cursor-text');
+    const textBox = page.locator('.view-lines.monaco-mouse-cursor-text');
 
     const textContent = await textBox.evaluate((el) => el.innerText);
 
@@ -139,5 +139,47 @@ test.describe('Dashboard', () => {
     const trimmedTextContent = textContent.replace(/\s/g, '');
 
     expect(trimmedTextContent).toContain(expectedText);
+  });
+
+  test("clicking on the Default experiment link redirects to the experiment's page", async ({
+    page,
+  }) => {
+    const table = await page.$('.BaseTable__body');
+    const rows = await table?.$$('.BaseTable__row');
+    expect(rows).not.toBeNull();
+
+    const firstRow = rows?.[0];
+    const experimentLink = await firstRow?.$('a');
+    await experimentLink?.click();
+
+    await page.waitForLoadState('networkidle');
+
+    const experimentNameElement = page.locator(
+      '.ExperimentHeader__headerContainer__appBarTitleBox__container',
+    );
+    const experimentName = await experimentNameElement.innerText();
+
+    expect(experimentName).toContain('Default');
+  });
+
+  test("clicking on the generated experiment link redirects to the experiment's page", async ({
+    page,
+  }) => {
+    const table = await page.$('.BaseTable__body');
+    const rows = await table?.$$('.BaseTable__row');
+    expect(rows).not.toBeNull();
+
+    const secondRow = rows?.[1];
+    const experimentLink = await secondRow?.$('a');
+    await experimentLink?.click();
+
+    await page.waitForLoadState('networkidle');
+
+    const experimentNameElement = page.locator(
+      '.ExperimentHeader__headerContainer__appBarTitleBox__container',
+    );
+    const experimentName = await experimentNameElement.innerText();
+
+    expect(experimentName).toContain('experiment-');
   });
 });
