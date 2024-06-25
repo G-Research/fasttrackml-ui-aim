@@ -103,6 +103,9 @@ function useDashboardContributionsFeed() {
 
   function loadMore(): void {
     if (contributionsFeedStore.data && !contributionsFeedStore.loading) {
+      if (data.length <= 0) {
+        return;
+      }
       engine.fetchContributionsFeed({
         limit: 25,
         exclude_params: true,
