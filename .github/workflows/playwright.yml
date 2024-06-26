@@ -24,14 +24,14 @@ jobs:
 
     - name: Install frontend dependencies
       run: |
-        npx playwright install-deps
+        cd src && npx playwright install-deps
         cd src && npm ci --legacy-peer-deps
 
     - name: Install wait-on
       run: npm install -g wait-on
 
     - name: Install Playwright browsers
-      run: npx playwright install
+      run: cd src && npx playwright install
 
     - name: Build and run backend
       run: |
