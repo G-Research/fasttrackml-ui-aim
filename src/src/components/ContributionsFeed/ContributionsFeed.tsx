@@ -46,6 +46,7 @@ function ContributionsFeed({
 
           {fetchedCount < totalRunsCount - archivedRunsCount! ? (
             <Button
+              className='ContributionsFeed__load-more'
               variant='outlined'
               fullWidth
               size='small'
