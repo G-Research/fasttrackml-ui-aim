@@ -24,14 +24,16 @@ jobs:
 
     - name: Install frontend dependencies
       run: |
-        cd src && npx playwright install-deps
-        cd src && npm ci --legacy-peer-deps
+        npx playwright install-deps
+        npm ci --legacy-peer-deps
+      working-directory: src
 
     - name: Install wait-on
       run: npm install -g wait-on
 
     - name: Install Playwright browsers
-      run: cd src && npx playwright install
+      run: npx playwright install
+      working-directory: src
 
     - name: Build and run backend
       run: |
@@ -54,10 +56,10 @@ jobs:
 
     - name: Start frontend dev server and run E2E tests
       run: |
-        cd src
         npm start &
         npx wait-on http://localhost:3000
         npx playwright test src/e2e
+      working-directory: src
 
     - name: Upload Playwright report
       uses: actions/upload-artifact@v4
