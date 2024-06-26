@@ -23,13 +23,15 @@ jobs:
         node-version: 16
 
     - name: Install frontend dependencies
-      run: cd src && npm ci --legacy-peer-deps
+      run: |
+        npx playwright install-deps
+        cd src && npm ci --legacy-peer-deps
 
     - name: Install wait-on
       run: npm install -g wait-on
 
     - name: Install Playwright browsers
-      run: npx playwright install --with-deps
+      run: npx playwright install
 
     - name: Build and run backend
       run: |
