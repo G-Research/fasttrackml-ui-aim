@@ -470,7 +470,64 @@ function ManageColumnsPopover({
                     />
                   </>
                 )}
+                <Button
+                  variant='text'
+                  size='xSmall'
+                  onClick={() => {
+                    console.log('columnsData: ', columnsData);
+                    console.log('hiddenColumns: ', hiddenColumns);
+                    // onColumnsVisibilityChange(HideColumnsEnum.All);
+                  }}
+                >
+                  <Icon name='eye-show-outline' color='#1473e6' />
+                  <Text size={12} tint={100}>
+                    {HideColumnsEnum.ShowParams}
+                  </Text>
+                </Button>
 
+                <Button
+                  variant='text'
+                  size='xSmall'
+                  onClick={() => {
+                    console.log('columnsData: ', columnsData);
+                    console.log('hiddenColumns: ', hiddenColumns);
+                    // onColumnsVisibilityChange(HideColumnsEnum.All);
+                  }}
+                >
+                  <Icon name='eye-outline-hide' />
+                  <Text size={12} tint={100}>
+                    {HideColumnsEnum.HideParams}
+                  </Text>
+                </Button>
+                <Button
+                  variant='text'
+                  size='xSmall'
+                  onClick={() => {
+                    console.log('columnsData: ', columnsData);
+                    console.log('hiddenColumns: ', hiddenColumns);
+                    // onColumnsVisibilityChange(HideColumnsEnum.All);
+                  }}
+                >
+                  <Icon name='eye-show-outline' color='#1473e6' />
+                  <Text size={12} tint={100}>
+                    {HideColumnsEnum.ShowMetrics}
+                  </Text>
+                </Button>
+
+                <Button
+                  variant='text'
+                  size='xSmall'
+                  onClick={() => {
+                    console.log('columnsData: ', columnsData);
+                    console.log('hiddenColumns: ', hiddenColumns);
+                    // onColumnsVisibilityChange(HideColumnsEnum.All);
+                  }}
+                >
+                  <Icon name='eye-outline-hide' />
+                  <Text size={12} tint={100}>
+                    {HideColumnsEnum.HideMetrics}
+                  </Text>
+                </Button>
                 <Button
                   variant='text'
                   size='xSmall'
