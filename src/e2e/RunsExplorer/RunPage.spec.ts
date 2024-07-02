@@ -4,8 +4,8 @@ const BASE_URL = 'http://localhost:3000/aim';
 const RUNS_PAGE = `${BASE_URL}/runs`;
 
 test.describe('Individual Run Page', () => {
+  // Navigate to the run page before each test as we don't know the hash in the link
   test.beforeEach(async ({ page }) => {
-    // Navigate to the individual run page
     await page.goto(RUNS_PAGE);
     await page.waitForLoadState('networkidle');
     await page.click(
@@ -41,6 +41,29 @@ test.describe('Individual Run Page', () => {
     );
     expect(rows[0]).toContain('param1');
     expect(rows.length).toBe(2); // 1 entry plus the header
+  });
+
+  test('view in metrics explorer link queries the right hash', async ({
+    page,
+  }) => {
+    // Wait for page content to load first
+    await page.waitForSelector('.runHashListItem__hashWrapper .Text');
+    const hash = await page.$eval(
+      '.runHashListItem__hashWrapper .Text',
+      (element) => element.textContent?.trim(),
+    );
+
+    await page.click('a:has-text("View in Metrics Explorer")', { force: true });
+
+    await page.waitForSelector('.view-lines.monaco-mouse-cursor-text');
+    const textBox = page.locator('.view-lines.monaco-mouse-cursor-text');
+
+    const textContent = await textBox.evaluate((el) => el.innerText);
+
+    // Remove tabs and newlines that might be present in the text content
+    const trimmedTextContent = textContent.replace(/\s/g, '');
+
+    expect(trimmedTextContent).toContain(hash);
   });
 
   test.afterEach(async ({ page }, testInfo) => {
