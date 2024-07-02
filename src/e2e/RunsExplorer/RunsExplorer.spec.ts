@@ -50,7 +50,6 @@ test.describe('Runs Explorer', () => {
   test('clicking on the experiment name navigates to the experiment page', async ({
     page,
   }) => {
-    // Add the generated experiment to the selection and wait for the table to appear
     await page.click(
       '.ExperimentBar__headerContainer__appBarTitleBox__buttonSelectToggler',
     );
@@ -59,8 +58,6 @@ test.describe('Runs Explorer', () => {
     await button.click();
 
     await page.waitForSelector('.Table__cell.undefined.experiment');
-
-    page.screenshot({ path: 'runs-explorer.png' });
 
     // Click on a random part of the screen to close the popover
     await page.mouse.click(0, 0);
@@ -75,6 +72,33 @@ test.describe('Runs Explorer', () => {
       .click();
 
     await page.waitForURL(/\/aim\/experiments\/\d+\/overview/);
+    expect(page.url()).toMatch(/\/aim\/experiments\/\d+\/overview/);
+  });
+
+  test("clicking on the first run name navigates to that run's page", async ({
+    page,
+  }) => {
+    await page.click(
+      '.ExperimentBar__headerContainer__appBarTitleBox__buttonSelectToggler',
+    );
+
+    const button = page.locator('button', { hasText: /^experiment-/ });
+    await button.click();
+
+    await page.waitForSelector('.Table__cell.undefined.experiment');
+
+    await page.mouse.click(0, 0);
+
+    await page.waitForSelector('.RunsTable');
+
+    const firstRunNameLink = page
+      .locator('.Table__cell.undefined.run .RunNameColumn__runName a')
+      .first();
+
+    await firstRunNameLink.click();
+
+    await page.waitForURL(/\/aim\/runs\/.+/);
+    expect(page.url()).toMatch(/\/aim\/runs\/.+/);
   });
 
   test.afterEach(async ({ page }, testInfo) => {
