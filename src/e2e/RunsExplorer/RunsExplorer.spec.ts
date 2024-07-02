@@ -20,7 +20,7 @@ test.describe('Runs Explorer', () => {
   test('displays no results message when no experiments are selected', async ({
     page,
   }) => {
-    const runsTable = await page.locator('.RunsTable');
+    const runsTable = page.locator('.RunsTable');
     expect(await runsTable.locator('text=No results').count()).toBe(1);
   });
 
@@ -69,13 +69,11 @@ test.describe('Runs Explorer', () => {
       '.Table__cell.undefined.experiment .ExperimentNameBox__experimentName',
     );
 
-    // Click on the a tag that contains experiment-
     await rows
       .locator('a', { hasText: /^experiment-/ })
       .first()
-      .click(); // Force click through the tooltip
+      .click();
 
-    // Wait until URL changes to the experiment page (http://localhost:3000/aim/experiments/1/overview)
     await page.waitForURL(/\/aim\/experiments\/\d+\/overview/);
   });
 
