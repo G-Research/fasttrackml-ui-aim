@@ -66,6 +66,27 @@ test.describe('Individual Run Page', () => {
     expect(trimmedTextContent).toContain(hash);
   });
 
+  test('settings page name and description can be edited', async ({ page }) => {
+    await page.click(
+      '.RunDetail__runDetailContainer__appBarContainer__appBarBox__actionContainer button',
+    );
+    await page.waitForSelector('.RunDetailSettingsTab');
+
+    const nameInput = await page.locator(
+      '.NameAndDescriptionCard__content__nameBox__nameInput input',
+    );
+    await nameInput.fill('New Run Name');
+
+    const descriptionInput = await page
+      .locator(
+        '.NameAndDescriptionCard__content__descriptionBox__descriptionInput textarea',
+      )
+      .first(); // There are two textareas, we want the first one
+    await descriptionInput.fill('New Run Description');
+
+    await page.click('.NameAndDescriptionCard__saveBtn', { force: true });
+  });
+
   test.afterEach(async ({ page }, testInfo) => {
     if (testInfo.status !== testInfo.expectedStatus) {
       await page.screenshot({ path: `failed-${testInfo.title}.png` });
