@@ -72,12 +72,12 @@ test.describe('Individual Run Page', () => {
     );
     await page.waitForSelector('.RunDetailSettingsTab');
 
-    const nameInput = await page.locator(
+    const nameInput = page.locator(
       '.NameAndDescriptionCard__content__nameBox__nameInput input',
     );
     await nameInput.fill('New Run Name');
 
-    const descriptionInput = await page
+    const descriptionInput = page
       .locator(
         '.NameAndDescriptionCard__content__descriptionBox__descriptionInput textarea',
       )
@@ -85,6 +85,38 @@ test.describe('Individual Run Page', () => {
     await descriptionInput.fill('New Run Description');
 
     await page.click('.NameAndDescriptionCard__saveBtn', { force: true });
+  });
+
+  test('run selector is working', async ({ page }) => {
+    const runNameElement = page.locator(
+      '.RunDetail__runDetailContainer__appBarContainer__appBarTitleBox__runName',
+    );
+
+    const originalRunName = await runNameElement.innerText();
+
+    await page.click(
+      '.RunDetail__runDetailContainer__appBarContainer__appBarTitleBox__buttonSelectToggler',
+    );
+
+    // Wait for the runs list to appear
+    await page.waitForSelector(
+      'div.RunSelectPopoverWrapper__selectPopoverContent__contentContainer__runsListContainer__runsList',
+    );
+
+    const run = page
+      .locator(
+        'a.RunSelectPopoverWrapper__selectPopoverContent__contentContainer__runsListContainer__runsList__runBox',
+      )
+      .last();
+
+    await run.click();
+
+    // Click outside the popover to close it
+    await page.mouse.click(0, 0);
+
+    const newRunName = await runNameElement.innerText();
+
+    expect(newRunName).not.toBe(originalRunName);
   });
 
   test.afterEach(async ({ page }, testInfo) => {
