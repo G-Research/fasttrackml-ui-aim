@@ -17,11 +17,25 @@ test.describe('Individual Run Page', () => {
     await page.waitForSelector('.Table__cell.undefined.experiment');
     await page.mouse.click(0, 0);
     await page.waitForSelector('.RunsTable');
+    const runNameLinks = page.locator(
+      '.Table__cell.undefined.run .RunNameColumn__runName a',
+    );
 
-    const firstRunNameLink = page
-      .locator('.Table__cell.undefined.run .RunNameColumn__runName a')
-      .first();
+    // Extract the text content from each element
+    const runNameTexts = await runNameLinks.allTextContents();
 
+    // Sort the run names alphabetically
+    const sortedRunNames = runNameTexts
+      .slice()
+      .sort((a, b) => a.localeCompare(b));
+
+    // Find the index of the first run name in alphabetical order
+    const firstRunNameIndex = runNameTexts.indexOf(sortedRunNames[0]);
+
+    // Get the locator for the first run name in alphabetical order
+    const firstRunNameLink = runNameLinks.nth(firstRunNameIndex);
+
+    // Click on the first run name link
     await firstRunNameLink.click();
     await page.waitForURL(/\/aim\/runs\/.+/);
   });
@@ -96,6 +110,7 @@ test.describe('Individual Run Page', () => {
 
     await page.click(
       '.RunDetail__runDetailContainer__appBarContainer__appBarTitleBox__buttonSelectToggler',
+      { force: true },
     );
 
     // Wait for the runs list to appear
@@ -103,13 +118,31 @@ test.describe('Individual Run Page', () => {
       'div.RunSelectPopoverWrapper__selectPopoverContent__contentContainer__runsListContainer__runsList',
     );
 
-    const run = page
-      .locator(
-        'a.RunSelectPopoverWrapper__selectPopoverContent__contentContainer__runsListContainer__runsList__runBox',
-      )
-      .last();
+    const runLocator = page.locator(
+      'a.RunSelectPopoverWrapper__selectPopoverContent__contentContainer__runsListContainer__runsList__runBox',
+    );
 
-    await run.click();
+    // Get all run name elements
+    const runNameElements = await runLocator.elementHandles();
+
+    // Extract the text content from each element
+    const runNames = await Promise.all(
+      runNameElements.map((element) => element.innerText()),
+    );
+
+    // Sort the run names alphabetically
+    const sortedRunNames = runNames.slice().sort((a, b) => a.localeCompare(b));
+
+    // Find the index of the last run name in alphabetical order
+    const lastRunNameIndex = runNames.indexOf(
+      sortedRunNames[sortedRunNames.length - 1],
+    );
+
+    // Get the locator for the last run name in alphabetical order
+    const lastRunNameLink = runLocator.nth(lastRunNameIndex);
+
+    // Click on the last run name link
+    await lastRunNameLink.click({ force: true });
 
     // Click outside the popover to close it
     await page.mouse.click(0, 0);
