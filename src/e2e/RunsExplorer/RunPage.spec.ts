@@ -4,7 +4,7 @@ const BASE_URL = 'http://localhost:3000/aim';
 const RUNS_PAGE = `${BASE_URL}/runs`;
 
 test.describe('Individual Run Page', () => {
-  // Navigate to the run page before each test as we don't know the hash in the link
+  // Navigate to the run page before each test as the link's hash is unknown
   test.beforeEach(async ({ page }) => {
     await page.goto(RUNS_PAGE);
     await page.waitForLoadState('networkidle');
@@ -21,21 +21,15 @@ test.describe('Individual Run Page', () => {
       '.Table__cell.undefined.run .RunNameColumn__runName a',
     );
 
-    // Extract the text content from each element
+    // Get the first run's link in alphabetical order and click on it
     const runNameTexts = await runNameLinks.allTextContents();
-
-    // Sort the run names alphabetically
     const sortedRunNames = runNameTexts
       .slice()
       .sort((a, b) => a.localeCompare(b));
 
-    // Find the index of the first run name in alphabetical order
     const firstRunNameIndex = runNameTexts.indexOf(sortedRunNames[0]);
-
-    // Get the locator for the first run name in alphabetical order
     const firstRunNameLink = runNameLinks.nth(firstRunNameIndex);
 
-    // Click on the first run name link
     await firstRunNameLink.click();
     await page.waitForURL(/\/aim\/runs\/.+/);
   });
@@ -95,7 +89,7 @@ test.describe('Individual Run Page', () => {
       .locator(
         '.NameAndDescriptionCard__content__descriptionBox__descriptionInput textarea',
       )
-      .first(); // There are two textareas, we want the first one
+      .first();
     await descriptionInput.fill('New Run Description');
 
     await page.click('.NameAndDescriptionCard__saveBtn', { force: true });
@@ -122,33 +116,23 @@ test.describe('Individual Run Page', () => {
       'a.RunSelectPopoverWrapper__selectPopoverContent__contentContainer__runsListContainer__runsList__runBox',
     );
 
-    // Get all run name elements
+    // Get the last run name in alphabetical order and click on it
     const runNameElements = await runLocator.elementHandles();
-
-    // Extract the text content from each element
     const runNames = await Promise.all(
       runNameElements.map((element) => element.innerText()),
     );
-
-    // Sort the run names alphabetically
     const sortedRunNames = runNames.slice().sort((a, b) => a.localeCompare(b));
-
-    // Find the index of the last run name in alphabetical order
     const lastRunNameIndex = runNames.indexOf(
       sortedRunNames[sortedRunNames.length - 1],
     );
 
-    // Get the locator for the last run name in alphabetical order
     const lastRunNameLink = runLocator.nth(lastRunNameIndex);
-
-    // Click on the last run name link
     await lastRunNameLink.click({ force: true });
 
     // Click outside the popover to close it
     await page.mouse.click(0, 0);
 
     const newRunName = await runNameElement.innerText();
-
     expect(newRunName).not.toBe(originalRunName);
   });
 
