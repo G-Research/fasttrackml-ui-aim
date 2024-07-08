@@ -38,15 +38,24 @@ export function generateGroupValues(
       const fieldName = fieldTypeAndName.slice(1).join('.');
 
       // Flatten default run attributes and store them in a single object
-      const runAttributes = {
+      let runAttributes = {
         ...data[i].run.params,
         ...data[i].run.props,
         hash: data[i].run.hash,
-        name: fieldType === 'metric' ? data[i].name : data[i].run.props.name,
+        name: data[i].run.props.name,
         tags: data[i].run.params.tags,
         experiment: data[i].run.props.experiment?.name,
         context: data[i].context,
       };
+
+      // Add or overwrite the metric-specific attributes
+      if (fieldType === 'metric') {
+        runAttributes = {
+          ...runAttributes,
+          name: data[i].name,
+          [data[i].name]: data[i].lastValue,
+        };
+      }
 
       // Get the relevant attribute's value
       const attributeValue = getValue(runAttributes, fieldName);
@@ -70,6 +79,5 @@ export function generateGroupValues(
       };
     }
   }
-
   return groupValues;
 }
