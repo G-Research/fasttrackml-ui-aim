@@ -1861,7 +1861,6 @@ function getQueryStringFromSelect(
       selectData.query?.trim() && !error?.message
         ? `(${selectData.query.trim()})`
         : '';
-    console.log('selectData', selectData);
     const selections = selectData.options?.length
       ? `(${selectData.options
           .map(
