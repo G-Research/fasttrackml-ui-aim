@@ -16,6 +16,8 @@ import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
+
 import {
   getImagesExploreTableColumns,
   imagesExploreTableRowRenderer,
@@ -95,6 +97,8 @@ import getFilteredRow from 'utils/app/getFilteredRow';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import onRunsTagsChange from 'utils/app/onRunsTagsChange';
 import saveRecentSearches from 'utils/saveRecentSearches';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 
 import createModel from '../model';
 import { AppNameEnum } from '../explorer';
@@ -1857,6 +1861,7 @@ function getQueryStringFromSelect(
       selectData.query?.trim() && !error?.message
         ? `(${selectData.query.trim()})`
         : '';
+    console.log('selectData', selectData);
     const selections = selectData.options?.length
       ? `(${selectData.options
           .map(
@@ -2321,6 +2326,16 @@ function onStackingToggle(): void {
   }
 }
 
+function onModelSelectExperimentsChange(experiment: IExperimentDataShort) {
+  onSelectExperimentsChange(experiment);
+  getImagesData(false, true).call();
+}
+
+function onModelToggleAllExperiments(experiments: IExperimentDataShort[]) {
+  onToggleAllExperiments(experiments);
+  getImagesData(false, true).call();
+}
+
 const imagesExploreAppModel = {
   ...model,
   initialize,
@@ -2375,6 +2390,8 @@ const imagesExploreAppModel = {
   archiveRuns,
   onRowSelect,
   onRunsTagsChange: onModelRunsTagsChange,
+  onSelectExperimentsChange: onModelSelectExperimentsChange,
+  onToggleAllExperiments: onModelToggleAllExperiments,
 };
 
 export default imagesExploreAppModel;
