@@ -227,6 +227,12 @@ function ImagesExplore(): React.FunctionComponentElement<React.ReactNode> {
               onBookmarkUpdate={imagesExploreAppModel.onBookmarkUpdate}
               onResetConfigData={imagesExploreAppModel.onResetConfigData}
               title={pageTitlesEnum.IMAGES_EXPLORER}
+              onSelectExperimentsChange={
+                imagesExploreAppModel.onSelectExperimentsChange
+              }
+              onToggleAllExperiments={
+                imagesExploreAppModel.onToggleAllExperiments
+              }
             />
             <div className='ImagesExplore__SelectForm__Grouping__container'>
               <SelectForm
