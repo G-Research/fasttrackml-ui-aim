@@ -90,6 +90,15 @@ export default function onColumnsVisibilityChange<M extends State>({
           );
         });
         break;
+      case HideColumnsEnum.HideParams:
+        params = modelState.sortOptions?.filter((option: any) => {
+          return option.group === 'run' && option.value?.includes('params');
+        });
+        columnKeys = _.uniq([
+          ...configData?.table.hiddenColumns,
+          ...params.map((param: ISelectOption) => param.label.split('.')[1]),
+        ]);
+        break;
     }
     const table = {
       ...configData.table,
