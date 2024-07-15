@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { List, AutoSizer } from 'react-virtualized';
 import _ from 'lodash-es';
 
 import { Divider, InputBase } from '@material-ui/core';
@@ -53,6 +54,8 @@ function ManageColumnsPopover({
   const [draggingItemId, setDraggingItemId] = React.useState<string>('');
   const [popoverWidth, setPopoverWidth] = React.useState(800);
   const ref = React.useRef<HTMLDivElement | null>(null);
+
+  const VIRTUAL_COLUMN_THRESHOLD = 100; // If exceeded, use virtualized list
 
   const onResize = _.debounce(() => {
     onPopoverWidthChange();
@@ -371,7 +374,8 @@ function ManageColumnsPopover({
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                     >
-                      {state.columns.middle.list.length < 50 ? (
+                      {state.columns.middle.list.length <
+                      VIRTUAL_COLUMN_THRESHOLD ? (
                         state.columns.middle.list.map(
                           (column: ITableColumn, index: number) => (
                             <ColumnItem
@@ -516,11 +520,9 @@ function ManageColumnsPopover({
                 <Button
                   variant='text'
                   size='xSmall'
-                  onClick={() => {
-                    console.log('columnsData: ', columnsData);
-                    console.log('hiddenColumns: ', hiddenColumns);
-                    // onColumnsVisibilityChange(HideColumnsEnum.All);
-                  }}
+                  onClick={() =>
+                    onColumnsVisibilityChange(HideColumnsEnum.ShowParams)
+                  }
                 >
                   <Icon name='eye-show-outline' color='#1473e6' />
                   <Text size={12} tint={100}>
@@ -532,9 +534,7 @@ function ManageColumnsPopover({
                   variant='text'
                   size='xSmall'
                   onClick={() => {
-                    console.log('columnsData: ', columnsData);
-                    console.log('hiddenColumns: ', hiddenColumns);
-                    // onColumnsVisibilityChange(HideColumnsEnum.All);
+                    onColumnsVisibilityChange(HideColumnsEnum.HideParams);
                   }}
                 >
                   <Icon name='eye-outline-hide' />
@@ -546,9 +546,7 @@ function ManageColumnsPopover({
                   variant='text'
                   size='xSmall'
                   onClick={() => {
-                    console.log('columnsData: ', columnsData);
-                    console.log('hiddenColumns: ', hiddenColumns);
-                    // onColumnsVisibilityChange(HideColumnsEnum.All);
+                    onColumnsVisibilityChange(HideColumnsEnum.ShowMetrics);
                   }}
                 >
                   <Icon name='eye-show-outline' color='#1473e6' />
@@ -561,9 +559,7 @@ function ManageColumnsPopover({
                   variant='text'
                   size='xSmall'
                   onClick={() => {
-                    console.log('columnsData: ', columnsData);
-                    console.log('hiddenColumns: ', hiddenColumns);
-                    // onColumnsVisibilityChange(HideColumnsEnum.All);
+                    onColumnsVisibilityChange(HideColumnsEnum.HideMetrics);
                   }}
                 >
                   <Icon name='eye-outline-hide' />
