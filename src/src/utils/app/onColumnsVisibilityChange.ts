@@ -58,13 +58,16 @@ export default function onColumnsVisibilityChange<M extends State>({
       hideSystemMetrics =
         getFilteredSystemMetrics(columnKeys).length === systemMetrics.length;
     }
-    columnKeys =
-      hiddenColumns === HideColumnsEnum.All
-        ? columnsData.map(
-            (col) => !AVOID_COLUMNS_TO_HIDE_LIST.has(col.key) && col.key,
-          )
-        : columnKeys;
-
+    switch (hiddenColumns) {
+      case HideColumnsEnum.All:
+        columnKeys = columnsData.map((col) => {
+          if (!AVOID_COLUMNS_TO_HIDE_LIST.has(col.key)) {
+            return col.label ?? col.key;
+          }
+          return false;
+        });
+        break;
+    }
     const table = {
       ...configData.table,
       hiddenColumns: columnKeys,
