@@ -53,7 +53,7 @@ function HideColumnsPopover({
         }}
         anchor={({ onAnchorClick, opened }) => (
           <Tooltip
-            title='Toggle hiding unselected columns by default'
+            title='Improve table performance by automatically hiding unselected columns'
             placement='top'
           >
             <div>

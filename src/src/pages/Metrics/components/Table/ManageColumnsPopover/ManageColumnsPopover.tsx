@@ -245,6 +245,33 @@ function ManageColumnsPopover({
     );
   }, [appName, hiddenColumns, state]);
 
+  function generateRowRenderer(columnList: ITableColumn[]) {
+    const rowRenderer = ({ index, key }: { index: number; key: string }) => {
+      const column = columnList[index];
+      return (
+        <ColumnItem
+          key={`${column.key}-${index}`}
+          data={column.key}
+          label={column.label ?? column.key}
+          index={index}
+          popoverWidth={popoverWidth}
+          appName={appName}
+          isHidden={isColumnHidden(column.key)}
+          onClick={() => {
+            toggleSoftHidden(column.key);
+            onColumnsVisibilityChange(
+              hiddenColumns?.includes(column.key)
+                ? hiddenColumns?.filter((col: string) => col !== column.key)
+                : hiddenColumns?.concat([column.key]),
+            );
+          }}
+          draggingItemId={draggingItemId}
+        />
+      );
+    };
+    return rowRenderer;
+  }
+
   return (
     <ErrorBoundary>
       <ControlPopover
@@ -344,31 +371,47 @@ function ManageColumnsPopover({
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                     >
-                      {state.columns.middle.list.map(
-                        (column: ITableColumn, index: number) => (
-                          <ColumnItem
-                            key={`${column.key}-${index}`}
-                            data={column.key}
-                            label={column.label ?? column.key}
-                            index={index}
-                            appName={appName}
-                            popoverWidth={popoverWidth}
-                            hasSearchableItems
-                            searchKey={searchKey}
-                            isHidden={isColumnHidden(column.key)}
-                            onClick={() => {
-                              toggleSoftHidden(column.key);
-                              onColumnsVisibilityChange(
-                                hiddenColumns?.includes(column.key)
-                                  ? hiddenColumns?.filter(
-                                      (col: string) => col !== column.key,
-                                    )
-                                  : hiddenColumns?.concat([column.key]),
-                              );
-                            }}
-                            draggingItemId={draggingItemId}
-                          />
-                        ),
+                      {state.columns.middle.list.length < 50 ? (
+                        state.columns.middle.list.map(
+                          (column: ITableColumn, index: number) => (
+                            <ColumnItem
+                              key={`${column.key}-${index}`}
+                              data={column.key}
+                              label={column.label ?? column.key}
+                              index={index}
+                              appName={appName}
+                              popoverWidth={popoverWidth}
+                              hasSearchableItems
+                              searchKey={searchKey}
+                              isHidden={isColumnHidden(column.key)}
+                              onClick={() => {
+                                toggleSoftHidden(column.key);
+                                onColumnsVisibilityChange(
+                                  hiddenColumns?.includes(column.key)
+                                    ? hiddenColumns?.filter(
+                                        (col: string) => col !== column.key,
+                                      )
+                                    : hiddenColumns?.concat([column.key]),
+                                );
+                              }}
+                              draggingItemId={draggingItemId}
+                            />
+                          ),
+                        )
+                      ) : (
+                        <AutoSizer>
+                          {({ height, width }) => (
+                            <List
+                              height={height}
+                              rowCount={state.columns.middle.list.length}
+                              rowHeight={30}
+                              width={width}
+                              rowRenderer={generateRowRenderer(
+                                state.columns.middle.list,
+                              )}
+                            />
+                          )}
+                        </AutoSizer>
                       )}
                       {provided.placeholder}
                     </div>
