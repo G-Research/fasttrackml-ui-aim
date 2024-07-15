@@ -67,6 +67,18 @@ export default function onColumnsVisibilityChange<M extends State>({
           return false;
         });
         break;
+      case HideColumnsEnum.HideMetrics:
+        const metrics = modelState.sortOptions?.filter(
+          (option: ISelectOption) => {
+            return option.group === 'metrics';
+          },
+        );
+        // Set columnkeys to all metrics plus the already hidden columns from config.table.hiddencolumns
+        columnKeys = _.uniq([
+          ...configData?.table.hiddenColumns,
+          ...metrics.map((metric: ISelectOption) => metric.label),
+        ]);
+        break;
     }
     const table = {
       ...configData.table,
