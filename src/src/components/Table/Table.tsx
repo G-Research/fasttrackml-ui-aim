@@ -146,6 +146,8 @@ const Table = React.forwardRef(function Table(
     availableSpace: 0,
   });
   const [isExporting, setIsExporting] = React.useState(false);
+  const [shiftClickRangeStart, setShiftClickRangeStart] =
+    React.useState<number>(null);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -1025,6 +1027,8 @@ const Table = React.forwardRef(function Table(
                         columnsColorScales={columnsColorScales}
                         onToggleColumnsColorScales={onToggleColumnsColorScales}
                         noColumnActions={noColumnActions}
+                        shiftClickRangeStart={shiftClickRangeStart}
+                        setShiftClickRangeStart={setShiftClickRangeStart}
                         {...props}
                       />
                     </ErrorBoundary>
@@ -1066,6 +1070,8 @@ const Table = React.forwardRef(function Table(
                       onRowHover={onRowHover}
                       onRowClick={onRowClick}
                       disableRowClick={disableRowClick}
+                      shiftClickRangeStart={shiftClickRangeStart}
+                      setShiftClickRangeStart={setShiftClickRangeStart}
                     />
                   </ErrorBoundary>
                 )

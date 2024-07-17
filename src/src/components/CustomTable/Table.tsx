@@ -371,6 +371,8 @@ function Table(props) {
                   isAlwaysVisible={true}
                   onRowHover={props.onRowHover}
                   listWindow={props.listWindow}
+                  shiftClickRangeStart={props.shiftClickRangeStart}
+                  setShiftClickRangeStart={props.setShiftClickRangeStart}
                 />
               </div>
             </ErrorBoundary>
@@ -445,6 +447,8 @@ function Table(props) {
                     selectedRows={props.selectedRows}
                     onRowSelect={props.onRowSelect}
                     listWindow={props.listWindow}
+                    shiftClickRangeStart={props.shiftClickRangeStart}
+                    setShiftClickRangeStart={props.setShiftClickRangeStart}
                   />
                 </ErrorBoundary>
               ))}
@@ -522,6 +526,8 @@ function Table(props) {
                     }
                     colLeft={colLefts[index] ?? null}
                     listWindow={props.listWindow}
+                    shiftClickRangeStart={props.shiftClickRangeStart}
+                    setShiftClickRangeStart={props.setShiftClickRangeStart}
                   />
                 </ErrorBoundary>
               );
@@ -589,6 +595,8 @@ function Table(props) {
                     columnOptions={col.columnOptions}
                     selectedRows={props.selectedRows}
                     listWindow={props.listWindow}
+                    shiftClickRangeStart={props.shiftClickRangeStart}
+                    setShiftClickRangeStart={props.setShiftClickRangeStart}
                   />
                 </ErrorBoundary>
               ))}
