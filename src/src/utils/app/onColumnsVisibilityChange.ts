@@ -7,7 +7,10 @@ import { AVOID_COLUMNS_TO_HIDE_LIST } from 'config/table/tableConfigs';
 import * as analytics from 'services/analytics';
 
 import { IModel, State } from 'types/services/models/model';
-import { IAppModelConfig } from 'types/services/models/explorer/createAppModel';
+import {
+  IAppModelConfig,
+  ISelectOption,
+} from 'types/services/models/explorer/createAppModel';
 import { ITableColumn } from 'types/pages/metrics/components/TableColumns/TableColumns';
 
 import { encode } from 'utils/encoder/encoder';
@@ -30,11 +33,14 @@ export default function onColumnsVisibilityChange<M extends State>({
     shouldURLUpdate?: boolean,
   ) => void;
 }): void {
-  const configData = model.getState()?.config;
-  const columnsData = model.getState()!.tableColumns!;
+  const modelState = model.getState();
+  const configData = modelState?.config;
+  const columnsData = modelState!.tableColumns!;
   const systemMetrics: string[] = getSystemMetricsFromColumns(
     columnsData as ITableColumn[],
   );
+  let params: ISelectOption[] = [];
+  let metrics: ISelectOption[] = [];
 
   let columnKeys: string[] = Array.isArray(hiddenColumns)
     ? [...hiddenColumns]
@@ -58,13 +64,52 @@ export default function onColumnsVisibilityChange<M extends State>({
       hideSystemMetrics =
         getFilteredSystemMetrics(columnKeys).length === systemMetrics.length;
     }
-    columnKeys =
-      hiddenColumns === HideColumnsEnum.All
-        ? columnsData.map(
-            (col) => !AVOID_COLUMNS_TO_HIDE_LIST.has(col.key) && col.key,
-          )
-        : columnKeys;
-
+    switch (hiddenColumns) {
+      case HideColumnsEnum.All:
+        columnKeys = columnsData.map((col) => {
+          if (!AVOID_COLUMNS_TO_HIDE_LIST.has(col.key)) {
+            return col.label ?? col.key;
+          }
+          return false;
+        });
+        break;
+      case HideColumnsEnum.HideMetrics:
+        metrics = modelState.sortOptions?.filter((option: ISelectOption) => {
+          return option.group === 'metrics';
+        });
+        // Set columnkeys to all metrics plus the already hidden columns from config.table.hiddencolumns
+        columnKeys = _.uniq([
+          ...configData?.table.hiddenColumns,
+          ...metrics.map((metric: ISelectOption) => metric.label),
+        ]);
+        break;
+      case HideColumnsEnum.ShowMetrics:
+        columnKeys = configData?.table.hiddenColumns.filter((col: string) => {
+          return !modelState.sortOptions?.some(
+            (option: ISelectOption) => option.label === col,
+          );
+        });
+        break;
+      case HideColumnsEnum.HideParams:
+        params = modelState.sortOptions?.filter((option: any) => {
+          return option.group === 'run' && option.value?.includes('params');
+        });
+        columnKeys = _.uniq([
+          ...configData?.table.hiddenColumns,
+          ...params.map((param: ISelectOption) => param.label.split('.')[1]),
+        ]);
+        break;
+      case HideColumnsEnum.ShowParams:
+        params = modelState.sortOptions?.filter((option: any) => {
+          return option.group === 'run' && option.value?.includes('params');
+        });
+        columnKeys = configData?.table.hiddenColumns.filter((col: string) => {
+          return !params.some(
+            (param: ISelectOption) => param.label.split('.')[1] === col,
+          );
+        });
+        break;
+    }
     const table = {
       ...configData.table,
       hiddenColumns: columnKeys,
