@@ -1682,11 +1682,21 @@ function getScattersModelMethods(
       onRowSelect({
         actionType,
         data,
+        rangeStart,
+        rangeEnd,
       }: {
-        actionType: 'single' | 'selectAll' | 'removeAll';
+        actionType: 'single' | 'selectAll' | 'removeAll' | 'range';
         data?: any;
+        rangeStart?: number;
+        rangeEnd?: number;
       }): void {
-        return onRowSelect({ actionType, data, model });
+        return onRowSelect({
+          actionType,
+          data,
+          rangeStart,
+          rangeEnd,
+          model,
+        });
       },
       onRowsVisibilityChange(metricKeys: string[]): void {
         return onRowsVisibilityChange({
