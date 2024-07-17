@@ -15,6 +15,7 @@ export interface State {
   params?: Record<string, any>;
   sameValueColumns?: string[];
   selectedRows?: any;
+  sortOptions?: Record<string, any>;
   tooltip?: ITooltip;
   selectFormData?: any;
 }

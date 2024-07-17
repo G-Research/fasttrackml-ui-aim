@@ -19,5 +19,9 @@ enum HideColumnsEnum {
   HideSystemMetrics = 'Hide System Metrics',
   ShowSystemMetrics = 'Show System Metrics',
   All = 'All',
+  HideMetrics = 'Hide Metrics',
+  ShowMetrics = 'Show Metrics',
+  HideParams = 'Hide Params',
+  ShowParams = 'Show Params',
 }
 export { RowHeightEnum, HideRowsEnum, ResizeModeEnum, HideColumnsEnum };

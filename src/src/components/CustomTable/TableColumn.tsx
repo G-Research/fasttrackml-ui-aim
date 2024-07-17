@@ -59,6 +59,8 @@ function Column({
   colLeft,
   listWindow,
   noColumnActions,
+  shiftClickRangeStart,
+  setShiftClickRangeStart,
 }) {
   const [maxWidth, setMaxWidth] = React.useState(width);
   const [isResizing, setIsResizing] = React.useState(false);
@@ -777,10 +779,21 @@ function Column({
                               checked={!!selectedRows[item.selectKey]}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                onRowSelect({
-                                  data: item,
-                                  actionType: 'single',
-                                });
+
+                                if (e.shiftKey) {
+                                  onRowSelect({
+                                    actionType: 'range',
+                                    data: data,
+                                    rangeStart: shiftClickRangeStart,
+                                    rangeEnd: item.index,
+                                  });
+                                } else {
+                                  setShiftClickRangeStart(item.index);
+                                  onRowSelect({
+                                    data: item,
+                                    actionType: 'single',
+                                  });
+                                }
                               }}
                             />
                           </>
