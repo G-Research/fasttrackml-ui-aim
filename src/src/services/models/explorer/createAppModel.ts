@@ -2303,11 +2303,15 @@ function createAppModel(appConfig: IAppInitialConfig) {
         onRowSelect({
           actionType,
           data,
+          rangeStart,
+          rangeEnd,
         }: {
-          actionType: 'single' | 'selectAll' | 'removeAll';
+          actionType: 'single' | 'selectAll' | 'removeAll' | 'range';
           data?: any;
+          rangeStart?: number;
+          rangeEnd?: number;
         }): void {
-          return onRowSelect({ actionType, data, model });
+          return onRowSelect({ actionType, data, rangeStart, rangeEnd, model });
         },
         onRowsVisibilityChange(metricKeys: string[]): void {
           return onRowsVisibilityChange({
@@ -3411,14 +3415,25 @@ function createAppModel(appConfig: IAppInitialConfig) {
               updateModelData,
             });
           },
+
           onRowSelect({
             actionType,
             data,
+            rangeStart,
+            rangeEnd,
           }: {
-            actionType: 'single' | 'selectAll' | 'removeAll';
+            actionType: 'single' | 'selectAll' | 'removeAll' | 'range';
             data?: any;
+            rangeStart?: number;
+            rangeEnd?: number;
           }): void {
-            return onRowSelect({ actionType, data, model });
+            return onRowSelect({
+              actionType,
+              data,
+              rangeStart,
+              rangeEnd,
+              model,
+            });
           },
           onToggleColumnsColorScales(colKey: string): void {
             onToggleColumnsColorScales({
@@ -5093,14 +5108,25 @@ function createAppModel(appConfig: IAppInitialConfig) {
               updateModelData,
             });
           },
+
           onRowSelect({
             actionType,
             data,
+            rangeStart,
+            rangeEnd,
           }: {
-            actionType: 'single' | 'selectAll' | 'removeAll';
+            actionType: 'single' | 'selectAll' | 'removeAll' | 'range';
             data?: any;
+            rangeStart?: number;
+            rangeEnd?: number;
           }): void {
-            return onRowSelect({ actionType, data, model });
+            return onRowSelect({
+              actionType,
+              data,
+              rangeStart,
+              rangeEnd,
+              model,
+            });
           },
           onRowsVisibilityChange(metricKeys: string[]): void {
             return onRowsVisibilityChange({
@@ -6672,11 +6698,21 @@ function createAppModel(appConfig: IAppInitialConfig) {
           onRowSelect({
             actionType,
             data,
+            rangeStart,
+            rangeEnd,
           }: {
-            actionType: 'single' | 'selectAll' | 'removeAll';
+            actionType: 'single' | 'selectAll' | 'removeAll' | 'range';
             data?: any;
+            rangeStart?: number;
+            rangeEnd?: number;
           }): void {
-            return onRowSelect({ actionType, data, model });
+            return onRowSelect({
+              actionType,
+              data,
+              rangeStart,
+              rangeEnd,
+              model,
+            });
           },
           onRowsVisibilityChange(metricKeys: string[]): void {
             return onRowsVisibilityChange({
