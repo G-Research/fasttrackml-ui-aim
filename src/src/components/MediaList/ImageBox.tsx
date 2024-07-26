@@ -42,7 +42,9 @@ const ImageBox = ({
 
     if (blobData === null) {
       // Get the formatted URI containing the run hash and experiment id
-      const formattedUri = `artifacts/${data.run.props.experiment.id}/${data.run.hash}/artifacts/${blob_uri}`;
+      const formattedUri = data.run.props.experiment.artifact_location
+        ? `${data.run.props.experiment.artifact_location}/${data.run.hash}/artifacts/${blob_uri}`
+        : `artifacts/${data.run.props.experiment.id}/${data.run.hash}/artifacts/${blob_uri}`;
 
       if (blobsURIModel.getState()[formattedUri]) {
         setBlobData(blobsURIModel.getState()[formattedUri]);
@@ -76,6 +78,7 @@ const ImageBox = ({
     blob_uri,
     data.run.hash,
     data.run.props.experiment.id,
+    data.run.props.experiment.artifact_location,
   ]);
 
   function onImageFullSizeModeButtonClick(e: React.ChangeEvent<any>): void {
