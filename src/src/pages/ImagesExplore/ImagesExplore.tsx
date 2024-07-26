@@ -216,6 +216,14 @@ function ImagesExplore(): React.FunctionComponentElement<React.ReactNode> {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  React.useEffect(() => {
+    imagesExploreAppModel.fetchProjectParamsAndUpdateState();
+    const pollingTimer = setInterval(() => {
+      imagesExploreAppModel.fetchProjectParamsAndUpdateState();
+    }, 30000);
+    return () => clearInterval(pollingTimer);
+  }, []);
+
   return (
     <ErrorBoundary>
       <div className='ImagesExplore__container' ref={wrapperElemRef}>

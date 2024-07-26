@@ -99,6 +99,8 @@ import onRunsTagsChange from 'utils/app/onRunsTagsChange';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
 import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import createModel from '../model';
 import { AppNameEnum } from '../explorer';
@@ -203,29 +205,7 @@ function initialize(appId: string): void {
   if (!appId) {
     setDefaultAppConfigData();
   }
-  projectsService
-    .getProjectParams(['images'])
-    .call()
-    .then((data: IProjectParamsMetrics) => {
-      const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
-        data.images,
-      );
-      model.setState({
-        selectFormData: {
-          options: getSelectFormOptions(data),
-          suggestions: getSuggestionsByExplorer(AppNameEnum.IMAGES, data),
-          advancedSuggestions: {
-            ...getSuggestionsByExplorer(AppNameEnum.IMAGES, data),
-            images: {
-              name: '',
-              context: _.isEmpty(advancedSuggestions)
-                ? ''
-                : { ...advancedSuggestions },
-            },
-          },
-        },
-      });
-    });
+  fetchProjectParamsAndUpdateState();
 }
 
 function setDefaultAppConfigData(recoverTableState: boolean = true) {
@@ -463,6 +443,37 @@ function getImagesData(
     },
     abort: imagesRequestRef.abort,
   };
+}
+
+function fetchProjectParamsAndUpdateState() {
+  const selectedExperiments = getSelectedExperiments();
+  projectsService
+    .getProjectParams(
+      ['images'],
+      selectedExperiments.map((exp) => exp.id),
+    )
+    .call()
+    .then((data: IProjectParamsMetrics) => {
+      const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
+        data.images,
+      );
+      model.setState({
+        selectFormData: {
+          options: getSelectFormOptions(data),
+          suggestions: getSuggestionsByExplorer(AppNameEnum.IMAGES, data),
+          advancedSuggestions: {
+            ...getSuggestionsByExplorer(AppNameEnum.IMAGES, data),
+            images: {
+              name: '',
+              context: _.isEmpty(advancedSuggestions)
+                ? ''
+                : { ...advancedSuggestions },
+            },
+          },
+        },
+      });
+      removeOldSelectedMetrics(model);
+    });
 }
 
 function getSelectFormOptions(projectsData: IProjectParamsMetrics) {
@@ -2391,6 +2402,7 @@ const imagesExploreAppModel = {
   onRunsTagsChange: onModelRunsTagsChange,
   onSelectExperimentsChange: onModelSelectExperimentsChange,
   onToggleAllExperiments: onModelToggleAllExperiments,
+  fetchProjectParamsAndUpdateState,
 };
 
 export default imagesExploreAppModel;
