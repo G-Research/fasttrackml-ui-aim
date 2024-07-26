@@ -8,7 +8,6 @@ const endpoints = {
 };
 
 function getImagesExploreData(params: {}): IApiRequest<ReadableStream> {
-  // Make a POST request to the API for the stream
   return API.getStream<IApiRequest<ReadableStream>>(
     endpoints.GET_IMAGES,
     params,
