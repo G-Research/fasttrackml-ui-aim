@@ -33,6 +33,9 @@ function DataList({
   tableClassName = '',
   toolbarItems = [],
   disableMatchBar = false,
+  isInfiniteLoading = false,
+  infiniteLoadHandler = () => {},
+  allowInfiniteLoading = false,
 }: IDataListProps): React.FunctionComponentElement<React.ReactNode> {
   const textSearch = useTextSearch({
     rawData: tableData,
@@ -117,6 +120,9 @@ function DataList({
             height='100%'
             disableRowClick
             rowHeight={rowHeight}
+            isInfiniteLoading={isInfiniteLoading}
+            infiniteLoadHandler={infiniteLoadHandler}
+            allowInfiniteLoading={allowInfiniteLoading}
           />
         )}
       </BusyLoaderWrapper>

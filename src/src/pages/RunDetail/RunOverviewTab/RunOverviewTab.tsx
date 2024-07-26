@@ -27,9 +27,16 @@ function RunOverviewTab({ runData, runHash }: IRunOverviewTabProps) {
   const overviewSectionContentRef = React.useRef<HTMLElement | any>(null);
   const [containerHeight, setContainerHeight] = React.useState<number>(0);
 
+  const [startIndex, setStartIndex] = React.useState(0);
+  const [count, setCount] = React.useState(500);
+  const [hasMoreData, setHasMoreData] = React.useState(true);
+
   useRunMetricsBatch({
     runTraces: runData.runTraces,
     runHash,
+    startIndex: 0,
+    count: 500,
+    // fetchMore: fetchMoreMetrics,
   });
 
   React.useEffect(() => {
@@ -69,6 +76,19 @@ function RunOverviewTab({ runData, runHash }: IRunOverviewTabProps) {
 
   function onContainerScroll(e: any) {
     sidebarRef?.current?.scrollTo(0, e.target.scrollTop);
+  }
+
+  function fetchMoreMetrics() {
+    console.log(
+      'fetchMoreMetrics - runMetricsBatch',
+      runData?.runMetricsBatch?.length,
+    );
+    if (runData.runMetricsBatch.length >= count) {
+      console.log('change start index');
+      // setStartIndex((prevIndex) => prevIndex + count);
+    } else {
+      // setHasMoreData(false);
+    }
   }
 
   return (
