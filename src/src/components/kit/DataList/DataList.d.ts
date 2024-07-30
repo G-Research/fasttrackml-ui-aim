@@ -15,7 +15,4 @@ export interface IDataListProps {
   tableClassName?: string;
   toolbarItems?: React.FunctionComponentElement<React.ReactNode>[];
   disableMatchBar?: boolean;
-  infiniteLoadHandler?: (data: any) => void;
-  isInfiniteLoading?: boolean;
-  allowInfiniteLoading?: boolean;
 }

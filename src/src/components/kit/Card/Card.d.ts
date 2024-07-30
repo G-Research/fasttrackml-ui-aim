@@ -15,9 +15,6 @@ export interface ICardProps {
     isLoading?: boolean;
     withSearchBar?: boolean;
     calcTableHeight?: boolean;
-    infiniteLoadHandler?: (data: any) => void;
-    isInfiniteLoading?: boolean;
-    allowInfiniteLoading?: boolean;
   };
   loadMore?: boolean;
   loadMoreHandler?: () => void;
