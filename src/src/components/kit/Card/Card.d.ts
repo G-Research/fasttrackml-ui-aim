@@ -19,4 +19,6 @@ export interface ICardProps {
     isInfiniteLoading?: boolean;
     allowInfiniteLoading?: boolean;
   };
+  loadMore?: boolean;
+  loadMoreHandler?: () => void;
 }

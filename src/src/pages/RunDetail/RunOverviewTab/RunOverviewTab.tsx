@@ -26,17 +26,15 @@ function RunOverviewTab({ runData, runHash }: IRunOverviewTabProps) {
   const overviewSectionRef = React.useRef<HTMLElement | any>(null);
   const overviewSectionContentRef = React.useRef<HTMLElement | any>(null);
   const [containerHeight, setContainerHeight] = React.useState<number>(0);
+  const METRICS_FETCH_COUNT = 500;
 
   const [startIndex, setStartIndex] = React.useState(0);
-  const [count, setCount] = React.useState(500);
-  const [hasMoreData, setHasMoreData] = React.useState(true);
 
   useRunMetricsBatch({
     runTraces: runData.runTraces,
     runHash,
-    startIndex: 0,
-    count: 500,
-    // fetchMore: fetchMoreMetrics,
+    startIndex,
+    count: METRICS_FETCH_COUNT,
   });
 
   React.useEffect(() => {
@@ -79,15 +77,8 @@ function RunOverviewTab({ runData, runHash }: IRunOverviewTabProps) {
   }
 
   function fetchMoreMetrics() {
-    console.log(
-      'fetchMoreMetrics - runMetricsBatch',
-      runData?.runMetricsBatch?.length,
-    );
-    if (runData.runMetricsBatch.length >= count) {
-      console.log('change start index');
-      // setStartIndex((prevIndex) => prevIndex + count);
-    } else {
-      // setHasMoreData(false);
+    if (runData.runMetricsBatch.length > startIndex + 1) {
+      setStartIndex((prevIndex) => prevIndex + METRICS_FETCH_COUNT);
     }
   }
 
@@ -121,6 +112,8 @@ function RunOverviewTab({ runData, runHash }: IRunOverviewTabProps) {
                     isLoading={runData?.isRunBatchLoading}
                     type='metric'
                     runBatch={cardsData?.runMetricsBatch}
+                    totalMetrics={runData?.runTraces?.metric?.length}
+                    loadMoreHandler={fetchMoreMetrics}
                   />
                 </ErrorBoundary>
               )}
