@@ -16,6 +16,12 @@
       margin-top: $space-xxxs;
       margin-bottom: $space-xxxs;
     }
+    &__loadMoreButton {
+      margin-top: $space-md;
+      margin-bottom: $space-sm * -1;
+      max-width: 7rem;
+      margin-left: 0;
+    }
   }
   &__tableWrapper {
     height: toRem(356px);
