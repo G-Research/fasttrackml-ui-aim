@@ -115,6 +115,23 @@ export const TABLE_DEFAULT_CONFIG: Record<string, any> = {
     },
     height: '0.5',
   },
+  [AppNameEnum.IMAGES]: {
+    resizeMode: ResizeModeEnum.Resizable,
+    rowHeight: RowHeightSize.md,
+    sortFields: [],
+    unselectedColumnState: UnselectedColumnState.FORCE_HIDE,
+    hiddenMetrics: [],
+    hiddenColumns: ['hash', 'description'],
+    nonHidableColumns: new Set(['#', 'run', 'actions']),
+    hideSystemMetrics: true,
+    columnsWidths: {},
+    columnsOrder: {
+      left: ['run'],
+      middle: [],
+      right: [],
+    },
+    height: '0.5',
+  },
 };
 
 export const AVOID_COLUMNS_TO_HIDE_LIST = new Set([
