@@ -18,4 +18,5 @@ export interface ICardProps {
   };
   loadMore?: boolean;
   loadMoreHandler?: () => void;
+  loadMoreText?: string;
 }

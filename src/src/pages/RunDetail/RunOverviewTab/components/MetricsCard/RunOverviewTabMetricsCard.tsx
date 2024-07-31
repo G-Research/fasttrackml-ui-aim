@@ -122,6 +122,7 @@ function RunOverviewTabMetricsCard({
         }}
         loadMore={loadMoreHandler && totalMetrics > runBatch?.length}
         loadMoreHandler={loadMoreHandler}
+        loadMoreText={`Load More (${runBatch?.length}/${totalMetrics})`}
       />
     </ErrorBoundary>
   );

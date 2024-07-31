@@ -31,6 +31,7 @@ function Card({
   children,
   loadMore,
   loadMoreHandler,
+  loadMoreText,
 }: ICardProps): React.FunctionComponentElement<React.ReactNode> {
   const tableRef = React.useRef<any>(null);
 
@@ -51,14 +52,16 @@ function Card({
           </Text>
         )}
         {loadMore && loadMoreHandler && (
-          <Button
-            onClick={loadMoreHandler}
-            className='Card__header__loadMoreButton'
-            color='primary'
-            variant='contained'
-          >
-            Load More
-          </Button>
+          <span>
+            <Button
+              onClick={loadMoreHandler}
+              className='Card__header__loadMoreButton'
+              color='primary'
+              variant='contained'
+            >
+              {loadMoreText || 'Load More'}
+            </Button>
+          </span>
         )}
       </div>
       {children || (
