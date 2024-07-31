@@ -41,19 +41,24 @@ const ImageBox = ({
     let subscription: any;
 
     if (blobData === null) {
-      if (blobsURIModel.getState()[blob_uri]) {
-        setBlobData(blobsURIModel.getState()[blob_uri]);
+      // Get the formatted URI containing the run hash and experiment id
+      const formattedUri = data.run.props.experiment.artifact_location
+        ? `${data.run.props.experiment.artifact_location}/${data.run.hash}/artifacts/${blob_uri}`
+        : `artifacts/${data.run.props.experiment.id}/${data.run.hash}/artifacts/${blob_uri}`;
+
+      if (blobsURIModel.getState()[formattedUri]) {
+        setBlobData(blobsURIModel.getState()[formattedUri]);
       } else {
-        subscription = blobsURIModel.subscribe(blob_uri, (data) => {
-          setBlobData(data[blob_uri]);
+        subscription = blobsURIModel.subscribe(formattedUri, (data) => {
+          setBlobData(data[formattedUri]);
           subscription.unsubscribe();
         });
         timeoutID = window.setTimeout(() => {
-          if (blobsURIModel.getState()[blob_uri]) {
-            setBlobData(blobsURIModel.getState()[blob_uri]);
+          if (blobsURIModel.getState()[formattedUri]) {
+            setBlobData(blobsURIModel.getState()[formattedUri]);
             subscription.unsubscribe();
           } else {
-            addUriToList(blob_uri);
+            addUriToList(formattedUri);
           }
         }, BATCH_COLLECT_DELAY);
       }
@@ -67,7 +72,14 @@ const ImageBox = ({
         subscription.unsubscribe();
       }
     };
-  }, [addUriToList, blobData, blob_uri]);
+  }, [
+    addUriToList,
+    blobData,
+    blob_uri,
+    data.run.hash,
+    data.run.props.experiment.id,
+    data.run.props.experiment.artifact_location,
+  ]);
 
   function onImageFullSizeModeButtonClick(e: React.ChangeEvent<any>): void {
     e.stopPropagation();

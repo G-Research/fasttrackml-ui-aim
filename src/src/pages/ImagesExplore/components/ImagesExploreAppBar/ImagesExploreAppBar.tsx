@@ -12,6 +12,18 @@ import ConfirmModal from 'components/ConfirmModal/ConfirmModal';
 
 import { DOCUMENTATIONS } from 'config/references';
 
+import { IResourceState } from 'modules/core/utils/createResource';
+import {
+  IExperimentData,
+  IExperimentDataShort,
+} from 'modules/core/api/experimentsApi';
+
+import createExperimentEngine from 'pages/Dashboard/components/ExploreSection/ExperimentsCard/ExperimentsStore';
+import ExperimentBar from 'pages/Experiment/components/ExperimentBar';
+import useExperimentState from 'pages/Experiment/useExperimentState';
+
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+
 import './ImagesExploreAppBar.scss';
 
 function ImagesExploreAppBar({
@@ -20,9 +32,49 @@ function ImagesExploreAppBar({
   onResetConfigData,
   title,
   disabled,
+  onSelectExperimentsChange,
+  onToggleAllExperiments,
 }: any): React.FunctionComponentElement<React.ReactNode> {
   const [popover, setPopover] = React.useState<string>('');
+  const [selectedExperiments, setSelectedExperiments] = React.useState<
+    IExperimentDataShort[]
+  >(getSelectedExperiments());
+
   const route = useRouteMatch<any>();
+
+  const { current: experimentsEngine } = React.useRef(createExperimentEngine);
+
+  const experimentsStore: IResourceState<IExperimentData[]> =
+    experimentsEngine.experimentsState((state) => state);
+
+  React.useEffect(() => {
+    experimentsEngine.fetchExperiments();
+    return () => {
+      experimentsEngine.destroy();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fetch all experiments along with default
+  const {
+    experimentState,
+    experimentsState,
+    selectedExperiments: filteredSelectedExperiments,
+    getExperimentsData,
+  } = useExperimentState(experimentsStore.data?.[0]?.id);
+
+  // Remove selected experiments that are not in the list of fetched experiments
+  React.useEffect(() => {
+    if (filteredSelectedExperiments.length !== selectedExperiments.length) {
+      setSelectedExperiments(filteredSelectedExperiments);
+    }
+  }, [filteredSelectedExperiments, selectedExperiments]);
+
+  const { data: experimentData, loading: isExperimentLoading } =
+    experimentState;
+
+  const { data: experimentsData, loading: isExperimentsLoading } =
+    experimentsState;
 
   function handleBookmarkClick(value: string): void {
     setPopover(value);
@@ -37,9 +89,23 @@ function ImagesExploreAppBar({
     handleClosePopover();
   }
 
+  function handleExperimentsChange(experiment: IExperimentDataShort): void {
+    onSelectExperimentsChange(experiment);
+    setSelectedExperiments(getSelectedExperiments());
+  }
+
   return (
     <ErrorBoundary>
       <AppBar title={title} disabled={disabled}>
+        <ExperimentBar
+          experimentsData={experimentsData}
+          isExperimentLoading={isExperimentLoading}
+          isExperimentsLoading={isExperimentsLoading}
+          selectedExperiments={selectedExperiments}
+          getExperimentsData={getExperimentsData}
+          onSelectExperimentsChange={handleExperimentsChange}
+          onToggleAllExperiments={onToggleAllExperiments}
+        />
         {route.params.appId ? (
           <ErrorBoundary>
             <ControlPopover
