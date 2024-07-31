@@ -134,7 +134,7 @@ const routes = {
   IMAGE_EXPLORE: {
     path: PathEnum.Images_Explore,
     component: ImagesExplore,
-    showInSidebar: false,
+    showInSidebar: true,
     displayName: 'Images',
     icon: 'images',
     isExact: true,
