@@ -120,9 +120,14 @@ test.describe('Dashboard', () => {
     const month = date.getUTCMonth() + 1; // getUTCMonth() is zero-based
     const day = date.getUTCDate();
 
-    const expectedText = `datetime(${year},${month},${day})<=run.created_at<datetime(${year},${month},${
-      day + 1
-    })`;
+    const nextDayDate = new Date(date);
+    nextDayDate.setUTCDate(day + 1);
+
+    const nextYear = nextDayDate.getUTCFullYear();
+    const nextMonth = nextDayDate.getUTCMonth() + 1; // getUTCMonth() is zero-based
+    const nextDay = nextDayDate.getUTCDate();
+
+    const expectedText = `datetime(${year},${month},${day})<=run.created_at<datetime(${nextYear},${nextMonth},${nextDay})`;
 
     // Locate and click the current day cell in the heatmap
     const heatmap = await page.$('.CalendarHeatmap');

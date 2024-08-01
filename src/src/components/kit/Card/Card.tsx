@@ -1,7 +1,7 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { Text } from 'components/kit';
+import { Button, Text } from 'components/kit';
 import DataList from 'components/kit/DataList';
 
 import { ICardProps } from './Card.d';
@@ -29,6 +29,9 @@ function Card({
   className,
   dataListProps,
   children,
+  loadMore,
+  loadMoreHandler,
+  loadMoreText,
 }: ICardProps): React.FunctionComponentElement<React.ReactNode> {
   const tableRef = React.useRef<any>(null);
 
@@ -47,6 +50,18 @@ function Card({
           >
             {subtitle}
           </Text>
+        )}
+        {loadMore && loadMoreHandler && (
+          <span>
+            <Button
+              onClick={loadMoreHandler}
+              className='Card__header__loadMoreButton'
+              color='primary'
+              variant='contained'
+            >
+              {loadMoreText || 'Load More'}
+            </Button>
+          </span>
         )}
       </div>
       {children || (
