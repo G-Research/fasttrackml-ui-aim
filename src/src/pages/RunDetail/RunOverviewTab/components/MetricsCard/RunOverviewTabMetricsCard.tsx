@@ -16,10 +16,14 @@ function RunOverviewTabMetricsCard({
   isLoading,
   runBatch,
   type,
+  totalMetrics = 0,
+  loadMoreHandler,
 }: {
   isLoading: boolean;
   runBatch: any;
   type: 'metric' | 'systemMetric';
+  totalMetrics?: number;
+  loadMoreHandler?: () => void;
 }) {
   const tableData = React.useMemo(() => {
     if (runBatch) {
@@ -49,7 +53,7 @@ function RunOverviewTabMetricsCard({
               tint={50}
               className='RunOverviewTab__cardBox__tableTitleCount'
             >
-              ({runBatch?.length})
+              ({totalMetrics})
             </Text>
           </Text>
         ),
@@ -92,7 +96,7 @@ function RunOverviewTabMetricsCard({
         ),
       },
     ],
-    [runBatch],
+    [totalMetrics],
   );
 
   return (
@@ -116,6 +120,9 @@ function RunOverviewTabMetricsCard({
             title: 'No Results',
           },
         }}
+        loadMore={loadMoreHandler && totalMetrics > runBatch?.length}
+        loadMoreHandler={loadMoreHandler}
+        loadMoreText={`Load More (${runBatch?.length}/${totalMetrics})`}
       />
     </ErrorBoundary>
   );

@@ -16,4 +16,7 @@ export interface ICardProps {
     withSearchBar?: boolean;
     calcTableHeight?: boolean;
   };
+  loadMore?: boolean;
+  loadMoreHandler?: () => void;
+  loadMoreText?: string;
 }
