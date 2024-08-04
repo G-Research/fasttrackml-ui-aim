@@ -32,12 +32,12 @@ describe('<InputWrapper /> -', () => {
 
     const minValidationPattern = {
       errorCondition: (value: any) => value < 10,
-      errorText: `Value should be equal or greater then ${min}`,
+      errorText: `Value should be equal or greater than ${min}`,
     };
 
     const maxValidationPattern = {
       errorCondition: (value: any) => value > max,
-      errorText: `Value should be equal or smaller then ${max}`,
+      errorText: `Value should be equal or smaller than ${max}`,
     };
 
     const zeroValidationPattern = {
