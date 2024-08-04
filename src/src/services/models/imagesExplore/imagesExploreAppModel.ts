@@ -366,7 +366,7 @@ function getImagesData(
         !_.isEmpty(indexSlice) &&
         !_.isNil(recordSlice?.[0]) &&
         !_.isNil(recordSlice[1])
-          ? `${indexSlice?.[0]}:${(indexSlice?.[1] || 0) + 1}`
+          ? `${indexSlice?.[0]}:${indexSlice?.[1] || 0}`
           : '',
       record_density:
         !_.isNil(recordDensity) && +recordDensity > 0 ? recordDensity : '',
@@ -682,8 +682,9 @@ function setModelData(rawData: any[], configData: IImagesExploreAppConfig) {
       ranges?.index_range_total[0] - 1,
       ranges?.index_range_total[1] + 1,
     )
-      ? ranges?.index_range_used[1] - 1
-      : ranges?.index_range_total[1] - 1,
+      ? // jescalada: Removed the "-1" in order to match the backend behavior
+        ranges?.index_range_used[1]
+      : ranges?.index_range_total[1],
   ];
   const recordRangeTotalCount =
     ranges?.record_range_total[1] - 1 - ranges?.record_range_total[0];
