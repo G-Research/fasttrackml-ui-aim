@@ -26,12 +26,10 @@ function RangePanel({
     >
       <div className='RangePanelContainer'>
         {items?.map((item) => {
-          console.log('RangePanel -> item', item);
           const rangeLength = _.range(
             item.rangeEndpoints?.[0] ?? 0,
             (item.rangeEndpoints?.[1] ?? 0) + 2,
           ).length;
-          console.log('RangePanel -> rangeLength', rangeLength);
           return (
             <React.Fragment key={item.sliderName}>
               {item.rangeEndpoints?.[0] !== item.rangeEndpoints?.[1] ? (
