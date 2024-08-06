@@ -32,7 +32,7 @@ const ImageBox = ({
   const { format, blob_uri } = data;
   const [isImageFullViewPopupOpened, setIsImageFullViewPopupOpened] =
     React.useState<boolean>(false);
-  let [blobData, setBlobData] = React.useState<string>(
+  const [blobData, setBlobData] = React.useState<string>(
     blobsURIModel.getState()[blob_uri] ?? null,
   );
 
@@ -40,7 +40,7 @@ const ImageBox = ({
     let timeoutID: number;
     let subscription: any;
 
-    if (blobData === null) {
+    if (!blobData) {
       // Get the formatted URI containing the run hash and experiment id
       const formattedUri = data.run.props.experiment.artifact_location
         ? `${data.run.props.experiment.artifact_location}/${data.run.hash}/artifacts/${blob_uri}`

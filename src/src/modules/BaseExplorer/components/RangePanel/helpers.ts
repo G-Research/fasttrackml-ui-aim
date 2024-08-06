@@ -25,7 +25,7 @@ export function getRangeAndDensityData(
   ];
   // calculating the items count in range
   const rangeTotalCount = total[1] - total[0] === 0 ? 1 : total[1] - total[0];
-  // checking if the previous density is bigger then the items in the total range.
+  // checking if the previous density is bigger than the items in the total range.
   // setting the density value to the items count otherwise setting the the previous density.
   const density: number =
     prevDensity > rangeTotalCount ? rangeTotalCount : prevDensity;

@@ -28,7 +28,7 @@ function RangePanel({
         {items?.map((item) => {
           const rangeLength = _.range(
             item.rangeEndpoints?.[0] ?? 0,
-            (item.rangeEndpoints?.[1] ?? 0) + 1,
+            (item.rangeEndpoints?.[1] ?? 0) + 2,
           ).length;
           return (
             <React.Fragment key={item.sliderName}>
@@ -40,7 +40,7 @@ function RangePanel({
                   countTitleTooltip={item.inputTitleTooltip}
                   sliderTitleTooltip={item.sliderTitleTooltip}
                   min={item.rangeEndpoints?.[0]}
-                  max={item.rangeEndpoints?.[1]}
+                  max={item.rangeEndpoints?.[1] + 1}
                   selectedRangeValue={item.selectedRangeValue}
                   selectedCountValue={item.inputValue}
                   onSearch={onApply}
@@ -54,13 +54,13 @@ function RangePanel({
                     item?.inputValidationPatterns ?? [
                       {
                         errorCondition: (value: string | number) => +value <= 0,
-                        errorText: `Value should be greater then ${0}`,
+                        errorText: `Value should be greater than ${0}`,
                       },
                       {
                         errorCondition: (value: string | number) => {
                           return +value > rangeLength;
                         },
-                        errorText: `Value should be smaller then ${
+                        errorText: `Value should be smaller than ${
                           rangeLength + 1
                         }`,
                       },
