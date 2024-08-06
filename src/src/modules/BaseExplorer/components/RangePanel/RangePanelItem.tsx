@@ -61,13 +61,13 @@ const RangePanelItem = ({
     () => [
       {
         errorCondition: (value: string | number) => +value <= 0,
-        errorText: `Value should be greater then ${0}`,
+        errorText: `Value should be greater than ${0}`,
       },
       {
         errorCondition: (value: string | number) => {
           return +value > rangeLength;
         },
-        errorText: `Value should be smaller then ${rangeLength + 1}`,
+        errorText: `Value should be smaller than ${rangeLength + 1}`,
       },
     ],
     [rangeLength],

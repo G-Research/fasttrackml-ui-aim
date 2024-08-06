@@ -158,11 +158,11 @@ const settings: Record<string, SettingItem> = {
     inputValidation: (min: number | string, max: number | string) => [
       {
         errorCondition: (value: string | number) => +value < min,
-        errorText: `Value should be equal or greater then ${min}`,
+        errorText: `Value should be equal or greater than ${min}`,
       },
       {
         errorCondition: (value: string | number) => +value > max,
-        errorText: `Value should be equal or smaller then ${max}`,
+        errorText: `Value should be equal or smaller than ${max}`,
       },
     ],
     sliders: {

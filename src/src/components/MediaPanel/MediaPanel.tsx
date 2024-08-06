@@ -200,9 +200,11 @@ function MediaPanel({
     if (blobUriArray.current.includes(blobUrl)) {
       return;
     }
+    /* jescalada: removing this refreshes the image when clicking Search
     if (processedBlobUriArray.current.includes(blobUrl)) {
       return;
     }
+    */
 
     blobUriArray.current.push(blobUrl);
     getBatch();
