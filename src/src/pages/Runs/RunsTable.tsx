@@ -81,7 +81,8 @@ function RunsTable({
             columnsOrder={columnsOrder}
             columnsWidths={columnsWidths}
             // Table actions
-            onMetricsValueKeyChange={onMetricsValueKeyChange}
+            // TODO: Re-enable the metrics value display options
+            // onMetricsValueKeyChange={onMetricsValueKeyChange}
             onManageColumns={onManageColumns}
             onColumnsVisibilityChange={onColumnsVisibilityChange}
             onTableDiffShow={onTableDiffShow}

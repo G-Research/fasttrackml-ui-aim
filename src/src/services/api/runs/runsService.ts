@@ -28,7 +28,7 @@ function getRunsData(
 ) {
   return API.getStream<ReadableStream>(endpoints.GET_RUNS, {
     q: query || '',
-    experiment_names: selectedExperimentNames,
+    experiment_names: selectedExperimentNames || [],
     ...(limit ? { limit } : {}),
     ...(offset ? { offset } : {}),
   });

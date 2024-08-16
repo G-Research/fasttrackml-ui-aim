@@ -389,7 +389,9 @@ function getParamsModelMethods(
         const metricsRowValues = getMetricsInitialRowData(metricsColumns);
         metric.run.traces.metric.forEach((trace: any) => {
           const metricHash = getMetricHash(trace.name, trace.context);
-          metricsRowValues[metricHash] = formatValue(trace.values.last);
+          // TODO: Implement Support for the new metric value API format
+          // metricsRowValues[metricHash] = formatValue(trace.values.last);
+          metricsRowValues[metricHash] = formatValue(trace.last_value.last);
         });
         const rowValues: any = {
           rowMeta: {
@@ -1004,11 +1006,18 @@ function getParamsModelMethods(
         };
         const metricHash = getMetricHash(trace.name, trace.context as any);
         metricsValues[metricHash] = {
-          min: trace.values.min,
-          max: trace.values.max,
-          last: trace.values.last,
-          first: trace.values.first,
+          min: '-',
+          max: '-',
+          last: '-',
+          first: '-',
         };
+        // TODO: Implement Support for the new metric value API format
+        // metricsValues[metricHash] = {
+        //   min: trace.values.min,
+        //   max: trace.values.max,
+        //   last: trace.values.last,
+        //   first: trace.values.first,
+        // };
       });
       const paramKey = encode({ runHash: run.hash });
 

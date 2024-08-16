@@ -380,12 +380,16 @@ function getScattersModelMethods(
                   };
                 }
                 if (type === 'metrics') {
-                  run.run.traces.metric.forEach((trace: IParamTrace) => {
+                  // TODO: Implement Support for the new metric value API format
+                  //run.run.traces.metric.forEach((trace: IParamTrace) => {
+                  // Change the type so that we can access fields of the old API type
+                  run.run.traces.metric.forEach((trace: any) => {
                     if (
                       trace.name === value?.option_name &&
                       _.isEqual(trace.context, value?.context)
                     ) {
-                      let lastValue = trace.values.last;
+                      // TODO: Revert this back to trace.values.last;
+                      let lastValue = trace.last_value.last;
                       const formattedLastValue = formatValue(lastValue, '-');
                       values[i] = lastValue;
                       if (formattedLastValue !== '-') {
@@ -560,7 +564,9 @@ function getScattersModelMethods(
         const metricsRowValues = getMetricsInitialRowData(metricsColumns);
         metric.run.traces.metric.forEach((trace: any) => {
           const metricHash = getMetricHash(trace.name, trace.context as any);
-          metricsRowValues[metricHash] = formatValue(trace.values.last);
+          // TODO: Implement Support for the new metric value API format
+          metricsRowValues[metricHash] = formatValue(trace.last_value.last);
+          //metricsRowValues[metricHash] = formatValue(trace.values.last);
         });
         const rowValues: any = {
           rowMeta: {
@@ -747,12 +753,20 @@ function getScattersModelMethods(
           ...metricsColumns[trace.name],
           [contextToString(trace.context) as string]: '-',
         };
+        // TODO: Implement Support for the new metric value API format
+        const traceOldAPI: any = trace;
         const metricHash = getMetricHash(trace.name, trace.context as any);
+        // metricsValues[metricHash] = {
+        //   min: trace.values.min,
+        //   max: trace.values.max,
+        //   last: trace.last,
+        //   first: trace.values.first,
+        // };
         metricsValues[metricHash] = {
-          min: trace.values.min,
-          max: trace.values.max,
-          last: trace.values.last,
-          first: trace.values.first,
+          min: '-',
+          max: '-',
+          last: traceOldAPI.last_value.last,
+          first: '-',
         };
       });
       const paramKey = encode({ runHash: run.hash });

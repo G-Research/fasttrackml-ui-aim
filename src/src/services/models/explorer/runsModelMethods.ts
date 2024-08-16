@@ -459,11 +459,16 @@ function getRunsModelMethods(
           [contextToString(trace.context) as string]: '-',
         };
         const metricHash = getMetricHash(trace.name, trace.context as any);
+        // TODO: Implement Support for the new metric value API format
         metricsValues[metricHash] = {
-          min: trace.values.min,
-          max: trace.values.max,
-          last: trace.values.last,
-          first: trace.values.first,
+          //min: trace.values.min,
+          min: '-',
+          // max: trace.values.max,
+          max: '-',
+          last: '-',
+          //last: trace.values.last,
+          first: '-',
+          //first: trace.values.first,
         };
       });
       runHashArray.push(run.hash);
@@ -707,8 +712,10 @@ function getRunsModelMethods(
         const metricsRowValues = getMetricsInitialRowData(metricsColumns);
         metric.run.traces.metric.forEach((trace: any) => {
           const metricHash = getMetricHash(trace.name, trace.context);
+          // TODO: Implement Support for the new metric value API format
           metricsRowValues[metricHash] = formatValue(
-            trace.values[metricsValueKey],
+            trace.last_value.last,
+            // trace.values[metricsValueKey],
           );
         });
 
