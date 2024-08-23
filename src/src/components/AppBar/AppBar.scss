@@ -1,0 +1,35 @@
+@use 'src/styles/abstracts' as *;
+
+.AppBar {
+  display: flex;
+  align-items: center;
+  min-height: 2.5rem;
+  border-bottom: $border-main;
+  border-left: $border-main;
+  border-right: $border-main;
+  padding-left: 1.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  background: $white;
+  z-index: 1;
+  &__title {
+    flex: 1;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  &__content {
+    display: flex;
+    flex: 6;
+    align-items: center;
+    justify-content: right;
+    &--disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .ExperimentBar__headerContainer {
+      margin-right: auto;
+    }
+  }
+}
