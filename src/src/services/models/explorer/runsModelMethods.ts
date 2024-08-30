@@ -714,7 +714,7 @@ function getRunsModelMethods(
           const metricHash = getMetricHash(trace.name, trace.context);
           // TODO: Implement Support for the new metric value API format
           metricsRowValues[metricHash] = formatValue(
-            trace.last_value.last,
+            trace.values.last,
             // trace.values[metricsValueKey],
           );
         });

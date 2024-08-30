@@ -389,7 +389,7 @@ function getScattersModelMethods(
                       _.isEqual(trace.context, value?.context)
                     ) {
                       // TODO: Revert this back to trace.values.last;
-                      let lastValue = trace.last_value.last;
+                      let lastValue = trace.values.last;
                       const formattedLastValue = formatValue(lastValue, '-');
                       values[i] = lastValue;
                       if (formattedLastValue !== '-') {
@@ -565,7 +565,7 @@ function getScattersModelMethods(
         metric.run.traces.metric.forEach((trace: any) => {
           const metricHash = getMetricHash(trace.name, trace.context as any);
           // TODO: Implement Support for the new metric value API format
-          metricsRowValues[metricHash] = formatValue(trace.last_value.last);
+          metricsRowValues[metricHash] = formatValue(trace.values.last);
           //metricsRowValues[metricHash] = formatValue(trace.values.last);
         });
         const rowValues: any = {
@@ -765,7 +765,7 @@ function getScattersModelMethods(
         metricsValues[metricHash] = {
           min: '-',
           max: '-',
-          last: traceOldAPI.last_value.last,
+          last: traceOldAPI.values.last,
           first: '-',
         };
       });

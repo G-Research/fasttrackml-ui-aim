@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { saveAs } from 'file-saver';
 import _ from 'lodash-es';
+import { config } from 'yargs';
 
 import { IAxesScaleRange } from 'components/AxesPropsPopover';
 
@@ -303,6 +304,7 @@ function getMetricsAppModelMethods(
 
     if (queryString) {
       configData.select.query = queryString;
+      configData.select.advancedMode = false;
     }
 
     let metrics = getMetricsListFromSelect(configData?.select);
