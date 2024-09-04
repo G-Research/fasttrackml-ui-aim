@@ -17,7 +17,7 @@ test.describe('Images Explorer', () => {
     expect(page.url()).toBe(IMAGES_PAGE);
   });
 
-  test('Check if image caption is present when searching', async ({ page }) => {
+  test('Image caption is present when searching', async ({ page }) => {
     // Select the latest experiment
     const experimentsIcon = page.locator('.icon-arrow-down');
     await experimentsIcon.click();
@@ -47,7 +47,7 @@ test.describe('Images Explorer', () => {
     expect(await imageBoxWithCaption.count()).toBeGreaterThan(0);
   });
 
-  test('Check if image info displays correctly when hovering over image', async ({
+  test('Image info displays correctly when hovering over image', async ({
     page,
   }) => {
     // Select the latest experiment
@@ -84,6 +84,77 @@ test.describe('Images Explorer', () => {
     expect(imageInfoText).toContain('example image name');
     expect(imageInfoText).toContain('Step: 4');
     expect(imageInfoText).toContain('Index: 0');
+  });
+
+  test('Table contains two runs', async ({ page }) => {
+    // Select the latest experiment
+    const experimentsIcon = page.locator('.icon-arrow-down');
+    await experimentsIcon.click();
+
+    const experiment = page.locator(
+      '.ExperimentSelectionPopover__contentContainer__experimentsListContainer__experimentList > :last-child',
+    );
+    await experiment.click();
+
+    // Close the experiment selection popover
+    await page.mouse.click(0, 0);
+
+    // Select the available image name and search
+    const imagesIcon = page.locator('.icon-plus');
+    await imagesIcon.click();
+    const option = page.locator('.SelectForm__option');
+    await option.click();
+    const searchIcon = page.locator('.icon-search');
+    await searchIcon.click();
+
+    await page.waitForSelector('.Table__cell.undefined.experiment');
+
+    const rows = page.locator(
+      '.Table__cell.undefined.experiment .ExperimentNameBox__experimentName',
+    );
+
+    expect(await rows.count()).toBe(2);
+
+    for (let i = 0; i < 2; i++) {
+      const runName = await rows.nth(i).innerText();
+      expect(runName).toMatch(/^experiment-/);
+    }
+  });
+
+  test('Clicking on experiment name navigates to the relevant page', async ({
+    page,
+  }) => {
+    // Select the latest experiment
+    const experimentsIcon = page.locator('.icon-arrow-down');
+    await experimentsIcon.click();
+
+    const experiment = page.locator(
+      '.ExperimentSelectionPopover__contentContainer__experimentsListContainer__experimentList > :last-child',
+    );
+    await experiment.click();
+
+    // Close the experiment selection popover
+    await page.mouse.click(0, 0);
+
+    // Select the available image name and search
+    const imagesIcon = page.locator('.icon-plus');
+    await imagesIcon.click();
+    const option = page.locator('.SelectForm__option');
+    await option.click();
+    const searchIcon = page.locator('.icon-search');
+    await searchIcon.click();
+
+    const rows = page.locator(
+      '.Table__cell.undefined.experiment .ExperimentNameBox__experimentName',
+    );
+
+    await rows
+      .locator('a', { hasText: /^experiment-/ })
+      .first()
+      .click();
+
+    await page.waitForURL(/\/aim\/experiments\/\d+\/overview/);
+    expect(page.url()).toMatch(/\/aim\/experiments\/\d+\/overview/);
   });
 
   test.afterEach(async ({ page }, testInfo) => {
