@@ -2339,11 +2339,13 @@ function onStackingToggle(): void {
 
 function onModelSelectExperimentsChange(experiment: IExperimentDataShort) {
   onSelectExperimentsChange(experiment);
+  fetchProjectParamsAndUpdateState();
   getImagesData(false, true).call();
 }
 
 function onModelToggleAllExperiments(experiments: IExperimentDataShort[]) {
   onToggleAllExperiments(experiments);
+  fetchProjectParamsAndUpdateState();
   getImagesData(false, true).call();
 }
 
