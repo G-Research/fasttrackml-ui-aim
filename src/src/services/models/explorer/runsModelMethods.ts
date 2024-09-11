@@ -4,13 +4,18 @@ import _ from 'lodash-es';
 
 import COLORS from 'config/colors/colors';
 import DASH_ARRAYS from 'config/dash-arrays/dashArrays';
-import { RowHeightSize } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 import { MetricsValueKeyEnum } from 'config/enums/tableEnums';
+
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 import {
   getRunsTableColumns,
@@ -46,12 +51,14 @@ import { ITagInfo } from 'types/pages/tags/Tags';
 import { aggregateGroupData } from 'utils/aggregateGroupData';
 import exceptionHandler from 'utils/app/exceptionHandler';
 import { getFilteredGroupingOptions } from 'utils/app/getFilteredGroupingOptions';
-import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
+import onDefaultColumnsVisibilityChange from 'utils/app/onDefaultColumnsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import { onTableDiffShow } from 'utils/app/onTableDiffShow';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
 import updateSortFields from 'utils/app/updateTableSortFields';
@@ -63,7 +70,6 @@ import {
 } from 'utils/encoder/streamEncoding';
 import { formatValue } from 'utils/formatValue';
 import getObjectPaths from 'utils/getObjectPaths';
-import JsonToCSV from 'utils/JsonToCSV';
 import { setItem } from 'utils/storage';
 import { encode } from 'utils/encoder/encoder';
 import onNotificationDelete from 'utils/app/onNotificationDelete';
@@ -79,6 +85,7 @@ import { getMetricsInitialRowData } from 'utils/app/getMetricsInitialRowData';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import onMetricsValueKeyChange from 'utils/app/onMetricsValueKeyChange';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import { InitialAppModelType } from './config';
 
@@ -183,6 +190,42 @@ function getRunsModelMethods(
     onRunsTagsChange({ runHash, tags, model, updateModelData });
   }
 
+  function onSelectExperiment(experiment: IExperimentDataShort): void {
+    onSelectExperimentsChange(experiment);
+    try {
+      getRunsData().call((detail) => {
+        exceptionHandler({ detail, model });
+      });
+    } catch (err: any) {
+      onNotificationAdd({
+        model,
+        notification: {
+          id: Date.now(),
+          messages: [err.message],
+          severity: 'error',
+        },
+      });
+    }
+  }
+
+  function onSelectExperiments(experiments: IExperimentDataShort[]): void {
+    onToggleAllExperiments(experiments);
+    try {
+      getRunsData().call((detail) => {
+        exceptionHandler({ detail, model });
+      });
+    } catch (err: any) {
+      onNotificationAdd({
+        model,
+        notification: {
+          id: Date.now(),
+          messages: [err.message],
+          severity: 'error',
+        },
+      });
+    }
+  }
+
   function getRunsData(
     shouldUrlUpdate?: boolean,
     shouldResetSelectedRows?: boolean,
@@ -206,7 +249,13 @@ function getRunsModelMethods(
 
     liveUpdateInstance?.stop().then();
 
-    runsRequestRef = runsService.getRunsData(query, 45, pagination?.offset);
+    const selectedExperimentNames = getSelectedExperiments().map((e) => e.name);
+    runsRequestRef = runsService.getRunsData(
+      query,
+      45,
+      pagination?.offset,
+      selectedExperimentNames,
+    );
     let limit = pagination.limit;
     setRequestProgress(model);
     return {
@@ -410,11 +459,16 @@ function getRunsModelMethods(
           [contextToString(trace.context) as string]: '-',
         };
         const metricHash = getMetricHash(trace.name, trace.context as any);
+        // TODO: Implement Support for the new metric value API format
         metricsValues[metricHash] = {
-          min: trace.values.min,
-          max: trace.values.max,
-          last: trace.values.last,
-          first: trace.values.first,
+          //min: trace.values.min,
+          min: '-',
+          // max: trace.values.max,
+          max: '-',
+          last: '-',
+          //last: trace.values.last,
+          first: '-',
+          //first: trace.values.first,
         };
       });
       runHashArray.push(run.hash);
@@ -658,8 +712,10 @@ function getRunsModelMethods(
         const metricsRowValues = getMetricsInitialRowData(metricsColumns);
         metric.run.traces.metric.forEach((trace: any) => {
           const metricHash = getMetricHash(trace.name, trace.context);
+          // TODO: Implement Support for the new metric value API format
           metricsRowValues[metricHash] = formatValue(
-            trace.values[metricsValueKey],
+            trace.values.last,
+            // trace.values[metricsValueKey],
           );
         });
 
@@ -809,63 +865,20 @@ function getRunsModelMethods(
     }
   }
 
-  function onExportTableData(): void {
-    // @TODO need to get data and params from state not from processData
-    const { data, params, metricsColumns } = processData(
-      model.getState()?.rawData,
-    );
-    const tableData = getDataAsTableRows(data, metricsColumns, params, true);
-    const configData = model.getState()?.config;
-    const tableColumns: ITableColumn[] = getRunsTableColumns(
-      metricsColumns,
-      params,
-      configData?.table.columnsOrder!,
-      configData?.table.hiddenColumns!,
-    );
-    const excludedFields: string[] = ['#', 'actions'];
-    const filteredHeader: string[] = tableColumns.reduce(
-      (acc: string[], column: ITableColumn) =>
-        acc.concat(
-          excludedFields.indexOf(column.key) === -1 && !column.isHidden
-            ? column.key
-            : [],
-        ),
-      [],
-    );
-
-    let emptyRow: { [key: string]: string } = {};
-    filteredHeader.forEach((column: string) => {
-      emptyRow[column] = '--';
+  async function onExportTableData(): Promise<void> {
+    const query = model.getState()?.config?.select?.query;
+    const request = runsService.getCsvData(query);
+    const readableStream = await request.call((detail) => {
+      exceptionHandler({ detail, model });
     });
-
-    const groupedRows: IMetricTableRowData[][] =
-      data.length > 1
-        ? Object.keys(tableData.rows).map(
-            (groupedRowKey: string) => tableData.rows[groupedRowKey].items,
-          )
-        : [
-            Array.isArray(tableData.rows)
-              ? tableData.rows
-              : tableData.rows[Object.keys(tableData.rows)[0]].items,
-          ];
-
-    const dataToExport: { [key: string]: string }[] = [];
-
-    groupedRows?.forEach(
-      (groupedRow: IMetricTableRowData[], groupedRowIndex: number) => {
-        groupedRow?.forEach((row: IMetricTableRowData) => {
-          const filteredRow = getFilteredRow({
-            columnKeys: filteredHeader,
-            row,
-          });
-          dataToExport.push(filteredRow);
-        });
-        if (groupedRows?.length - 1 !== groupedRowIndex) {
-          dataToExport.push(emptyRow);
-        }
-      },
-    );
-    const blob = new Blob([JsonToCSV(dataToExport)], {
+    const reader = readableStream.getReader();
+    const data = [];
+    let readResult = await reader.read();
+    while (!readResult.done) {
+      data.push(readResult.value);
+      readResult = await reader.read();
+    }
+    const blob = new Blob(data, {
       type: 'text/csv;charset=utf-8;',
     });
     saveAs(blob, `runs-${moment().format(DATE_EXPORTING_FORMAT)}.csv`);
@@ -1093,6 +1106,8 @@ function getRunsModelMethods(
     onNotificationDelete: onModelNotificationDelete,
     setDefaultAppConfigData: setModelDefaultAppConfigData,
     onRunsTagsChange: onModelRunsTagsChange,
+    onSelectExperimentsChange: onSelectExperiment,
+    onToggleAllExperiments: onSelectExperiments,
     changeLiveUpdateConfig,
     archiveRuns,
     deleteRuns,
@@ -1140,6 +1155,14 @@ function getRunsModelMethods(
           updateModelData,
         });
       },
+      onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+        onDefaultColumnsVisibilityChange({
+          unselectedColumnState: state,
+          model,
+          appName,
+          updateModelData,
+        });
+      },
       onTableDiffShow(): void {
         onTableDiffShow({ model, appName, updateModelData });
       },
@@ -1161,14 +1184,25 @@ function getRunsModelMethods(
           updateModelData,
         });
       },
+
       onRowSelect({
         actionType,
         data,
+        rangeStart,
+        rangeEnd,
       }: {
-        actionType: 'single' | 'selectAll' | 'removeAll';
+        actionType: 'single' | 'selectAll' | 'removeAll' | 'range';
         data?: any;
+        rangeStart?: number;
+        rangeEnd?: number;
       }): void {
-        return onRowSelect({ actionType, data, model });
+        return onRowSelect({
+          actionType,
+          data,
+          rangeStart,
+          rangeEnd,
+          model,
+        });
       },
       onToggleColumnsColorScales(colKey: string): void {
         onToggleColumnsColorScales({

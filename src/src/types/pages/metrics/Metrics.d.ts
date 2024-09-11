@@ -1,10 +1,15 @@
 import React from 'react';
 import { RouteChildrenProps } from 'react-router-dom';
 
-import { RowHeightSize } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { ResizeModeEnum } from 'config/enums/tableEnums';
 import { DensityOptions } from 'config/enums/densityEnum';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
+
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 import {
   IGroupingConfig,
@@ -30,6 +35,7 @@ import {
   ISmoothing,
   LegendsDataType,
   LegendsConfig,
+  IGroupingCondition,
 } from 'types/services/models/metrics/metricsAppModel';
 import { ITableColumn } from 'types/components/TableColumns/TableColumns';
 import { IChartPanelRef } from 'types/components/ChartPanel/ChartPanel';
@@ -68,7 +74,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   zoom: IChartZoom;
   densityType: DensityOptions;
   axesScaleType: IAxesScaleState;
-  axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   smoothing: ISmoothing;
   focusedState: IFocusedState;
   highlightMode: HighlightEnum;
@@ -76,7 +82,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   notifyData: IMetricAppModelState['notifyData'];
   tooltip: ITooltip;
   aggregationConfig: IAggregationConfig;
-  alignmentConfig: IAlignmentConfig;
+  alignmentConfigs: IAlignmentConfig[];
   selectedMetricsData: ISelectConfig;
   tableRowHeight: RowHeightSize;
   selectedRows: { [key: string]: any };
@@ -84,8 +90,10 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   hiddenMetrics: string[];
   hiddenColumns: string[];
   hideSystemMetrics: boolean;
+  unselectedColumnState: UnselectedColumnState;
   sameValueColumns?: string[] | [];
   groupingSelectOptions: IGroupingSelectOption[];
+  conditionalGroupingOptions: IGroupingSelectOption[];
   sortOptions: IGroupingSelectOption[];
   requestStatus: RequestStatusEnum;
   requestProgress: IRequestProgress;
@@ -111,7 +119,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onTableRowHover: (rowKey?: string) => void;
   onTableRowClick: (rowKey?: string) => void;
   onAxesScaleTypeChange: (params: IAxesScaleState) => void;
-  onAxesScaleRangeChange: (range: Partial<IAxesScaleRange>) => void;
+  onAxesScaleRangeChange: (chartId: number, range: Partial<IAxesScaleRange>) => void;
   onAggregationConfigChange: (
     aggregationConfig: Partial<IAggregationConfig>,
   ) => void;
@@ -121,19 +129,23 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onGroupingReset: (groupName: GroupNameEnum) => void;
   onGroupingApplyChange: (groupName: GroupNameEnum) => void;
   onGroupingPersistenceChange: (groupName: 'color' | 'stroke') => void;
+  onGroupingConditionsChange: (
+    conditions: IGroupingCondition[],
+    groupName: GroupNameEnum,
+  ) => void;
   onBookmarkCreate: (params: IBookmarkFormState) => void;
   onBookmarkUpdate: (id: string) => void;
   onNotificationAdd: (notification: INotification) => void;
   onNotificationDelete: (id: number) => void;
   onResetConfigData: () => void;
   onAlignmentMetricChange: (metric: string) => void;
-  onAlignmentTypeChange: (type: XAlignmentEnum) => void;
+  onAlignmentTypeChange: (chartId: number, type: XAlignmentEnum) => void;
   onDensityTypeChange: (type: DensityOptions) => void;
   onMetricsSelectChange: (options: ISelectOption[]) => void;
+  onSelectExperimentsChange: (experiment: IExperimentDataShort) => void;
+  onToggleAllExperiments: (experiments: IExperimentDataShort[]) => void;
   onSelectRunQueryChange: (query: string) => void;
-  onSelectAdvancedQueryChange: (query: string) => void;
   onRowsVisibilityChange: (metricKeys: string[]) => void;
-  toggleSelectAdvancedMode: () => void;
   onExportTableData: (e: React.ChangeEvent<any>) => void;
   onRowHeightChange: (height: RowHeightSize) => void;
   onSortReset: () => void;
@@ -141,6 +153,7 @@ export interface IMetricProps extends Partial<RouteChildrenProps> {
   onMetricVisibilityChange: (metricKeys: string[]) => void;
   onColumnsOrderChange: (order: any) => void;
   onColumnsVisibilityChange: (hiddenColumns: string[] | string) => void;
+  onDefaultColumnsVisibilityChange: (state: UnselectedColumnState) => void;
   onTableDiffShow: () => void;
   onTableResizeModeChange: (mode: ResizeModeEnum) => void;
   updateColumnsWidths: (key: string, width: number, isReset: boolean) => void;

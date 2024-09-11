@@ -1,7 +1,7 @@
 import React from 'react';
 import { RouteChildrenProps } from 'react-router-dom';
 
-import { RowHeightSize } from 'config/table/tableConfigs';
+import { RowHeightSize, UnselectedColumnState } from 'config/table/tableConfigs';
 import { ResizeModeEnum } from 'config/enums/tableEnums';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 
@@ -35,6 +35,7 @@ import { IProjectParamsMetrics } from 'types/services/models/projects/projectsMo
 import { ITrendlineOptions } from 'types/services/models/scatter/scatterAppModel';
 
 import { IRequestProgress } from 'utils/app/setRequestProgress';
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 export interface IScattersProps extends Partial<RouteChildrenProps> {
   tableRef: React.RefObject<ITableRef>;
@@ -58,6 +59,7 @@ export interface IScattersProps extends Partial<RouteChildrenProps> {
   sortFields: [string, 'asc' | 'desc' | boolean][];
   hiddenMetrics: string[];
   hiddenColumns: string[];
+  unselectedColumnState: UnselectedColumnState;
   hideSystemMetrics: boolean;
   groupingSelectOptions: IGroupingSelectOption[];
   sortOptions: IGroupingSelectOption[];
@@ -93,6 +95,8 @@ export interface IScattersProps extends Partial<RouteChildrenProps> {
   onNotificationAdd: (notification: INotification) => void;
   onNotificationDelete: (id: number) => void;
   onResetConfigData: () => void;
+  onSelectExperimentsChange: (experiment: IExperimentDataShort) => void;
+  onToggleAllExperiments: (experiments: IExperimentDataShort[]) => void;
   onSelectOptionsChange: (options: ISelectOption[]) => void;
   onSelectRunQueryChange: (query: string) => void;
   onExportTableData: (e: React.ChangeEvent<any>) => void;
@@ -102,6 +106,7 @@ export interface IScattersProps extends Partial<RouteChildrenProps> {
   onParamVisibilityChange: (metricKeys: string[]) => void;
   onColumnsOrderChange: (order: any) => void;
   onColumnsVisibilityChange: (hiddenColumns: string[] | string) => void;
+  onDefaultColumnsVisibilityChange: (state: UnselectedColumnState) => void;
   onTableDiffShow: () => void;
   onTableResizeModeChange: (mode: ResizeModeEnum) => void;
   updateColumnsWidths: (key: string, width: number, isReset: boolean) => void;

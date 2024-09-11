@@ -30,6 +30,7 @@ import { AppNameEnum } from 'services/models/explorer';
 
 import { ILine } from 'types/components/LineChart/LineChart';
 import { IMetricProps } from 'types/pages/metrics/Metrics';
+import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
 import { ChartTypeEnum, CurveEnum } from 'utils/d3';
 
@@ -39,29 +40,33 @@ import SelectForm from './components/SelectForm/SelectForm';
 
 import './Metrics.scss';
 
+const MaxMetrics = 50;
+
 function Metrics(
   props: IMetricProps,
 ): React.FunctionComponentElement<React.ReactNode> {
   const [isProgressBarVisible, setIsProgressBarVisible] =
     React.useState<boolean>(false);
   const chartProps = React.useMemo(() => {
-    return (props.lineChartData || []).map((chartData: ILine[]) => ({
-      axesScaleType: props.axesScaleType,
-      axesScaleRange: props.axesScaleRange,
-      curveInterpolation: props.smoothing.isApplied
-        ? props.smoothing.curveInterpolation
-        : CurveEnum.Linear,
-      ignoreOutliers: props.ignoreOutliers,
-      highlightMode: props.highlightMode,
-      aggregatedData: props.aggregatedData?.filter(
-        (data) => data.chartIndex === chartData[0]?.chartIndex,
-      ),
-      zoom: props.zoom,
-      chartTitle: props.chartTitleData[chartData[0]?.chartIndex!],
-      aggregationConfig: props.aggregationConfig,
-      alignmentConfig: props.alignmentConfig,
-      onZoomChange: props.onZoomChange,
-    }));
+    return (props.lineChartData || []).map(
+      (chartData: ILine[], index: number) => ({
+        axesScaleType: props.axesScaleType,
+        axesScaleRange: props.axesScaleRanges[index],
+        curveInterpolation: props.smoothing.isApplied
+          ? props.smoothing.curveInterpolation
+          : CurveEnum.Linear,
+        ignoreOutliers: props.ignoreOutliers,
+        highlightMode: props.highlightMode,
+        aggregatedData: props.aggregatedData?.filter(
+          (data) => data.chartIndex === chartData[0]?.chartIndex,
+        ),
+        zoom: props.zoom,
+        chartTitle: props.chartTitleData[chartData[0]?.chartIndex!],
+        aggregationConfig: props.aggregationConfig,
+        alignmentConfig: props.alignmentConfigs[index],
+        onZoomChange: props.onZoomChange,
+      }),
+    );
   }, [
     props.lineChartData,
     props.axesScaleType,
@@ -73,10 +78,22 @@ function Metrics(
     props.chartTitleData,
     props.aggregatedData,
     props.aggregationConfig,
-    props.alignmentConfig,
+    props.alignmentConfigs,
     props.onZoomChange,
-    props.axesScaleRange,
+    props.axesScaleRanges,
   ]);
+
+  const metricsSelectChange = (selectedMetrics: ISelectOption[]): void => {
+    if (selectedMetrics.length > MaxMetrics) {
+      props.onNotificationAdd({
+        id: Date.now(),
+        severity: 'warning',
+        messages: [`Maximum number of metrics is ${MaxMetrics}`],
+      });
+      return;
+    }
+    props.onMetricsSelectChange(selectedMetrics);
+  };
 
   return (
     <ErrorBoundary>
@@ -91,6 +108,8 @@ function Metrics(
               liveUpdateConfig={props.liveUpdateConfig}
               onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
               title={pageTitlesEnum.METRICS_EXPLORER}
+              onSelectExperimentsChange={props.onSelectExperimentsChange}
+              onToggleAllExperiments={props.onToggleAllExperiments}
             />
             <div className='Metrics__SelectForm__Grouping__container'>
               <SelectForm
@@ -100,10 +119,8 @@ function Metrics(
                 isDisabled={isProgressBarVisible}
                 selectFormData={props.selectFormData}
                 selectedMetricsData={props.selectedMetricsData}
-                onMetricsSelectChange={props.onMetricsSelectChange}
+                onMetricsSelectChange={metricsSelectChange}
                 onSelectRunQueryChange={props.onSelectRunQueryChange}
-                onSelectAdvancedQueryChange={props.onSelectAdvancedQueryChange}
-                toggleSelectAdvancedMode={props.toggleSelectAdvancedMode}
                 onSearchQueryCopy={props.onSearchQueryCopy}
               />
               <Grouping
@@ -116,12 +133,14 @@ function Metrics(
                 isDisabled={isProgressBarVisible}
                 groupingData={props.groupingData}
                 groupingSelectOptions={props.groupingSelectOptions}
+                conditionalGroupingOptions={props.conditionalGroupingOptions}
                 onGroupingSelectChange={props.onGroupingSelectChange}
                 onGroupingModeChange={props.onGroupingModeChange}
                 onGroupingPaletteChange={props.onGroupingPaletteChange}
                 onGroupingReset={props.onGroupingReset}
                 onGroupingApplyChange={props.onGroupingApplyChange}
                 onGroupingPersistenceChange={props.onGroupingPersistenceChange}
+                onGroupingConditionsChange={props.onGroupingConditionsChange}
                 onShuffleChange={props.onShuffleChange}
               />
             </div>
@@ -166,7 +185,7 @@ function Metrics(
                         focusedState={props.focusedState}
                         tooltip={props.tooltip}
                         legends={props.legends}
-                        alignmentConfig={props.alignmentConfig}
+                        alignmentConfigs={props.alignmentConfigs}
                         zoom={props.zoom}
                         chartProps={chartProps}
                         resizeMode={props.resizeMode}
@@ -190,8 +209,8 @@ function Metrics(
                             highlightMode={props.highlightMode}
                             aggregationConfig={props.aggregationConfig}
                             axesScaleType={props.axesScaleType}
-                            axesScaleRange={props.axesScaleRange}
-                            alignmentConfig={props.alignmentConfig}
+                            axesScaleRanges={props.axesScaleRanges}
+                            alignmentConfigs={props.alignmentConfigs}
                             onChangeTooltip={props.onChangeTooltip}
                             onIgnoreOutliersChange={
                               props.onIgnoreOutliersChange
@@ -259,6 +278,7 @@ function Metrics(
                           resizeMode={props.resizeMode}
                           columnsWidths={props.columnsWidths}
                           selectedRows={props.selectedRows}
+                          unselectedColumnState={props.unselectedColumnState}
                           hideSystemMetrics={props.hideSystemMetrics}
                           appName={AppNameEnum.METRICS}
                           hiddenChartRows={props.lineChartData?.length === 0}
@@ -271,6 +291,9 @@ function Metrics(
                           onManageColumns={props.onColumnsOrderChange}
                           onColumnsVisibilityChange={
                             props.onColumnsVisibilityChange
+                          }
+                          onDefaultColumnsVisibilityChange={
+                            props.onDefaultColumnsVisibilityChange
                           }
                           onTableDiffShow={props.onTableDiffShow}
                           onRowHeightChange={props.onRowHeightChange}

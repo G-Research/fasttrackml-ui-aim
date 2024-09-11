@@ -8,7 +8,13 @@ const endpoints = {
 };
 
 function getImagesExploreData(params: {}): IApiRequest<ReadableStream> {
-  return API.getStream<ReadableStream>(endpoints.GET_IMAGES, params);
+  return API.getStream<IApiRequest<ReadableStream>>(
+    endpoints.GET_IMAGES,
+    params,
+    {
+      method: 'POST',
+    },
+  );
 }
 
 function getImagesByURIs(body: string[]): IApiRequest<any> {

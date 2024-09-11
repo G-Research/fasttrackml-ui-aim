@@ -16,6 +16,8 @@ import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
+
 import {
   getImagesExploreTableColumns,
   imagesExploreTableRowRenderer,
@@ -95,6 +97,10 @@ import getFilteredRow from 'utils/app/getFilteredRow';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import onRunsTagsChange from 'utils/app/onRunsTagsChange';
 import saveRecentSearches from 'utils/saveRecentSearches';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import createModel from '../model';
 import { AppNameEnum } from '../explorer';
@@ -199,29 +205,7 @@ function initialize(appId: string): void {
   if (!appId) {
     setDefaultAppConfigData();
   }
-  projectsService
-    .getProjectParams(['images'])
-    .call()
-    .then((data: IProjectParamsMetrics) => {
-      const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
-        data.images,
-      );
-      model.setState({
-        selectFormData: {
-          options: getSelectFormOptions(data),
-          suggestions: getSuggestionsByExplorer(AppNameEnum.IMAGES, data),
-          advancedSuggestions: {
-            ...getSuggestionsByExplorer(AppNameEnum.IMAGES, data),
-            images: {
-              name: '',
-              context: _.isEmpty(advancedSuggestions)
-                ? ''
-                : { ...advancedSuggestions },
-            },
-          },
-        },
-      });
-    });
+  fetchProjectParamsAndUpdateState();
 }
 
 function setDefaultAppConfigData(recoverTableState: boolean = true) {
@@ -382,7 +366,7 @@ function getImagesData(
         !_.isEmpty(indexSlice) &&
         !_.isNil(recordSlice?.[0]) &&
         !_.isNil(recordSlice[1])
-          ? `${indexSlice?.[0]}:${(indexSlice?.[1] || 0) + 1}`
+          ? `${indexSlice?.[0]}:${indexSlice?.[1] || 0}`
           : '',
       record_density:
         !_.isNil(recordDensity) && +recordDensity > 0 ? recordDensity : '',
@@ -459,6 +443,37 @@ function getImagesData(
     },
     abort: imagesRequestRef.abort,
   };
+}
+
+function fetchProjectParamsAndUpdateState() {
+  const selectedExperiments = getSelectedExperiments();
+  projectsService
+    .getProjectParams(
+      ['images'],
+      selectedExperiments.map((exp) => exp.id),
+    )
+    .call()
+    .then((data: IProjectParamsMetrics) => {
+      const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
+        data.images,
+      );
+      model.setState({
+        selectFormData: {
+          options: getSelectFormOptions(data),
+          suggestions: getSuggestionsByExplorer(AppNameEnum.IMAGES, data),
+          advancedSuggestions: {
+            ...getSuggestionsByExplorer(AppNameEnum.IMAGES, data),
+            images: {
+              name: '',
+              context: _.isEmpty(advancedSuggestions)
+                ? ''
+                : { ...advancedSuggestions },
+            },
+          },
+        },
+      });
+      removeOldSelectedMetrics(model);
+    });
 }
 
 function getSelectFormOptions(projectsData: IProjectParamsMetrics) {
@@ -667,8 +682,9 @@ function setModelData(rawData: any[], configData: IImagesExploreAppConfig) {
       ranges?.index_range_total[0] - 1,
       ranges?.index_range_total[1] + 1,
     )
-      ? ranges?.index_range_used[1] - 1
-      : ranges?.index_range_total[1] - 1,
+      ? // jescalada: Removed the "-1" in order to match the backend behavior
+        ranges?.index_range_used[1]
+      : ranges?.index_range_total[1],
   ];
   const recordRangeTotalCount =
     ranges?.record_range_total[1] - 1 - ranges?.record_range_total[0];
@@ -2321,6 +2337,16 @@ function onStackingToggle(): void {
   }
 }
 
+function onModelSelectExperimentsChange(experiment: IExperimentDataShort) {
+  onSelectExperimentsChange(experiment);
+  getImagesData(false, true).call();
+}
+
+function onModelToggleAllExperiments(experiments: IExperimentDataShort[]) {
+  onToggleAllExperiments(experiments);
+  getImagesData(false, true).call();
+}
+
 const imagesExploreAppModel = {
   ...model,
   initialize,
@@ -2375,6 +2401,9 @@ const imagesExploreAppModel = {
   archiveRuns,
   onRowSelect,
   onRunsTagsChange: onModelRunsTagsChange,
+  onSelectExperimentsChange: onModelSelectExperimentsChange,
+  onToggleAllExperiments: onModelToggleAllExperiments,
+  fetchProjectParamsAndUpdateState,
 };
 
 export default imagesExploreAppModel;

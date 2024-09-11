@@ -52,13 +52,8 @@ function RunOverviewSidebar({
   const insightsList = React.useMemo(() => {
     const path = url.split('/').slice(0, -1).join('/');
     const systemMetricsLength: number =
-      traces.metric.filter((m) => m.name.startsWith('__system__')).length || 0;
+      traces.metric.filter((m) => m.name.startsWith('system/')).length || 0;
     return [
-      {
-        name: 'Notes',
-        path: `${path}/notes`,
-        value: info.notes || 0,
-      },
       {
         name: 'Metrics',
         path: `${path}/metrics`,
@@ -68,31 +63,6 @@ function RunOverviewSidebar({
         name: 'System',
         path: `${path}/system`,
         value: systemMetricsLength,
-      },
-      {
-        name: 'Distributions',
-        path: `${path}/distributions`,
-        value: traces?.distributions?.length || 0,
-      },
-      {
-        name: 'Images',
-        path: `${path}/images`,
-        value: traces?.images?.length || 0,
-      },
-      {
-        name: 'Audios',
-        path: `${path}/audios`,
-        value: traces?.audios?.length || 0,
-      },
-      {
-        name: 'Texts',
-        path: `${path}/texts`,
-        value: traces?.texts?.length || 0,
-      },
-      {
-        name: 'Figures',
-        path: `${path}/figures`,
-        value: traces?.figures?.length || 0,
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps

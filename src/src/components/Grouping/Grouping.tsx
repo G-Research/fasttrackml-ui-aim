@@ -16,6 +16,7 @@ import './Grouping.scss';
 function Grouping({
   groupingData,
   groupingSelectOptions,
+  conditionalGroupingOptions,
   onGroupingSelectChange,
   onGroupingModeChange,
   onGroupingPaletteChange,
@@ -23,6 +24,7 @@ function Grouping({
   onGroupingPersistenceChange,
   onGroupingApplyChange,
   onShuffleChange,
+  onGroupingConditionsChange,
   groupingPopovers = GroupingPopovers,
   isDisabled = false,
 }: IGroupingProps): React.FunctionComponentElement<React.ReactNode> {
@@ -45,6 +47,7 @@ function Grouping({
                   groupName={groupName as GroupNameEnum}
                   groupingData={groupingData}
                   groupingSelectOptions={groupingSelectOptions}
+                  conditionalGroupingOptions={conditionalGroupingOptions}
                   onSelect={onGroupingSelectChange}
                   onGroupingModeChange={onGroupingModeChange}
                   isDisabled={isDisabled}
@@ -63,6 +66,10 @@ function Grouping({
                           onGroupingPaletteChange,
                           paletteIndex: groupingData?.paletteIndex,
                         })}
+                        groupingSelectOptions={groupingSelectOptions}
+                        conditionalGroupingOptions={conditionalGroupingOptions}
+                        onSelect={onGroupingSelectChange}
+                        onGroupingConditionsChange={onGroupingConditionsChange}
                       />
                     )
                   }

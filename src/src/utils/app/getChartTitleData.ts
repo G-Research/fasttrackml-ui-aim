@@ -6,6 +6,7 @@ import { DATE_WITH_SECONDS } from 'config/dates/dates';
 import {
   IChartTitle,
   IChartTitleData,
+  IGroupingCondition,
   IGroupingSelectOption,
   IMetricsCollection,
 } from 'types/services/models/metrics/metricsAppModel';
@@ -28,9 +29,19 @@ export default function getChartTitleData<D, M extends State>({
   }
   const groupData = model.getState()?.config?.grouping;
   let chartTitleData: IChartTitleData = {};
+
+  // Get the list of conditions as strings
+  const conditions: IGroupingCondition[] = groupData.conditions?.chart?.map(
+    (condition: IGroupingCondition) =>
+      `${condition.fieldName} ${condition.operator} ${condition.value}`,
+  );
+
+  // Add the conditions to the chart names array
+  const chartNames = groupData.chart.concat(conditions || []);
+
   processedData.forEach((metricsCollection) => {
     if (!chartTitleData[metricsCollection.chartIndex]) {
-      chartTitleData[metricsCollection.chartIndex] = groupData.chart.reduce(
+      chartTitleData[metricsCollection.chartIndex] = chartNames.reduce(
         (acc: IChartTitle, groupItemKey: string) => {
           if (metricsCollection.config?.hasOwnProperty(groupItemKey)) {
             const value = metricsCollection.config[groupItemKey];
@@ -45,8 +56,10 @@ export default function getChartTitleData<D, M extends State>({
                     : value,
                 );
             } else {
-              acc[getValueByField(groupingSelectOptions || [], groupItemKey)] =
-                formatValue(value);
+              acc[
+                getValueByField(groupingSelectOptions || [], groupItemKey) ||
+                  groupItemKey
+              ] = formatValue(value);
             }
           }
           return acc;

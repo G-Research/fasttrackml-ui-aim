@@ -95,6 +95,8 @@ function RunsContainer(): React.FunctionComponentElement<React.ReactNode> {
         archiveRuns={runsAppModel.archiveRuns}
         deleteRuns={runsAppModel.deleteRuns}
         onMetricsValueKeyChange={runsAppModel.onMetricsValueKeyChange}
+        onSelectExperimentsChange={runsAppModel.onSelectExperimentsChange}
+        onToggleAllExperiments={runsAppModel.onToggleAllExperiments}
       />
     </ErrorBoundary>
   );

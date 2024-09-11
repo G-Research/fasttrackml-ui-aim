@@ -56,6 +56,7 @@ export interface IMetricAppModelState {
   params: string[];
   notifyData: INotification[];
   groupingSelectOptions: IGroupingSelectOption[];
+  conditionalGroupingOptions: IGroupingSelectOption[];
   sortOptions: IGroupingSelectOption[];
   selectFormData?: {
     options: ISelectOption[];
@@ -256,6 +257,19 @@ export interface IAlignMetricsDataParams {
   }[];
 }
 
+export interface IContext {
+  [key: string]: any;
+}
+
+export interface IMetricsDataParams {
+  report_progress?: boolean;
+  metrics: Array<{ key: string; context: IContext }>;
+  query: string;
+  steps: number;
+  x_axis: string;
+  skip_system?: boolean;
+}
+
 export interface ISmoothing {
   algorithm: SmoothingAlgorithmEnum;
   factor: number;
@@ -272,4 +286,10 @@ export interface LegendColumnDataType {
 
 export interface LegendsDataType {
   [key: string]: Record<string, LegendColumnDataType[]>;
+}
+
+export interface IGroupingCondition {
+  fieldName: string;
+  operator: IOperator;
+  value: string | number;
 }

@@ -65,6 +65,14 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
   }, [paramsData?.rawData]);
 
   React.useEffect(() => {
+    paramsAppModel.fetchProjectParamsAndUpdateState();
+    const pollingTimer = setInterval(() => {
+      paramsAppModel.fetchProjectParamsAndUpdateState();
+    }, 30000);
+    return () => clearInterval(pollingTimer);
+  }, []);
+
+  React.useEffect(() => {
     paramsAppModel.initialize(route.params.appId);
     let appRequestRef: IApiRequest<void>;
     let paramsRequestRef: IApiRequest<void>;
@@ -147,6 +155,7 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       sortOptions={paramsData?.sortOptions!}
       hiddenColumns={paramsData?.config?.table?.hiddenColumns!}
       hideSystemMetrics={paramsData?.config?.table?.hideSystemMetrics!}
+      unselectedColumnState={paramsData?.config?.table?.unselectedColumnState!}
       columnsOrder={paramsData?.config?.table?.columnsOrder!}
       resizeMode={paramsData?.config?.table?.resizeMode!}
       hiddenMetrics={paramsData?.config?.table?.hiddenMetrics!}
@@ -154,6 +163,7 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       tableRowHeight={paramsData?.config?.table?.rowHeight!}
       columnsWidths={paramsData?.config?.table?.columnsWidths!}
       selectFormData={paramsData?.selectFormData!}
+      selectedParams={paramsData?.config?.select?.options!}
       onColorIndicatorChange={paramsAppModel.onColorIndicatorChange}
       onCurveInterpolationChange={paramsAppModel.onCurveInterpolationChange}
       onParamsSelectChange={paramsAppModel.onParamsSelectChange}
@@ -164,6 +174,8 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       onActivePointChange={paramsAppModel.onActivePointChange}
       onGroupingApplyChange={paramsAppModel.onGroupingApplyChange}
       onGroupingPersistenceChange={paramsAppModel.onGroupingPersistenceChange}
+      onSelectExperimentsChange={paramsAppModel.onSelectExperimentsChange}
+      onToggleAllExperiments={paramsAppModel.onToggleAllExperiments}
       onSelectRunQueryChange={paramsAppModel.onSelectRunQueryChange}
       onBookmarkCreate={paramsAppModel.onBookmarkCreate}
       onBookmarkUpdate={paramsAppModel.onBookmarkUpdate}
@@ -180,6 +192,9 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       onRunsTagsChange={paramsAppModel.onRunsTagsChange}
       onColumnsOrderChange={paramsAppModel.onColumnsOrderChange}
       onColumnsVisibilityChange={paramsAppModel.onColumnsVisibilityChange}
+      onDefaultColumnsVisibilityChange={
+        paramsAppModel.onDefaultColumnsVisibilityChange
+      }
       onTableResizeModeChange={paramsAppModel.onTableResizeModeChange}
       onTableDiffShow={paramsAppModel.onTableDiffShow}
       onSortReset={paramsAppModel.onSortReset}
@@ -192,6 +207,7 @@ function ParamsContainer(): React.FunctionComponentElement<React.ReactNode> {
       archiveRuns={paramsAppModel.archiveRuns}
       deleteRuns={paramsAppModel.deleteRuns}
       onRowsVisibilityChange={paramsAppModel.onRowsVisibilityChange}
+      onParamsScaleTypeChange={paramsAppModel.onParamsScaleTypeChange}
     />
   );
 }

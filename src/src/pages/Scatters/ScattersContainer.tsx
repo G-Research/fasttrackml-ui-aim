@@ -55,6 +55,14 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
   }, chartElemRef);
 
   React.useEffect(() => {
+    scattersAppModel.fetchProjectParamsAndUpdateState();
+    const pollingTimer = setInterval(() => {
+      scattersAppModel.fetchProjectParamsAndUpdateState();
+    }, 30000);
+    return () => clearInterval(pollingTimer);
+  }, []);
+
+  React.useEffect(() => {
     if (tableRef.current && chartPanelRef.current) {
       setComponentRefs({
         model: scattersAppModel,
@@ -146,6 +154,9 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
         hiddenMetrics={scattersData?.config?.table?.hiddenMetrics!}
         hideSystemMetrics={scattersData?.config?.table?.hideSystemMetrics!}
         hiddenColumns={scattersData?.config?.table?.hiddenColumns!}
+        unselectedColumnState={
+          scattersData?.config?.table?.unselectedColumnState!
+        }
         groupingSelectOptions={scattersData?.groupingSelectOptions!}
         sortOptions={scattersData?.sortOptions!}
         projectsDataMetrics={projectsData?.metrics!}
@@ -177,6 +188,8 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
         onNotificationAdd={scattersAppModel.onNotificationAdd}
         onNotificationDelete={scattersAppModel.onNotificationDelete}
         onResetConfigData={scattersAppModel.onResetConfigData}
+        onSelectExperimentsChange={scattersAppModel.onSelectExperimentsChange}
+        onToggleAllExperiments={scattersAppModel.onToggleAllExperiments}
         onSelectOptionsChange={scattersAppModel.onSelectOptionsChange}
         onSelectRunQueryChange={scattersAppModel.onSelectRunQueryChange}
         onExportTableData={scattersAppModel.onExportTableData}
@@ -186,6 +199,9 @@ function ScattersContainer(): React.FunctionComponentElement<React.ReactNode> {
         onParamVisibilityChange={scattersAppModel.onParamVisibilityChange}
         onColumnsOrderChange={scattersAppModel.onColumnsOrderChange}
         onColumnsVisibilityChange={scattersAppModel.onColumnsVisibilityChange}
+        onDefaultColumnsVisibilityChange={
+          scattersAppModel.onDefaultColumnsVisibilityChange
+        }
         onTableDiffShow={scattersAppModel.onTableDiffShow}
         onTableResizeModeChange={scattersAppModel.onTableResizeModeChange}
         onRunsTagsChange={scattersAppModel.onRunsTagsChange}

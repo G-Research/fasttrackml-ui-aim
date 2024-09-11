@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie';
 
-import { getAPIHost, getAPIAuthToken } from 'config/config';
+import { getAPIHost, getAPIAuthToken, getBaseHost } from 'config/config';
 
 import ENDPOINTS from './endpoints';
 
@@ -43,7 +43,12 @@ function createAPIRequestWrapper<ResponseDataType>(
   return {
     call: (exceptionHandler?: (error: ResponseDataType) => any) =>
       new Promise((resolve: (data: ResponseDataType) => void, reject) => {
-        fetch(`${apiHost}/${url}`, { ...options, signal })
+        // prevent creating urls with double forward slashes.
+        let urlSep = '/';
+        if (url.charAt(0) == urlSep) {
+          urlSep = '';
+        }
+        fetch(`${apiHost}${urlSep}${url}`, { ...options, signal })
           .then(async (response) => {
             try {
               if (response.status >= 400) {
@@ -53,17 +58,7 @@ function createAPIRequestWrapper<ResponseDataType>(
                   exceptionHandler(body);
                 }
 
-                return await checkCredentials<ResponseDataType>(
-                  response,
-                  url,
-                  () =>
-                    createAPIRequestWrapper<ResponseDataType>(
-                      url,
-                      options,
-                      stream,
-                      apiHost,
-                    ).call(exceptionHandler),
-                );
+                return;
               }
               const data = stream ? response.body : await response.json();
 
@@ -96,13 +91,19 @@ function getStream<ResponseDataType>(
   options?: RequestInit,
   apiHost: string = getAPIHost(),
 ) {
+  const queryString = Object.entries(params || {})
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return value.map((v) => `${key}=${v}`).join('&');
+      } else {
+        return `${key}=${value}`;
+      }
+    })
+    .join('&');
+
   return createAPIRequestWrapper<ResponseDataType>(
     `${url}${
-      options?.method === 'POST'
-        ? ''
-        : params
-        ? '?' + new URLSearchParams(params).toString()
-        : ''
+      options?.method === 'POST' ? '' : queryString ? '?' + queryString : ''
     }`,
     {
       method: 'GET',
@@ -139,6 +140,23 @@ function getStream1<ResponseDataType>(
     },
     true,
     apiHost,
+  );
+}
+
+function getFromBaseHost<ResponseDataType>(
+  url: string,
+  params?: {},
+  options?: RequestInit,
+) {
+  return createAPIRequestWrapper<ResponseDataType>(
+    `${url}${params ? '?' + new URLSearchParams(params).toString() : ''}`,
+    {
+      method: 'GET',
+      ...options,
+      headers: getRequestHeaders(),
+    },
+    false,
+    getBaseHost(),
   );
 }
 
@@ -369,6 +387,7 @@ async function checkCredentials<T>(
 
 const API = {
   get,
+  getFromBaseHost,
   getStream,
   getStream1,
   post,

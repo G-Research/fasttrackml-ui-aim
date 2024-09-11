@@ -278,11 +278,11 @@ function ExportPreview({
     (min: number, max: number) => [
       {
         errorCondition: (value: number) => value < min,
-        errorText: `Value should be equal or greater then ${min}`,
+        errorText: `Value should be equal or greater than ${min}`,
       },
       {
         errorCondition: (value: number) => value > max,
-        errorText: `Value should be equal or smaller then ${max}`,
+        errorText: `Value should be equal or smaller than ${max}`,
       },
     ],
     [],

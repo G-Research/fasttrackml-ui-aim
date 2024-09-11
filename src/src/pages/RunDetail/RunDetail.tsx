@@ -14,7 +14,13 @@ import {
 } from 'react-router-dom';
 import { useModel } from 'hooks';
 
-import { Paper, Tab, Tabs, Tooltip } from '@material-ui/core';
+import {
+  Paper,
+  Tab,
+  Tabs,
+  Tooltip,
+  Link as MaterialLink,
+} from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 
 import { Button, Icon, Text } from 'components/kit';
@@ -28,6 +34,7 @@ import Spinner from 'components/kit/Spinner';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DATE_WITH_SECONDS } from 'config/dates/dates';
 import { PathEnum } from 'config/enums/routesEnum';
+import { getBaseHost } from 'config/config';
 
 import CompareSelectedRunsPopover from 'pages/Metrics/components/Table/CompareSelectedRunsPopover';
 
@@ -35,22 +42,23 @@ import runDetailAppModel from 'services/models/runs/runDetailAppModel';
 import * as analytics from 'services/analytics';
 import notesModel from 'services/models/notes/notesModel';
 import { AppNameEnum } from 'services/models/explorer';
+import namespacesService from 'services/api/namespaces/namespacesService';
 
 import { setDocumentTitle } from 'utils/document/documentTitle';
 import { processDurationTime } from 'utils/processDurationTime';
+import onSelectExperimentChange from 'utils/app/onSelectExperimentsChange';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import RunSelectPopoverContent from './RunSelectPopoverContent';
 
 import './RunDetail.scss';
 
-const RunDetailNotesTab = React.lazy(
-  () =>
-    import(/* webpackChunkName: "RunDetailNotesTab" */ './RunDetailNotesTab'),
-);
-
 const RunDetailParamsTab = React.lazy(
   () =>
     import(/* webpackChunkName: "RunDetailParamsTab" */ './RunDetailParamsTab'),
+);
+const RunLogsTab = React.lazy(
+  () => import(/* webpackChunkName: "RunLogsTab" */ './RunLogsTab'),
 );
 const RunDetailSettingsTab = React.lazy(
   () =>
@@ -64,35 +72,16 @@ const RunDetailMetricsAndSystemTab = React.lazy(
       /* webpackChunkName: "RunDetailMetricsAndSystemTab" */ './RunDetailMetricsAndSystemTab'
     ),
 );
-const TraceVisualizationContainer = React.lazy(
-  () =>
-    import(
-      /* webpackChunkName: "TraceVisualizationContainer" */ './TraceVisualizationContainer'
-    ),
-);
 const RunOverviewTab = React.lazy(
   () => import(/* webpackChunkName: "RunOverviewTab" */ './RunOverviewTab'),
-);
-const RunLogsTab = React.lazy(
-  () => import(/* webpackChunkName: "RunLogsTab" */ './RunLogsTab'),
-);
-const RunLogRecords = React.lazy(
-  () => import(/* webpackChunkName: "RunLogRecords" */ './RunLogRecords'),
 );
 
 const tabs: Record<string, string> = {
   overview: 'Overview',
   run_parameters: 'Run Params',
-  notes: 'Notes',
   logs: 'Logs',
-  messages: 'Messages',
   metrics: 'Metrics',
   system: 'System',
-  distributions: 'Distributions',
-  images: 'Images',
-  audios: 'Audios',
-  texts: 'Texts',
-  figures: 'Figures',
   settings: 'Settings',
 };
 
@@ -109,6 +98,12 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
   const [isRunSelectDropdownOpen, setIsRunSelectDropdownOpen] =
     React.useState(false);
   const [activeTab, setActiveTab] = React.useState(pathname);
+  const [selectedNamespace, setSelectedNamespace] = React.useState<string>('');
+  React.useEffect(() => {
+    namespacesService.fetchCurrentNamespacePath().then((data) => {
+      setSelectedNamespace(data);
+    });
+  }, []);
 
   function redirect(): void {
     const splitPathname: string[] = pathname.split('/');
@@ -145,12 +140,6 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
         isRunLogsLoading={runData?.isRunLogsLoading}
       />
     ),
-    messages: (
-      <RunLogRecords
-        runHash={runHash}
-        inProgress={_.isNil(runData?.runInfo?.end_time)}
-      />
-    ),
     metrics: (
       <RunDetailMetricsAndSystemTab
         runHash={runHash}
@@ -168,43 +157,6 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
         isRunBatchLoading={runData?.isRunBatchLoading}
       />
     ),
-    distributions: (
-      <TraceVisualizationContainer
-        runHash={runHash}
-        traceType='distributions'
-        traceInfo={runData?.runTraces}
-      />
-    ),
-    images: (
-      <TraceVisualizationContainer
-        runHash={runHash}
-        traceType='images'
-        traceInfo={runData?.runTraces}
-        runParams={runData?.runParams}
-      />
-    ),
-    audios: (
-      <TraceVisualizationContainer
-        runHash={runHash}
-        traceType='audios'
-        traceInfo={runData?.runTraces}
-        runParams={runData?.runParams}
-      />
-    ),
-    texts: (
-      <TraceVisualizationContainer
-        runHash={runHash}
-        traceType='texts'
-        traceInfo={runData?.runTraces}
-      />
-    ),
-    figures: (
-      <TraceVisualizationContainer
-        runHash={runHash}
-        traceType='figures'
-        traceInfo={runData?.runTraces}
-      />
-    ),
     settings: (
       <RunDetailSettingsTab
         isArchived={runData?.runInfo?.archived}
@@ -213,7 +165,6 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
         runHash={runHash}
       />
     ),
-    notes: <RunDetailNotesTab runHash={runHash} />,
   };
 
   function getRunsOfExperiment(
@@ -231,6 +182,19 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
 
   function handleTabChange(event: React.ChangeEvent<{}>, newValue: string) {
     setActiveTab(newValue);
+  }
+
+  function handleOnClickViewInMetricsExplorer(experiment: any) {
+    if (experiment !== undefined) {
+      const selectedExperiments = getSelectedExperiments();
+      if (
+        !selectedExperiments.find(
+          (e) => e.id === experiment.id && e.name === experiment.name,
+        )
+      ) {
+        onSelectExperimentChange(experiment);
+      }
+    }
   }
 
   function onRunsSelectToggle() {
@@ -399,6 +363,47 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
                             : dateNow,
                         )}`}
                       </Text>
+                      <MaterialLink
+                        href={
+                          getBaseHost() +
+                          selectedNamespace +
+                          '/mlflow/#/experiments/' +
+                          runData?.runInfo?.experiment?.id +
+                          '/runs/' +
+                          runHash
+                        }
+                        target='_blank'
+                        style={{ marginLeft: '2rem' }}
+                      >
+                        <div style={{ fontSize: '0.8rem' }}>
+                          <Icon
+                            name='live-demo'
+                            style={{ marginRight: '0.3rem' }}
+                          />
+                          Open in Classic UI
+                        </div>
+                      </MaterialLink>
+                      <NavLink
+                        to={{
+                          pathname: '/metrics',
+                          runProps: { hash: runHash },
+                        }}
+                        style={{ marginLeft: '2rem' }}
+                        className='MuiTypography-root MuiLink-root MuiLink-underlineHover MuiTypography-colorPrimary'
+                        onClick={() =>
+                          handleOnClickViewInMetricsExplorer(
+                            runData?.runInfo?.experiment,
+                          )
+                        }
+                      >
+                        <div style={{ fontSize: '0.8rem' }}>
+                          <Icon
+                            name='metrics'
+                            style={{ marginRight: '0.3rem' }}
+                          />
+                          View in Metrics Explorer
+                        </div>
+                      </NavLink>
                     </>
                   ) : (
                     <Skeleton

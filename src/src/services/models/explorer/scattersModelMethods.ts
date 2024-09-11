@@ -7,12 +7,18 @@ import { IPoint } from 'components/ScatterPlot';
 import COLORS from 'config/colors/colors';
 import DASH_ARRAYS from 'config/dash-arrays/dashArrays';
 import { MetricsValueKeyEnum, ResizeModeEnum } from 'config/enums/tableEnums';
-import { RowHeightSize } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  TABLE_DEFAULT_CONFIG,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
+
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 import {
   getParamsTableColumns,
@@ -61,10 +67,12 @@ import { getFilteredGroupingOptions } from 'utils/app/getFilteredGroupingOptions
 import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import getGroupingSelectOptions from 'utils/app/getGroupingSelectOptions';
+import getQueryStringFromSelect from 'utils/app/getQueryStringFromSelect';
 import getRunData from 'utils/app/getRunData';
 import onChangeTooltip from 'utils/app/onChangeTooltip';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
+import onDefaultColumnsVisibilityChange from 'utils/app/onDefaultColumnsVisibilityChange';
 import onGroupingApplyChange from 'utils/app/onGroupingApplyChange';
 import onGroupingModeChange from 'utils/app/onGroupingModeChange';
 import onGroupingPaletteChange from 'utils/app/onGroupingPaletteChange';
@@ -83,6 +91,8 @@ import onTableResizeModeChange from 'utils/app/onTableResizeModeChange';
 import onTableRowClick from 'utils/app/onTableRowClick';
 import onTableRowHover from 'utils/app/onTableRowHover';
 import onTableSortChange from 'utils/app/onTableSortChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
 import updateSortFields from 'utils/app/updateTableSortFields';
 import contextToString from 'utils/contextToString';
@@ -115,6 +125,8 @@ import onRowsVisibilityChange from 'utils/app/onRowsVisibilityChange';
 import { getMetricsInitialRowData } from 'utils/app/getMetricsInitialRowData';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import { getMetricLabel } from 'utils/app/getMetricLabel';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import { InitialAppModelType } from './config';
 
@@ -173,9 +185,22 @@ function getScattersModelMethods(
       setModelDefaultAppConfigData();
     }
     const liveUpdateState = model.getState()?.config?.liveUpdate;
+    if (liveUpdateState?.enabled) {
+      liveUpdateInstance = new LiveUpdateService(
+        appName,
+        updateData,
+        liveUpdateState.delay,
+      );
+    }
+  }
 
+  function fetchProjectParamsAndUpdateState() {
+    const selectedExperiments = getSelectedExperiments();
     projectsService
-      .getProjectParams(['metric'])
+      .getProjectParams(
+        ['metric'],
+        selectedExperiments.map((e) => e.id),
+      )
       .call()
       .then((data: IProjectParamsMetrics) => {
         model.setState({
@@ -184,15 +209,8 @@ function getScattersModelMethods(
             suggestions: getSuggestionsByExplorer(appName, data),
           },
         });
+        removeOldSelectedMetrics(model);
       });
-
-    if (liveUpdateState?.enabled) {
-      liveUpdateInstance = new LiveUpdateService(
-        appName,
-        updateData,
-        liveUpdateState.delay,
-      );
-    }
   }
 
   function updateData(newData: IRun<IParamTrace>[]): void {
@@ -234,6 +252,52 @@ function getScattersModelMethods(
       groupingSelectOptions,
     );
     const sortFields = modelState?.config?.table.sortFields;
+
+    const unselectedColumnState = configData.table?.unselectedColumnState;
+
+    if (unselectedColumnState !== UnselectedColumnState.DEFAULT) {
+      const selected = modelState?.config?.select?.options.map(
+        (option: ISelectOption) => option.label,
+      );
+
+      let hiddenColumns = configData.table?.hiddenColumns;
+
+      const defaultHiddenColumns =
+        TABLE_DEFAULT_CONFIG?.[AppNameEnum.PARAMS]?.hiddenColumns;
+
+      if (unselectedColumnState === UnselectedColumnState.FORCE_HIDE) {
+        // Extract the combined keys from metricsColumns dictionary
+        const metricList = Object.keys(metricsColumns).reduce(
+          (acc: string[], key: string) => {
+            const metricKeys = Object.keys(metricsColumns[key]);
+            return acc.concat(
+              metricKeys.map((metricKey) => `${key} ${metricKey}`.trim()),
+            );
+          },
+          [],
+        );
+
+        const metricsAndParams = metricList.concat(params);
+        hiddenColumns = _.uniq(
+          defaultHiddenColumns?.concat(
+            metricsAndParams.filter((item: string) => !selected.includes(item)),
+          ),
+        );
+      } else {
+        // Remove unselected values from hiddenColumns
+        hiddenColumns = defaultHiddenColumns;
+      }
+
+      configData = {
+        ...configData,
+        table: {
+          ...configData.table,
+          rowHeight: modelState?.config?.table?.rowHeight!,
+          unselectedColumnState,
+          hiddenColumns,
+        },
+      };
+    }
 
     const tableColumns = getParamsTableColumns(
       sortOptions,
@@ -316,11 +380,15 @@ function getScattersModelMethods(
                   };
                 }
                 if (type === 'metrics') {
-                  run.run.traces.metric.forEach((trace: IParamTrace) => {
+                  // TODO: Implement Support for the new metric value API format
+                  //run.run.traces.metric.forEach((trace: IParamTrace) => {
+                  // Change the type so that we can access fields of the old API type
+                  run.run.traces.metric.forEach((trace: any) => {
                     if (
                       trace.name === value?.option_name &&
                       _.isEqual(trace.context, value?.context)
                     ) {
+                      // TODO: Revert this back to trace.values.last;
                       let lastValue = trace.values.last;
                       const formattedLastValue = formatValue(lastValue, '-');
                       values[i] = lastValue;
@@ -496,7 +564,9 @@ function getScattersModelMethods(
         const metricsRowValues = getMetricsInitialRowData(metricsColumns);
         metric.run.traces.metric.forEach((trace: any) => {
           const metricHash = getMetricHash(trace.name, trace.context as any);
+          // TODO: Implement Support for the new metric value API format
           metricsRowValues[metricHash] = formatValue(trace.values.last);
+          //metricsRowValues[metricHash] = formatValue(trace.values.last);
         });
         const rowValues: any = {
           rowMeta: {
@@ -683,12 +753,20 @@ function getScattersModelMethods(
           ...metricsColumns[trace.name],
           [contextToString(trace.context) as string]: '-',
         };
+        // TODO: Implement Support for the new metric value API format
+        const traceOldAPI: any = trace;
         const metricHash = getMetricHash(trace.name, trace.context as any);
+        // metricsValues[metricHash] = {
+        //   min: trace.values.min,
+        //   max: trace.values.max,
+        //   last: trace.last,
+        //   first: trace.values.first,
+        // };
         metricsValues[metricHash] = {
-          min: trace.values.min,
-          max: trace.values.max,
-          last: trace.values.last,
-          first: trace.values.first,
+          min: '-',
+          max: '-',
+          last: traceOldAPI.values.last,
+          first: '-',
         };
       });
       const paramKey = encode({ runHash: run.hash });
@@ -999,7 +1077,8 @@ function getScattersModelMethods(
     }
     const configData = { ...model.getState()?.config };
 
-    runsRequestRef = runsService.getRunsData(configData?.select?.query);
+    const query = getQueryStringFromSelect(configData?.select, true);
+    runsRequestRef = runsService.getRunsData(query);
     setRequestProgress(model);
     return {
       call: async () => {
@@ -1444,6 +1523,7 @@ function getScattersModelMethods(
     changeLiveUpdateConfig,
     archiveRuns,
     deleteRuns,
+    fetchProjectParamsAndUpdateState,
   };
 
   if (grouping) {
@@ -1492,6 +1572,17 @@ function getScattersModelMethods(
     Object.assign(methods, {
       onSelectOptionsChange<D>(data: D & Partial<ISelectOption[]>): void {
         onSelectOptionsChange({ data, model });
+      },
+      onSelectExperimentsChange(experiment: IExperimentDataShort): void {
+        // Handle experiment change, then re-fetch scatters data
+        onSelectExperimentsChange(experiment);
+        fetchProjectParamsAndUpdateState();
+        getScattersData(true, true).call();
+      },
+      onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+        onToggleAllExperiments(experiments);
+        fetchProjectParamsAndUpdateState();
+        getScattersData(true, true).call();
       },
       onSelectRunQueryChange(query: string): void {
         onSelectRunQueryChange({ query, model });
@@ -1545,6 +1636,14 @@ function getScattersModelMethods(
           updateModelData,
         });
       },
+      onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+        onDefaultColumnsVisibilityChange({
+          unselectedColumnState: state,
+          model,
+          appName,
+          updateModelData,
+        });
+      },
       onTableResizeModeChange(mode: ResizeModeEnum): void {
         onTableResizeModeChange({ mode, model, appName });
       },
@@ -1583,11 +1682,21 @@ function getScattersModelMethods(
       onRowSelect({
         actionType,
         data,
+        rangeStart,
+        rangeEnd,
       }: {
-        actionType: 'single' | 'selectAll' | 'removeAll';
+        actionType: 'single' | 'selectAll' | 'removeAll' | 'range';
         data?: any;
+        rangeStart?: number;
+        rangeEnd?: number;
       }): void {
-        return onRowSelect({ actionType, data, model });
+        return onRowSelect({
+          actionType,
+          data,
+          rangeStart,
+          rangeEnd,
+          model,
+        });
       },
       onRowsVisibilityChange(metricKeys: string[]): void {
         return onRowsVisibilityChange({

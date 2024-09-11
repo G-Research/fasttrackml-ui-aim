@@ -1,5 +1,8 @@
 import { MetricsValueKeyEnum, ResizeModeEnum } from 'config/enums/tableEnums';
-import { RowHeightSize } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { DensityOptions } from 'config/enums/densityEnum';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
 
@@ -18,6 +21,7 @@ import {
   ITooltipConfig,
   ISmoothing,
   LegendsConfig,
+  IGroupingCondition,
 } from 'types/services/models/metrics/metricsAppModel';
 import { IParamsAppModelState } from 'types/services/models/params/paramsAppModel';
 import { IRunsAppModelState } from 'types/services/models/runs/runsAppModel';
@@ -26,7 +30,7 @@ import {
   ITrendlineOptions,
 } from 'types/services/models/scatter/scatterAppModel';
 
-import { ChartTypeEnum, CurveEnum, HighlightEnum } from 'utils/d3';
+import { ChartTypeEnum, CurveEnum, HighlightEnum, ScaleEnum } from 'utils/d3';
 
 import { IImagesExploreAppModelState } from '../imagesExplore/imagesExploreAppModel';
 
@@ -90,6 +94,11 @@ export interface IGroupingConfig {
     stroke: number;
   };
   paletteIndex?: number;
+  conditions?: {
+    color: IGroupingCondition[];
+    stroke: IGroupingCondition[];
+    chart: IGroupingCondition[];
+  };
 }
 
 export interface ISelectOption {
@@ -102,6 +111,7 @@ export interface ISelectOption {
     option_name: string;
     context: { [key: string]: unknown } | null | any;
   };
+  scale?: ScaleEnum;
 }
 
 export interface ISelectConfig {
@@ -116,6 +126,7 @@ export interface ITableConfig {
   resizeMode?: ResizeModeEnum;
   rowHeight: RowHeightSize;
   sortFields?: SortField[];
+  unselectedColumnState?: UnselectedColumnState;
   hiddenMetrics?: string[];
   hiddenColumns?: string[];
   hideSystemMetrics?: boolean;
@@ -152,6 +163,7 @@ export interface IHighPlotConfig {
       [key: string]: [number, number] | [string, string];
     };
   };
+  // paramsScaleType: IParamsScaleStates;
 }
 
 export interface ILineChartConfig {
@@ -160,10 +172,11 @@ export interface ILineChartConfig {
   zoom: IChartZoom;
   axesScaleType: IAxesScaleState;
   axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   smoothing: ISmoothing;
   aggregationConfig: IAggregationConfig;
   densityType: DensityOptions;
-  alignmentConfig: IAlignmentConfig;
+  alignmentConfigs: IAlignmentConfig[];
   focusedState: IFocusedState;
   tooltip: ITooltipConfig;
   legends: LegendsConfig;

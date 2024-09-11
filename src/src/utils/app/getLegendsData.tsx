@@ -36,16 +36,28 @@ function getLegendsData(
   for (let groupName of groupingNames) {
     const legendRowData: Record<string, any> = {};
     const groupPropKey = groupingPropKeys[groupName];
-    const groupedItemPropKeys = groupingConfig[groupName] || [];
+
+    const groupConfig = groupingConfig[groupName];
+    const groupedItemPropKeys =
+      groupName === GroupNameEnum.ROW
+        ? groupConfig || []
+        : groupConfig?.concat(
+            groupingConfig.conditions?.[groupName].map(
+              (condition) =>
+                `${condition.fieldName} ${condition.operator} ${condition.value}`,
+            ) || [],
+          ) || [];
 
     if (groupedItemPropKeys.length > 0) {
       for (const item of processedData) {
         const config: Record<string, string> = {};
         for (const propKey of groupedItemPropKeys) {
-          const key = getValueByField(groupingSelectOptions, propKey);
+          const key =
+            getValueByField(groupingSelectOptions, propKey) || propKey;
           const value = item.config?.[propKey];
           config[key] = formatValue(value);
         }
+
         const legendRow = {
           [groupPropKey]: item[groupPropKey],
           config,
@@ -55,9 +67,10 @@ function getLegendsData(
           legendRowData[hashed] = legendRow;
         }
       }
-      const keys = groupedItemPropKeys.map((item) =>
-        getValueByField(groupingSelectOptions, item),
+      const keys = groupedItemPropKeys.map(
+        (item) => getValueByField(groupingSelectOptions, item) || item,
       );
+
       const uniqueRows = Object.values(legendRowData);
       const groupedByColumns: Record<string, LegendColumnDataType[]> = {};
       for (let key of keys) {

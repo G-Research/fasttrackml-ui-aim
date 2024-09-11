@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { List, AutoSizer } from 'react-virtualized';
 import _ from 'lodash-es';
 
 import { Divider, InputBase } from '@material-ui/core';
@@ -21,6 +22,7 @@ import { IManageColumnsPopoverProps } from './ManageColumns';
 
 import './ManageColumnsPopover.scss';
 
+let softHidden: string[] = [];
 const initialData = {
   columns: {
     left: {
@@ -53,6 +55,8 @@ function ManageColumnsPopover({
   const [popoverWidth, setPopoverWidth] = React.useState(800);
   const ref = React.useRef<HTMLDivElement | null>(null);
 
+  const VIRTUAL_COLUMN_THRESHOLD = 100; // If exceeded, use virtualized list
+
   const onResize = _.debounce(() => {
     onPopoverWidthChange();
   }, 500);
@@ -72,6 +76,12 @@ function ManageColumnsPopover({
       );
     }
   };
+
+  function toggleSoftHidden(key: string) {
+    softHidden.includes(key)
+      ? softHidden.splice(softHidden.indexOf(key), 1)
+      : softHidden.push(key);
+  }
 
   function onDragStart(result: any) {
     setDraggingItemId(result.draggableId);
@@ -171,13 +181,20 @@ function ManageColumnsPopover({
   React.useEffect(() => {
     const newState = { ...state };
     const leftList = columnsData.filter(
-      (item: ITableColumn) => item.pin === 'left',
+      (item: ITableColumn) =>
+        item.pin === 'left' &&
+        (!item.isHidden || softHidden.includes(item.key)),
     );
     const rightList = columnsData.filter(
-      (item: ITableColumn) => item.pin === 'right',
+      (item: ITableColumn) =>
+        item.pin === 'right' &&
+        (!item.isHidden || softHidden.includes(item.key)),
     );
     const middleList = columnsData.filter(
-      (item: ITableColumn) => item.pin !== 'left' && item.pin !== 'right',
+      (item: ITableColumn) =>
+        item.pin !== 'left' &&
+        item.pin !== 'right' &&
+        (!item.isHidden || softHidden.includes(item.key)),
     );
     newState.columns.left.list = leftList;
     newState.columns.middle.list = middleList;
@@ -230,6 +247,33 @@ function ManageColumnsPopover({
       !_.isEqual(hiddenColumns, TABLE_DEFAULT_CONFIG[appName].hiddenColumns)
     );
   }, [appName, hiddenColumns, state]);
+
+  function generateRowRenderer(columnList: ITableColumn[]) {
+    const rowRenderer = ({ index, key }: { index: number; key: string }) => {
+      const column = columnList[index];
+      return (
+        <ColumnItem
+          key={`${column.key}-${index}`}
+          data={column.key}
+          label={column.label ?? column.key}
+          index={index}
+          popoverWidth={popoverWidth}
+          appName={appName}
+          isHidden={isColumnHidden(column.key)}
+          onClick={() => {
+            toggleSoftHidden(column.key);
+            onColumnsVisibilityChange(
+              hiddenColumns?.includes(column.key)
+                ? hiddenColumns?.filter((col: string) => col !== column.key)
+                : hiddenColumns?.concat([column.key]),
+            );
+          }}
+          draggingItemId={draggingItemId}
+        />
+      );
+    };
+    return rowRenderer;
+  }
 
   return (
     <ErrorBoundary>
@@ -285,15 +329,16 @@ function ManageColumnsPopover({
                             popoverWidth={popoverWidth}
                             appName={appName}
                             isHidden={isColumnHidden(column.key)}
-                            onClick={() =>
+                            onClick={() => {
+                              toggleSoftHidden(column.key);
                               onColumnsVisibilityChange(
                                 hiddenColumns?.includes(column.key)
                                   ? hiddenColumns?.filter(
                                       (col: string) => col !== column.key,
                                     )
                                   : hiddenColumns?.concat([column.key]),
-                              )
-                            }
+                              );
+                            }}
                             draggingItemId={draggingItemId}
                           />
                         ),
@@ -329,30 +374,48 @@ function ManageColumnsPopover({
                       ref={provided.innerRef}
                       {...provided.droppableProps}
                     >
-                      {state.columns.middle.list.map(
-                        (column: ITableColumn, index: number) => (
-                          <ColumnItem
-                            key={`${column.key}-${index}`}
-                            data={column.key}
-                            label={column.label ?? column.key}
-                            index={index}
-                            appName={appName}
-                            popoverWidth={popoverWidth}
-                            hasSearchableItems
-                            searchKey={searchKey}
-                            isHidden={isColumnHidden(column.key)}
-                            onClick={() =>
-                              onColumnsVisibilityChange(
-                                hiddenColumns?.includes(column.key)
-                                  ? hiddenColumns?.filter(
-                                      (col: string) => col !== column.key,
-                                    )
-                                  : hiddenColumns?.concat([column.key]),
-                              )
-                            }
-                            draggingItemId={draggingItemId}
-                          />
-                        ),
+                      {state.columns.middle.list.length <
+                      VIRTUAL_COLUMN_THRESHOLD ? (
+                        state.columns.middle.list.map(
+                          (column: ITableColumn, index: number) => (
+                            <ColumnItem
+                              key={`${column.key}-${index}`}
+                              data={column.key}
+                              label={column.label ?? column.key}
+                              index={index}
+                              appName={appName}
+                              popoverWidth={popoverWidth}
+                              hasSearchableItems
+                              searchKey={searchKey}
+                              isHidden={isColumnHidden(column.key)}
+                              onClick={() => {
+                                toggleSoftHidden(column.key);
+                                onColumnsVisibilityChange(
+                                  hiddenColumns?.includes(column.key)
+                                    ? hiddenColumns?.filter(
+                                        (col: string) => col !== column.key,
+                                      )
+                                    : hiddenColumns?.concat([column.key]),
+                                );
+                              }}
+                              draggingItemId={draggingItemId}
+                            />
+                          ),
+                        )
+                      ) : (
+                        <AutoSizer>
+                          {({ height, width }) => (
+                            <List
+                              height={height}
+                              rowCount={state.columns.middle.list.length}
+                              rowHeight={30}
+                              width={width}
+                              rowRenderer={generateRowRenderer(
+                                state.columns.middle.list,
+                              )}
+                            />
+                          )}
+                        </AutoSizer>
                       )}
                       {provided.placeholder}
                     </div>
@@ -383,15 +446,16 @@ function ManageColumnsPopover({
                               appName={appName}
                               popoverWidth={popoverWidth}
                               isHidden={isColumnHidden(column.key)}
-                              onClick={() =>
+                              onClick={() => {
+                                toggleSoftHidden(column.key);
                                 onColumnsVisibilityChange(
                                   hiddenColumns.includes(column.key)
                                     ? hiddenColumns.filter(
                                         (col: string) => col !== column.key,
                                       )
                                     : hiddenColumns.concat([column.key]),
-                                )
-                              }
+                                );
+                              }}
                               draggingItemId={draggingItemId}
                             />
                           );
@@ -453,7 +517,56 @@ function ManageColumnsPopover({
                     />
                   </>
                 )}
+                <Button
+                  variant='text'
+                  size='xSmall'
+                  onClick={() =>
+                    onColumnsVisibilityChange(HideColumnsEnum.ShowParams)
+                  }
+                >
+                  <Icon name='eye-show-outline' color='#1473e6' />
+                  <Text size={12} tint={100}>
+                    {HideColumnsEnum.ShowParams}
+                  </Text>
+                </Button>
 
+                <Button
+                  variant='text'
+                  size='xSmall'
+                  onClick={() => {
+                    onColumnsVisibilityChange(HideColumnsEnum.HideParams);
+                  }}
+                >
+                  <Icon name='eye-outline-hide' />
+                  <Text size={12} tint={100}>
+                    {HideColumnsEnum.HideParams}
+                  </Text>
+                </Button>
+                <Button
+                  variant='text'
+                  size='xSmall'
+                  onClick={() => {
+                    onColumnsVisibilityChange(HideColumnsEnum.ShowMetrics);
+                  }}
+                >
+                  <Icon name='eye-show-outline' color='#1473e6' />
+                  <Text size={12} tint={100}>
+                    {HideColumnsEnum.ShowMetrics}
+                  </Text>
+                </Button>
+
+                <Button
+                  variant='text'
+                  size='xSmall'
+                  onClick={() => {
+                    onColumnsVisibilityChange(HideColumnsEnum.HideMetrics);
+                  }}
+                >
+                  <Icon name='eye-outline-hide' />
+                  <Text size={12} tint={100}>
+                    {HideColumnsEnum.HideMetrics}
+                  </Text>
+                </Button>
                 <Button
                   variant='text'
                   size='xSmall'

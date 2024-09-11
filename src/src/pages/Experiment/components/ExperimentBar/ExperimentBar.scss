@@ -1,0 +1,116 @@
+@use 'src/styles/abstracts' as *;
+
+.ExperimentBar {
+  &__headerContainer {
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    &__appBarBox {
+      display: flex;
+      justify-content: space-between;
+      &__navigationContainer {
+        width: 100%;
+      }
+      &__actionContainer {
+        width: 4.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-left: $border-main;
+        margin-bottom: $space-unit;
+        i {
+          color: $pico-70;
+        }
+        a {
+          text-decoration: unset;
+        }
+      }
+    }
+    &__appBarTitleBox {
+      display: flex;
+      flex-direction: column;
+      font-size: $text-md;
+      font-weight: $font-600;
+      color: $text-color;
+      align-items: flex-start;
+      height: fit-content;
+      max-width: 100%;
+      width: auto;
+      &__appBarTitleBoxWrapper {
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        max-width: 100%;
+        width: 100%;
+      }
+      &__chipContainer {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        &__chip {
+          margin-left: $space-xxs;
+          font-size: smaller;
+          font-weight: $font-600;
+          border-color: $cuddle-50;
+          background-color: $cuddle-10;
+          color: $pico-80;
+        }
+      }
+      &__title {
+        margin-bottom: $space-xxs;
+      }
+      &__text {
+        margin-left: $space-xxs;
+        font-size: $text-md;
+      }
+      &__date {
+        display: flex;
+        i {
+          margin-right: $space-xxs;
+          color: $pico-70;
+        }
+      }
+      &__Skeleton {
+        margin-right: $space-xs;
+      }
+      &__buttonSelectToggler {
+        width: 1.5rem;
+        height: 1.5rem;
+        &.opened {
+          background: $primary-color-10;
+        }
+        .MuiButton-label {
+          padding-top: $space-xxxxs;
+        }
+      }
+      &__container {
+        display: flex;
+        align-items: flex-start;
+        flex-direction: column;
+        margin-right: $space-xxxs;
+        cursor: pointer;
+        max-width: calc(100% - 6.5rem);
+
+        &__pageName {
+          margin-right: 0.4375em;
+          text-transform: capitalize;
+          text-decoration: none;
+        }
+        &__runHash {
+          margin-left: 0.4375em;
+          text-transform: lowercase;
+        }
+      }
+      span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+      }
+    }
+    .StatusLabel {
+      margin-left: $space-xs;
+    }
+  }
+}

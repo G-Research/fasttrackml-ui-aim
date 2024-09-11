@@ -3,6 +3,7 @@ import { RouteChildrenProps } from 'react-router-dom';
 
 import { ITableRef } from 'components/Table/Table';
 
+import { UnselectedColumnState } from 'config/table/tableConfigs';
 import { ResizeModeEnum } from 'config/enums/tableEnums';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 
@@ -31,6 +32,7 @@ import {
 
 import { CurveEnum } from 'utils/d3';
 import { IRequestProgress } from 'utils/app/setRequestProgress';
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 export interface IParamsProps extends Partial<RouteChildrenProps> {
   chartElemRef: React.RefObject<HTMLDivElement>;
@@ -50,6 +52,7 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   sortOptions: IGroupingSelectOption[];
   hiddenMetrics: string[];
   hideSystemMetrics: boolean;
+  unselectedColumnState: UnselectedColumnState;
   sortFields: [string, 'asc' | 'desc' | boolean][];
   focusedState: IFocusedState;
   isVisibleColorIndicator: boolean;
@@ -81,6 +84,7 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   };
   columnsOrder: IColumnsOrder;
   sameValueColumns: string[] | [];
+  selectedParams: ISelectOption[];
   onNotificationDelete: (id: number) => void;
   onCurveInterpolationChange: () => void;
   onActivePointChange: (
@@ -89,6 +93,8 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   ) => void;
   onColorIndicatorChange: () => void;
   onParamsSelectChange: (options: ISelectOption[]) => void;
+  onSelectExperimentsChange: (experiment: IExperimentDataShort) => void;
+  onToggleAllExperiments: (experiments: IExperimentDataShort[]) => void;
   onSelectRunQueryChange: (query: string) => void;
   onGroupingSelectChange: (params: IOnGroupingSelectChangeParams) => void;
   onGroupingModeChange: (params: IOnGroupingModeChangeParams) => void;
@@ -103,6 +109,7 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   onChangeTooltip: (tooltip: Partial<ITooltip>) => void;
   onExportTableData: (e: React.ChangeEvent<any>) => void;
   onColumnsVisibilityChange: (order: any) => void;
+  onDefaultColumnsVisibilityChange: (state: UnselectedColumnState) => void;
   onTableDiffShow: () => void;
   onTableResizeModeChange: (mode: ResizeModeEnum) => void;
   onSortReset: () => void;
@@ -124,4 +131,5 @@ export interface IParamsProps extends Partial<RouteChildrenProps> {
   archiveRuns: (ids: string[], archived: boolean) => void;
   deleteRuns: (ids: string[]) => void;
   onRowsVisibilityChange: (metricKeys: string[]) => void;
+  onParamsScaleTypeChange: (params: ISelectOption[]) => void;
 }

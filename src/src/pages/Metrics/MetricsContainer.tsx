@@ -63,6 +63,14 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
   }, [metricsData?.rawData]);
 
   React.useEffect(() => {
+    metricAppModel.fetchProjectParamsAndUpdateState();
+    const pollingTimer = setInterval(() => {
+      metricAppModel.fetchProjectParamsAndUpdateState();
+    }, 30000);
+    return () => clearInterval(pollingTimer);
+  }, []);
+
+  React.useEffect(() => {
     metricAppModel.initialize(route.params.appId);
     let appRequestRef: IApiRequest<void>;
     let metricsRequestRef: IApiRequest<void>;
@@ -137,13 +145,13 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         zoom={metricsData?.config?.chart?.zoom!}
         highlightMode={metricsData?.config?.chart?.highlightMode!}
         axesScaleType={metricsData?.config?.chart?.axesScaleType!}
-        axesScaleRange={metricsData?.config?.chart?.axesScaleRange!}
+        axesScaleRanges={metricsData?.config?.chart?.axesScaleRanges!}
         smoothing={metricsData?.config?.chart?.smoothing!}
         focusedState={metricsData?.config?.chart?.focusedState!}
         notifyData={metricsData?.notifyData!}
         tooltip={metricsData?.tooltip!}
         aggregationConfig={metricsData?.config?.chart?.aggregationConfig!}
-        alignmentConfig={metricsData?.config?.chart?.alignmentConfig!}
+        alignmentConfigs={metricsData?.config?.chart?.alignmentConfigs!}
         densityType={metricsData?.config?.chart?.densityType!}
         selectedMetricsData={metricsData?.config?.select!}
         tableRowHeight={metricsData?.config?.table?.rowHeight!}
@@ -151,9 +159,13 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         hiddenMetrics={metricsData?.config?.table?.hiddenMetrics!}
         hideSystemMetrics={metricsData?.config?.table?.hideSystemMetrics!}
         hiddenColumns={metricsData?.config?.table?.hiddenColumns!}
+        unselectedColumnState={
+          metricsData?.config?.table?.unselectedColumnState!
+        }
         chartPanelOffsetHeight={chartPanelOffsetHeight}
         selectedRows={metricsData?.selectedRows!}
         groupingSelectOptions={metricsData?.groupingSelectOptions!}
+        conditionalGroupingOptions={metricsData?.conditionalGroupingOptions!}
         sortOptions={metricsData?.sortOptions!}
         resizeMode={metricsData?.config?.table?.resizeMode!}
         columnsWidths={metricsData?.config?.table?.columnsWidths!}
@@ -182,6 +194,7 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onActivePointChange={metricAppModel.onActivePointChange}
         onGroupingApplyChange={metricAppModel.onGroupingApplyChange}
         onGroupingPersistenceChange={metricAppModel.onGroupingPersistenceChange}
+        onGroupingConditionsChange={metricAppModel.onGroupingConditionsChange}
         onBookmarkCreate={metricAppModel.onBookmarkCreate}
         onBookmarkUpdate={metricAppModel.onBookmarkUpdate}
         onNotificationAdd={metricAppModel.onNotificationAdd}
@@ -191,9 +204,9 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onAlignmentTypeChange={metricAppModel.onAlignmentTypeChange}
         onDensityTypeChange={metricAppModel.onDensityTypeChange}
         onMetricsSelectChange={metricAppModel.onMetricsSelectChange}
+        onSelectExperimentsChange={metricAppModel.onSelectExperimentsChange}
+        onToggleAllExperiments={metricAppModel.onToggleAllExperiments}
         onSelectRunQueryChange={metricAppModel.onSelectRunQueryChange}
-        onSelectAdvancedQueryChange={metricAppModel.onSelectAdvancedQueryChange}
-        toggleSelectAdvancedMode={metricAppModel.toggleSelectAdvancedMode}
         onExportTableData={metricAppModel.onExportTableData}
         onRowHeightChange={metricAppModel.onRowHeightChange}
         onSortChange={metricAppModel.onSortChange}
@@ -201,6 +214,9 @@ function MetricsContainer(): React.FunctionComponentElement<React.ReactNode> {
         onMetricVisibilityChange={metricAppModel.onMetricVisibilityChange}
         onColumnsOrderChange={metricAppModel.onColumnsOrderChange}
         onColumnsVisibilityChange={metricAppModel.onColumnsVisibilityChange}
+        onDefaultColumnsVisibilityChange={
+          metricAppModel.onDefaultColumnsVisibilityChange
+        }
         onTableDiffShow={metricAppModel.onTableDiffShow}
         onTableResizeModeChange={metricAppModel.onTableResizeModeChange}
         onRowsVisibilityChange={metricAppModel.onRowsVisibilityChange}

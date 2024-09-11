@@ -62,6 +62,8 @@ function Scatters(
               onResetConfigData={props.onResetConfigData}
               liveUpdateConfig={props.liveUpdateConfig}
               onLiveUpdateConfigChange={props.onLiveUpdateConfigChange}
+              onSelectExperimentsChange={props.onSelectExperimentsChange}
+              onToggleAllExperiments={props.onToggleAllExperiments}
               title='Scatters explorer'
             />
             <div className='Scatters__SelectForm__Grouping__container'>
@@ -84,6 +86,7 @@ function Scatters(
                 isDisabled={isProgressBarVisible}
                 groupingData={props.groupingData}
                 groupingSelectOptions={props.groupingSelectOptions}
+                conditionalGroupingOptions={props.groupingSelectOptions} // jescalada: TODO: Implement conditional grouping (Params/Scatters)
                 onGroupingSelectChange={props.onGroupingSelectChange}
                 onGroupingModeChange={props.onGroupingModeChange}
                 onGroupingPaletteChange={props.onGroupingPaletteChange}
@@ -195,6 +198,7 @@ function Scatters(
                           hiddenRows={props.hiddenMetrics}
                           hiddenColumns={props.hiddenColumns}
                           hideSystemMetrics={props.hideSystemMetrics}
+                          unselectedColumnState={props.unselectedColumnState}
                           resizeMode={props.resizeMode}
                           columnsWidths={props.columnsWidths}
                           selectedRows={props.selectedRows}
@@ -211,6 +215,9 @@ function Scatters(
                           onManageColumns={props.onColumnsOrderChange}
                           onColumnsVisibilityChange={
                             props.onColumnsVisibilityChange
+                          }
+                          onDefaultColumnsVisibilityChange={
+                            props.onDefaultColumnsVisibilityChange
                           }
                           onTableDiffShow={props.onTableDiffShow}
                           onRowHeightChange={props.onRowHeightChange}

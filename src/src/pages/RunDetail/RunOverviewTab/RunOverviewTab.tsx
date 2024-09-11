@@ -27,10 +27,15 @@ function RunOverviewTab({ runData, runHash }: IRunOverviewTabProps) {
   const overviewSectionRef = React.useRef<HTMLElement | any>(null);
   const overviewSectionContentRef = React.useRef<HTMLElement | any>(null);
   const [containerHeight, setContainerHeight] = React.useState<number>(0);
+  const METRICS_FETCH_COUNT = 500;
+
+  const [startIndex, setStartIndex] = React.useState(0);
 
   useRunMetricsBatch({
     runTraces: runData.runTraces,
     runHash,
+    startIndex,
+    count: METRICS_FETCH_COUNT,
   });
 
   React.useEffect(() => {
@@ -75,6 +80,12 @@ function RunOverviewTab({ runData, runHash }: IRunOverviewTabProps) {
     sidebarRef?.current?.scrollTo(0, e.target.scrollTop);
   }
 
+  function fetchMoreMetrics() {
+    if (runData.runMetricsBatch.length > startIndex + 1) {
+      setStartIndex((prevIndex) => prevIndex + METRICS_FETCH_COUNT);
+    }
+  }
+
   return (
     <ErrorBoundary>
       <section
@@ -105,6 +116,8 @@ function RunOverviewTab({ runData, runHash }: IRunOverviewTabProps) {
                     isLoading={runData?.isRunBatchLoading}
                     type='metric'
                     runBatch={cardsData?.runMetricsBatch}
+                    totalMetrics={runData?.runTraces?.metric?.length}
+                    loadMoreHandler={fetchMoreMetrics}
                   />
                 </ErrorBoundary>
               )}

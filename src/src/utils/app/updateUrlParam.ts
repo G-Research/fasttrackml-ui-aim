@@ -1,3 +1,5 @@
+import { getPrefix } from 'config/config';
+
 import getUrlWithParam from 'utils/getUrlWithParam';
 import { setItem } from 'utils/storage';
 
@@ -22,9 +24,12 @@ export default function updateUrlParam({
   }
 
   const isExistBasePath = (window as any).API_BASE_PATH !== '{{ base_path }}';
+  const hasPrefix = getPrefix() !== '/';
 
   const appId: string =
-    window.location.pathname.split('/')[isExistBasePath ? 3 : 2];
+    window.location.pathname.split('/')[
+      (isExistBasePath ? 3 : 2) + (hasPrefix ? 2 : 0)
+    ];
   if (!appId) {
     let fullURL = url;
 

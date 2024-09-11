@@ -5,12 +5,18 @@ import _ from 'lodash-es';
 import COLORS from 'config/colors/colors';
 import DASH_ARRAYS from 'config/dash-arrays/dashArrays';
 import { MetricsValueKeyEnum, ResizeModeEnum } from 'config/enums/tableEnums';
-import { RowHeightSize } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  TABLE_DEFAULT_CONFIG,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
+
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 import {
   getParamsTableColumns,
@@ -54,12 +60,14 @@ import { getFilteredGroupingOptions } from 'utils/app/getFilteredGroupingOptions
 import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import getGroupingSelectOptions from 'utils/app/getGroupingSelectOptions';
+import getQueryStringFromSelect from 'utils/app/getQueryStringFromSelect';
 import getRunData from 'utils/app/getRunData';
 import onChangeTooltip from 'utils/app/onChangeTooltip';
 import onColorIndicatorChange from 'utils/app/onColorIndicatorChange';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
 import onCurveInterpolationChange from 'utils/app/onCurveInterpolationChange';
+import onDefaultColumnsVisibilityChange from 'utils/app/onDefaultColumnsVisibilityChange';
 import onGroupingApplyChange from 'utils/app/onGroupingApplyChange';
 import onGroupingModeChange from 'utils/app/onGroupingModeChange';
 import onGroupingPaletteChange from 'utils/app/onGroupingPaletteChange';
@@ -68,13 +76,16 @@ import onGroupingReset from 'utils/app/onGroupingReset';
 import onGroupingSelectChange from 'utils/app/onGroupingSelectChange';
 import onSelectOptionsChange from 'utils/app/onSelectOptionsChange';
 import onParamVisibilityChange from 'utils/app/onParamsVisibilityChange';
+import onParamsScaleTypeChange from 'utils/app/onParamsScaleTypeChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
 import onSortFieldsChange from 'utils/app/onSortFieldsChange';
 import { onTableDiffShow } from 'utils/app/onTableDiffShow';
 import { onTableResizeEnd } from 'utils/app/onTableResizeEnd';
 import onTableResizeModeChange from 'utils/app/onTableResizeModeChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import onTableRowClick from 'utils/app/onTableRowClick';
 import onTableRowHover from 'utils/app/onTableRowHover';
 import onTableSortChange from 'utils/app/onTableSortChange';
@@ -110,6 +121,8 @@ import onRowsVisibilityChange from 'utils/app/onRowsVisibilityChange';
 import { getMetricsInitialRowData } from 'utils/app/getMetricsInitialRowData';
 import { getMetricHash } from 'utils/app/getMetricHash';
 import { getMetricLabel } from 'utils/app/getMetricLabel';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import { InitialAppModelType } from './config';
 
@@ -163,21 +176,11 @@ function getParamsModelMethods(
         chartPanelRef: { current: null },
       };
     }
-    projectsService
-      .getProjectParams(['metric'])
-      .call()
-      .then((data) => {
-        model.setState({
-          selectFormData: {
-            options: getSelectOptions(data),
-            suggestions: getSuggestionsByExplorer(appName, data),
-          },
-        });
-      });
     model.setState({ ...state });
     if (!appId) {
       setModelDefaultAppConfigData();
     }
+
     const liveUpdateState = model.getState()?.config?.liveUpdate;
 
     if (liveUpdateState?.enabled) {
@@ -187,6 +190,25 @@ function getParamsModelMethods(
         liveUpdateState.delay,
       );
     }
+  }
+
+  function fetchProjectParamsAndUpdateState() {
+    const selectedExperiments = getSelectedExperiments();
+    projectsService
+      .getProjectParams(
+        ['metric'],
+        selectedExperiments.map((e) => e.id),
+      )
+      .call()
+      .then((data) => {
+        model.setState({
+          selectFormData: {
+            options: getSelectOptions(data),
+            suggestions: getSuggestionsByExplorer(appName, data),
+          },
+        });
+        removeOldSelectedMetrics(model);
+      });
   }
 
   function updateData(newData: IRun<IParamTrace>[]): void {
@@ -223,11 +245,14 @@ function getParamsModelMethods(
       runsRequestRef.abort();
     }
     const configData = { ...model.getState()?.config };
-    if (queryString) {
-      configData.select.query = queryString;
-    }
-    runsRequestRef = runsService.getRunsData(configData?.select?.query);
-    setRequestProgress(model);
+    const query = getQueryStringFromSelect(configData?.select, true);
+    const selectedExperimentNames = getSelectedExperiments().map((e) => e.name);
+    runsRequestRef = runsService.getRunsData(
+      query,
+      undefined,
+      undefined,
+      selectedExperimentNames,
+    );
     return {
       call: async () => {
         if (_.isEmpty(configData?.select?.options)) {
@@ -369,6 +394,8 @@ function getParamsModelMethods(
         const metricsRowValues = getMetricsInitialRowData(metricsColumns);
         metric.run.traces.metric.forEach((trace: any) => {
           const metricHash = getMetricHash(trace.name, trace.context);
+          // TODO: Implement Support for the new metric value API format
+          // metricsRowValues[metricHash] = formatValue(trace.values.last);
           metricsRowValues[metricHash] = formatValue(trace.values.last);
         });
         const rowValues: any = {
@@ -544,9 +571,14 @@ function getParamsModelMethods(
               ({ type, label, value }: ISelectOption) => {
                 const dimension = dimensionsObject[chartIndex];
                 if (!dimension[label] && type === 'params') {
+                  const paramValue = getValue(run.run.params, label, '-');
+                  const scaleType =
+                    typeof paramValue === 'number'
+                      ? ScaleEnum.Linear
+                      : ScaleEnum.Point;
                   dimension[label] = {
                     values: new Set(),
-                    scaleType: ScaleEnum.Linear,
+                    scaleType: scaleType,
                     displayName: label,
                     dimensionType: 'param',
                   };
@@ -698,6 +730,51 @@ function getParamsModelMethods(
       groupingSelectOptions,
     );
     const sortFields = modelState?.config?.table.sortFields;
+
+    const unselectedColumnState = configData.table?.unselectedColumnState;
+
+    if (unselectedColumnState !== UnselectedColumnState.DEFAULT) {
+      const selected = modelState?.config?.select?.options.map(
+        (option: ISelectOption) => option.label,
+      );
+
+      let hiddenColumns = configData.table?.hiddenColumns;
+
+      const defaultHiddenColumns =
+        TABLE_DEFAULT_CONFIG?.[AppNameEnum.PARAMS]?.hiddenColumns;
+
+      if (unselectedColumnState === UnselectedColumnState.FORCE_HIDE) {
+        // Extract the combined keys from metricsColumns dictionary
+        const metricList = Object.keys(metricsColumns).reduce(
+          (acc: string[], key: string) => {
+            const metricKeys = Object.keys(metricsColumns[key]);
+            return acc.concat(
+              metricKeys.map((metricKey) => `${key} ${metricKey}`.trim()),
+            );
+          },
+          [],
+        );
+
+        const metricsAndParams = metricList.concat(params);
+        hiddenColumns = _.uniq(
+          defaultHiddenColumns?.concat(
+            metricsAndParams.filter((item: string) => !selected.includes(item)),
+          ),
+        );
+      } else {
+        // Remove unselected values from hiddenColumns
+        hiddenColumns = defaultHiddenColumns;
+      }
+
+      configData = {
+        ...configData,
+        table: {
+          ...configData.table,
+          rowHeight: modelState?.config?.table?.rowHeight!,
+          hiddenColumns,
+        },
+      };
+    }
 
     const tableColumns = getParamsTableColumns(
       sortOptions,
@@ -934,11 +1011,18 @@ function getParamsModelMethods(
         };
         const metricHash = getMetricHash(trace.name, trace.context as any);
         metricsValues[metricHash] = {
-          min: trace.values.min,
-          max: trace.values.max,
-          last: trace.values.last,
-          first: trace.values.first,
+          min: '-',
+          max: '-',
+          last: '-',
+          first: '-',
         };
+        // TODO: Implement Support for the new metric value API format
+        // metricsValues[metricHash] = {
+        //   min: trace.values.min,
+        //   max: trace.values.max,
+        //   last: trace.values.last,
+        //   first: trace.values.first,
+        // };
       });
       const paramKey = encode({ runHash: run.hash });
 
@@ -1471,6 +1555,7 @@ function getParamsModelMethods(
     onShuffleChange,
     deleteRuns,
     archiveRuns,
+    fetchProjectParamsAndUpdateState,
   };
 
   if (grouping) {
@@ -1559,6 +1644,17 @@ function getParamsModelMethods(
       onParamsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
         onSelectOptionsChange({ data, model });
       },
+      onSelectExperimentsChange(experiment: IExperimentDataShort): void {
+        // Handle experiment change, then re-fetch params data
+        onSelectExperimentsChange(experiment);
+        fetchProjectParamsAndUpdateState();
+        getParamsData(true, true).call();
+      },
+      onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+        onToggleAllExperiments(experiments);
+        fetchProjectParamsAndUpdateState();
+        getParamsData(true, true).call();
+      },
       onSelectRunQueryChange(query: string): void {
         onSelectRunQueryChange({ query, model });
       },
@@ -1596,6 +1692,9 @@ function getParamsModelMethods(
           model,
           updateModelData,
         });
+      },
+      onParamsScaleTypeChange(args: any): void {
+        onParamsScaleTypeChange({ args, model, appName, updateModelData });
       },
     });
   }
@@ -1637,6 +1736,14 @@ function getParamsModelMethods(
           updateModelData,
         });
       },
+      onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+        onDefaultColumnsVisibilityChange({
+          unselectedColumnState: state,
+          model,
+          appName,
+          updateModelData,
+        });
+      },
       onTableResizeModeChange(mode: ResizeModeEnum): void {
         onTableResizeModeChange({ mode, model, appName });
       },
@@ -1664,14 +1771,25 @@ function getParamsModelMethods(
           updateModelData,
         });
       },
+
       onRowSelect({
         actionType,
         data,
+        rangeStart,
+        rangeEnd,
       }: {
-        actionType: 'single' | 'selectAll' | 'removeAll';
+        actionType: 'single' | 'selectAll' | 'removeAll' | 'range';
         data?: any;
+        rangeStart?: number;
+        rangeEnd?: number;
       }): void {
-        return onRowSelect({ actionType, data, model });
+        return onRowSelect({
+          actionType,
+          data,
+          rangeStart,
+          rangeEnd,
+          model,
+        });
       },
       onRowsVisibilityChange(metricKeys: string[]): void {
         return onRowsVisibilityChange({

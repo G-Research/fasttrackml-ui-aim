@@ -15,6 +15,7 @@ import getUrlSearchParam from 'modules/core/utils/getUrlSearchParam';
 
 import getStateFromLocalStorage from 'utils/getStateFromLocalStorage';
 import { encode } from 'utils/encoder/encoder';
+import { removeItem, setItem } from 'utils/storage';
 
 import { ControlsConfigs } from '../explorer/state/controls';
 import { PersistenceTypesEnum } from '../types';
@@ -224,12 +225,12 @@ function createVisualizationEngine<TStore>(
 
           boxMethods.reset = () => {
             originalMethods.reset();
-            localStorage.removeItem(boxPersistenceKey);
+            removeItem(boxPersistenceKey);
           };
 
           boxMethods.update = (newValue: Partial<BoxState>) => {
             originalMethods.update(newValue);
-            localStorage.setItem(boxPersistenceKey, encode(newValue));
+            setItem(boxPersistenceKey, encode(newValue));
           };
         }
 

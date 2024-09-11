@@ -95,14 +95,14 @@ function AxesRange(props: IAxesRangeProps) {
         {
           errorCondition: (value: number) =>
             max === undefined ? false : value > max,
-          errorText: `Value should be equal or smaller then ${max}`,
+          errorText: `Value should be equal or smaller than ${max}`,
         },
       ],
       max: (min?: number) => [
         {
           errorCondition: (value: number) =>
             min === undefined ? false : value < min,
-          errorText: `Value should be equal or greater then ${min}`,
+          errorText: `Value should be equal or greater than ${min}`,
         },
       ],
     }),

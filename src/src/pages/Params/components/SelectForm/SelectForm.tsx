@@ -1,13 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
 
-import { Box, Checkbox, Divider, InputBase, Popper } from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import {
-  CheckBox as CheckBoxIcon,
-  CheckBoxOutlineBlank,
-} from '@material-ui/icons';
+import { Box, Divider } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
+import SelectFormPopper from 'components/SelectFormPopper/SelectFormPopper';
 import { Badge, Button, Icon, Text } from 'components/kit';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 import AutocompleteInput from 'components/AutocompleteInput';
@@ -22,6 +19,12 @@ import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
 import './SelectForm.scss';
 
+const useStyles = makeStyles({
+  popper: {
+    width: '100% !important',
+  },
+});
+
 function SelectForm({
   requestIsPending,
   isDisabled = false,
@@ -32,8 +35,11 @@ function SelectForm({
 }: ISelectFormProps): React.FunctionComponentElement<React.ReactNode> {
   const [anchorEl, setAnchorEl] = React.useState<any>(null);
   const [searchValue, setSearchValue] = React.useState<string>('');
+  const [isRegexSearch, setIsRegexSearch] = React.useState(false);
+  const [regexError, setRegexError] = React.useState<string | null>(null);
   const searchRef = React.useRef<any>(null);
   const autocompleteRef: any = React.useRef<React.MutableRefObject<any>>(null);
+  const classes = useStyles();
   React.useEffect(() => {
     return () => {
       searchRef.current?.abort();
@@ -64,7 +70,7 @@ function SelectForm({
     event: React.ChangeEvent<{}>,
     value: ISelectOption[],
   ): void {
-    if (event.type === 'click') {
+    if (event.type === 'click' || event.type === 'change') {
       const lookup = value.reduce(
         (acc: { [key: string]: number }, curr: ISelectOption) => {
           acc[curr.key] = ++acc[curr.key] || 0;
@@ -109,20 +115,48 @@ function SelectForm({
   }
 
   const options = React.useMemo(() => {
-    return (
-      selectFormData?.options?.filter(
-        (option) => option.label.indexOf(searchValue) !== -1,
-      ) ?? []
-    );
-  }, [searchValue, selectFormData?.options]);
+    if (isRegexSearch) {
+      try {
+        const regex = new RegExp(searchValue, 'i');
+        setRegexError(null);
+        return (
+          selectFormData?.options?.filter((option) =>
+            regex.test(option.label),
+          ) ?? []
+        );
+      } catch (error) {
+        setRegexError('Invalid Regex');
+        return [];
+      }
+    } else {
+      return (
+        selectFormData?.options?.filter(
+          (option) => option.label.indexOf(searchValue) !== -1,
+        ) ?? []
+      );
+    }
+  }, [searchValue, selectFormData?.options, isRegexSearch]);
 
   const open: boolean = !!anchorEl;
   const id = open ? 'select-metric' : undefined;
+  let isSearchDisabled = selectedParamsData?.options.length === 0;
   return (
     <ErrorBoundary>
       <div className='SelectForm__container'>
         <div className='SelectForm__params__container'>
-          <Box display='flex'>
+          <ErrorBoundary>
+            <div className='SelectForm__TextField'>
+              <AutocompleteInput
+                refObject={autocompleteRef}
+                context={selectFormData?.suggestions}
+                error={selectFormData?.error}
+                onEnter={handleParamsSearch}
+                value={selectedParamsData?.query}
+                disabled={isDisabled}
+              />
+            </div>
+          </ErrorBoundary>
+          <Box display='flex' alignItems='center'>
             <Box
               width='100%'
               display='flex'
@@ -130,7 +164,7 @@ function SelectForm({
               alignItems='center'
             >
               <ErrorBoundary>
-                <Box display='flex' alignItems='center'>
+                <Box display='flex' alignItems='center' width='100%'>
                   <Button
                     variant='contained'
                     color='primary'
@@ -141,69 +175,24 @@ function SelectForm({
                     <Icon name='plus' style={{ marginRight: '0.5rem' }} /> Run
                     Params
                   </Button>
-                  <Popper
+                  <SelectFormPopper
                     id={id}
+                    type=''
                     open={open}
                     anchorEl={anchorEl}
-                    placement='bottom-start'
+                    options={options}
+                    selectedData={selectedParamsData}
+                    onSelect={onSelect}
+                    searchValue={searchValue}
+                    handleSearchInputChange={handleSearchInputChange}
+                    handleClose={handleClose}
+                    regexError={regexError}
+                    setRegexError={setRegexError}
+                    isRegexSearch={isRegexSearch}
+                    setIsRegexSearch={setIsRegexSearch}
                     className='SelectForm__Popper'
-                  >
-                    <Autocomplete
-                      open
-                      onClose={handleClose}
-                      multiple
-                      size='small'
-                      disablePortal
-                      disableCloseOnSelect
-                      options={options}
-                      value={selectedParamsData?.options}
-                      onChange={onSelect}
-                      groupBy={(option) => option.group}
-                      getOptionLabel={(option) => option.label}
-                      renderTags={() => null}
-                      disableClearable={true}
-                      ListboxProps={{
-                        style: {
-                          height: 400,
-                        },
-                      }}
-                      renderInput={(params) => (
-                        <InputBase
-                          ref={params.InputProps.ref}
-                          inputProps={{
-                            ...params.inputProps,
-                            value: searchValue,
-                            onChange: handleSearchInputChange,
-                          }}
-                          autoFocus={true}
-                          spellCheck={false}
-                          className='SelectForm__param__select'
-                        />
-                      )}
-                      renderOption={(option) => {
-                        let selected: boolean =
-                          !!selectedParamsData?.options.find(
-                            (item: ISelectOption) => item.key === option.key,
-                          )?.key;
-                        return (
-                          <div className='SelectForm__option'>
-                            <Checkbox
-                              color='primary'
-                              icon={<CheckBoxOutlineBlank />}
-                              checkedIcon={<CheckBoxIcon />}
-                              checked={selected}
-                            />
-                            <Text
-                              className='SelectForm__option__label'
-                              size={14}
-                            >
-                              {option.label}
-                            </Text>
-                          </div>
-                        );
-                      }}
-                    />
-                  </Popper>
+                    classes={classes}
+                  />
                   <Divider
                     style={{ margin: '0 1em' }}
                     orientation='vertical'
@@ -225,7 +214,7 @@ function SelectForm({
                             (tag: ISelectOption) => {
                               return (
                                 <Badge
-                                  size='large'
+                                  size='small'
                                   key={tag.label}
                                   label={tag.label}
                                   value={tag.key}
@@ -235,26 +224,30 @@ function SelectForm({
                               );
                             },
                           )}
+
+                          {selectedParamsData?.options &&
+                            selectedParamsData.options.length > 1 && (
+                              <ErrorBoundary>
+                                <Button
+                                  onClick={() => onParamsSelectChange([])}
+                                  withOnlyIcon
+                                  className={classNames(
+                                    'SelectForm__clearAll',
+                                    {
+                                      disabled: isDisabled,
+                                    },
+                                  )}
+                                  size='xSmall'
+                                  disabled={isDisabled}
+                                >
+                                  <Icon name='close' />
+                                </Button>
+                              </ErrorBoundary>
+                            )}
                         </Box>
                       </ErrorBoundary>
                     )}
                 </Box>
-                {selectedParamsData?.options &&
-                  selectedParamsData.options.length > 1 && (
-                    <ErrorBoundary>
-                      <Button
-                        onClick={() => onParamsSelectChange([])}
-                        withOnlyIcon
-                        className={classNames('SelectForm__clearAll', {
-                          disabled: isDisabled,
-                        })}
-                        size='xSmall'
-                        disabled={isDisabled}
-                      >
-                        <Icon name='close' />
-                      </Button>
-                    </ErrorBoundary>
-                  )}
               </ErrorBoundary>
             </Box>
             <Button
@@ -267,7 +260,10 @@ function SelectForm({
                   fontSize={requestIsPending ? 12 : 14}
                 />
               }
-              className='Params__SelectForm__search__button'
+              className={classNames('Params__SelectForm__search__button', {
+                disabled: isSearchDisabled,
+              })}
+              disabled={isSearchDisabled}
               onClick={
                 requestIsPending ? handleRequestAbort : handleParamsSearch
               }
@@ -275,16 +271,6 @@ function SelectForm({
               {requestIsPending ? 'Cancel' : 'Search'}
             </Button>
           </Box>
-          <div className='SelectForm__TextField'>
-            <AutocompleteInput
-              refObject={autocompleteRef}
-              context={selectFormData?.suggestions}
-              error={selectFormData?.error}
-              onEnter={handleParamsSearch}
-              value={selectedParamsData?.query}
-              disabled={isDisabled}
-            />
-          </div>
         </div>
       </div>
     </ErrorBoundary>

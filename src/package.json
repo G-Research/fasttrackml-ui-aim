@@ -44,6 +44,7 @@
     "memoize-one": "^5.2.1",
     "moment": "^2.29.4",
     "monaco-editor": "^0.33.0",
+    "playwright": "^1.45.0",
     "plotly.js": "^2.7.0",
     "prop-types": "^15.7.2",
     "prosemirror-tables": "^1.1.1",
@@ -69,7 +70,7 @@
   },
   "scripts": {
     "start": "react-app-rewired --max_old_space_size=4096 start",
-    "build": "react-app-rewired --max_old_space_size=4096 build && gzipper c -i js,css,html ./build && node tasks/index-html-template-generator.js",
+    "build": "GENERATE_SOURCEMAP=false react-app-rewired --max_old_space_size=2048 build",
     "test": "react-app-rewired test ",
     "test:coverage": "react-app-rewired test --collectCoverage",
     "test:watch": "react-app-rewired test --watchAll",
@@ -77,14 +78,14 @@
     "lint": "eslint src/. --ext .js,.jsx,.ts,.tsx",
     "format:fix": "eslint src/. --ext .js,.jsx,.ts,.tsx --quiet --fix",
     "preinstall": "rimraf public/vs",
-    "postinstall": "cp -R node_modules/monaco-editor/min/vs public/vs",
+    "postinstall": "cp -R node_modules/monaco-editor/min/vs public/vs && find public/vs -type f | xargs sed -i -e '/^\\/\\/# sourceMappingURL=/d'",
     "analyze-bundles": "node tasks/bundle-analyzer.js",
     "crc-kit": "func() { node tasks/cli/index.js  create-component --name=\"$1\" --path=./src/components/kit/ --lint; }; func",
     "crc": "func() { node tasks/cli/index.js  create-component --name=\"$1\" --path=./src/components/ --lint; }; func",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
   },
-  "homepage": "/static-files/",
+  "homepage": "/static/aim/",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -108,6 +109,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.45.0",
     "@storybook/addon-actions": "^6.5.12",
     "@storybook/addon-essentials": "^6.5.12",
     "@storybook/addon-interactions": "^6.5.12",
@@ -139,6 +141,7 @@
     "@types/react-dom": "^17.0.0",
     "@types/react-plotly.js": "^2.5.0",
     "@types/react-router-dom": "^5.1.7",
+    "@types/react-virtualized": "^9.21.30",
     "@types/react-virtualized-auto-sizer": "^1.0.1",
     "@types/react-window": "^1.8.4",
     "@types/storybook__react": "^5.2.1",

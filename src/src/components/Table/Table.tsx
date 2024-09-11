@@ -2,9 +2,11 @@
 /* eslint-disable react/prop-types */
 
 import React from 'react';
-import { isEmpty, isEqual, isNil } from 'lodash-es';
+import { isEmpty, isEqual, isNil, debounce } from 'lodash-es';
 import { useResizeObserver } from 'hooks';
 import _ from 'lodash-es';
+
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { Button, Icon, Text } from 'components/kit';
 import ControlPopover from 'components/ControlPopover/ControlPopover';
@@ -25,6 +27,7 @@ import HideRowsPopover from 'pages/Metrics/components/Table/HideRowsPopover/Hide
 import RowHeightPopover from 'pages/Metrics/components/Table/RowHeightPopover/RowHeightPopover';
 import CompareSelectedRunsPopover from 'pages/Metrics/components/Table/CompareSelectedRunsPopover';
 import MetricsValueKeyPopover from 'pages/Metrics/components/Table/MetricsValueKeyPopover';
+import HideColumnsPopover from 'pages/Metrics/components/Table/HideColumnsPopover/HideColumnsPopover';
 
 import { ITableProps } from 'types/components/Table/Table';
 
@@ -52,6 +55,7 @@ const Table = React.forwardRef(function Table(
     onTableResizeModeChange,
     onMetricsValueKeyChange,
     metricsValueKey,
+    onDefaultColumnsVisibilityChange,
     custom,
     data,
     columns,
@@ -72,6 +76,7 @@ const Table = React.forwardRef(function Table(
     updateColumnsWidths,
     sortFields,
     hiddenRows,
+    unselectedColumnState,
     isLoading,
     showRowClickBehaviour = true,
     showResizeContainerActionBar = true,
@@ -143,6 +148,18 @@ const Table = React.forwardRef(function Table(
     width: 0,
     availableSpace: 0,
   });
+  const [isExporting, setIsExporting] = React.useState(false);
+  const [shiftClickRangeStart, setShiftClickRangeStart] =
+    React.useState<number>(null);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      await onExport();
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   let groups = !Array.isArray(rowData);
 
@@ -370,19 +387,21 @@ const Table = React.forwardRef(function Table(
               const groupRow = dataRef.current[groupKey];
               if (!!groupRow && !!groupRow.data) {
                 if (colKey === 'value') {
+                  const { min, line, max, stdDevValue, stdErrValue } =
+                    groupRow.data.aggregation.area;
                   groupHeaderRowCell.children[0].children[0].children[0].textContent =
-                    groupRow.data.aggregation.area.min;
+                    min;
                   groupHeaderRowCell.children[0].children[0].children[1].textContent =
-                    groupRow.data.aggregation.line;
+                    line;
                   groupHeaderRowCell.children[0].children[0].children[2].textContent =
-                    groupRow.data.aggregation.area.max;
+                    max;
                   if (!isNil(groupRow.data.aggregation.area.stdDevValue)) {
                     groupHeaderRowCell.children[0].children[0].children[3].textContent =
-                      groupRow.data.aggregation.area.stdDevValue;
+                      stdDevValue;
                   }
                   if (!isNil(groupRow.data.aggregation.area.stdErrValue)) {
                     groupHeaderRowCell.children[0].children[0].children[3].textContent =
-                      groupRow.data.aggregation.area.stdErrValue;
+                      stdErrValue;
                   }
                 } else {
                   groupHeaderRowCell.textContent = groupRow.data[colKey];
@@ -595,22 +614,9 @@ const Table = React.forwardRef(function Table(
 
   React.useEffect(() => {
     if (custom && !!tableContainerRef.current) {
-      const windowEdges = calculateWindow({
-        scrollTop: tableContainerRef.current.scrollTop,
-        offsetHeight: tableContainerRef.current.offsetHeight,
-        scrollHeight: tableContainerRef.current.scrollHeight,
-        itemHeight: rowHeight,
-        groupMargin:
-          ROW_CELL_SIZE_CONFIG[rowHeight]?.groupMargin ??
-          ROW_CELL_SIZE_CONFIG[RowHeightSize.md].groupMargin,
-      });
-
-      startIndex.current = windowEdges.startIndex;
-      endIndex.current = windowEdges.endIndex;
-
-      virtualizedUpdate();
-
-      tableContainerRef.current.onscroll = ({ target }) => {
+      // Debounce the scroll event to avoid performance issues
+      const handleScroll = debounce(() => {
+        const target = tableContainerRef.current;
         const windowEdges = calculateWindow({
           scrollTop: target.scrollTop,
           offsetHeight: target.offsetHeight,
@@ -642,15 +648,16 @@ const Table = React.forwardRef(function Table(
           }
         }
         setListWindowMeasurements();
+      }, 30);
+
+      tableContainerRef.current.addEventListener('scroll', handleScroll);
+
+      return () => {
+        if (tableContainerRef.current) {
+          tableContainerRef.current.removeEventListener('scroll', handleScroll);
+        }
       };
     }
-
-    return () => {
-      if (custom && tableContainerRef.current) {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        tableContainerRef.current.onscroll = null;
-      }
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [custom, rowData]);
 
@@ -794,6 +801,15 @@ const Table = React.forwardRef(function Table(
                     data={dataRef.current}
                   />
                 )}
+                {onDefaultColumnsVisibilityChange && (
+                  <HideColumnsPopover
+                    unselectedColumnState={unselectedColumnState}
+                    onDefaultColumnsVisibilityChange={
+                      onDefaultColumnsVisibilityChange
+                    }
+                    appName={appName}
+                  />
+                )}
                 {onSort && (
                   <ControlPopover
                     anchorOrigin={{
@@ -863,8 +879,15 @@ const Table = React.forwardRef(function Table(
                     fullWidth
                     variant='outlined'
                     size='small'
-                    onClick={onExport}
-                    startIcon={<Icon fontSize={14} name='download' />}
+                    onClick={handleExport}
+                    startIcon={
+                      isExporting ? (
+                        <CircularProgress size={14} />
+                      ) : (
+                        <Icon fontSize={14} name='download' />
+                      )
+                    }
+                    disabled={isExporting}
                   >
                     <Text size={14} color='inherit'>
                       Export
@@ -1014,6 +1037,8 @@ const Table = React.forwardRef(function Table(
                         columnsColorScales={columnsColorScales}
                         onToggleColumnsColorScales={onToggleColumnsColorScales}
                         noColumnActions={noColumnActions}
+                        shiftClickRangeStart={shiftClickRangeStart}
+                        setShiftClickRangeStart={setShiftClickRangeStart}
                         {...props}
                       />
                     </ErrorBoundary>
@@ -1055,6 +1080,8 @@ const Table = React.forwardRef(function Table(
                       onRowHover={onRowHover}
                       onRowClick={onRowClick}
                       disableRowClick={disableRowClick}
+                      shiftClickRangeStart={shiftClickRangeStart}
+                      setShiftClickRangeStart={setShiftClickRangeStart}
                     />
                   </ErrorBoundary>
                 )

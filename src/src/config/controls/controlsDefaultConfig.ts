@@ -33,6 +33,12 @@ export const CONTROLS_DEFAULT_CONFIG = {
       yAxis: { min: undefined, max: undefined },
       xAxis: { min: undefined, max: undefined },
     },
+    axesScaleRanges: [
+      {
+        yAxis: { min: undefined, max: undefined },
+        xAxis: { min: undefined, max: undefined },
+      },
+    ],
     alignmentConfig: {
       type: AlignmentOptionsEnum.STEP,
       metric: '',
@@ -76,6 +82,7 @@ export const CONTROLS_DEFAULT_CONFIG = {
       selectedFields: [],
     },
     sortFields: [],
+    defaultParamsScaleType: ScaleEnum.Linear,
   },
   images: {
     alignmentType: MediaItemAlignmentEnum.Height,

@@ -206,7 +206,7 @@ function flattenDict(
         closedValue: '[...]',
         sub: `${nestedItemsLength} item${nestedItemsLength === 1 ? '' : 's'}`,
         color: typeToColor('array'),
-        copyContent: formatValue(dict),
+        copyContent: JSON.stringify(JSON.parse(formatValue(dict)), null, 2),
       });
     } else {
       let nestedItemsLength = Object.keys(dict).length;
@@ -219,7 +219,7 @@ function flattenDict(
         closedValue: '{...}',
         sub: `${nestedItemsLength} item${nestedItemsLength === 1 ? '' : 's'}`,
         color: typeToColor('object'),
-        copyContent: formatValue(dict),
+        copyContent: JSON.stringify(JSON.parse(formatValue(dict)), null, 2),
       });
     }
   }
@@ -240,7 +240,7 @@ function flattenDict(
         closedValue: '[...]',
         sub: `${item.length} item${item.length === 1 ? '' : 's'}`,
         color: typeToColor('array'),
-        copyContent: value,
+        copyContent: JSON.stringify(JSON.parse(value), null, 2),
       });
       if (item.length > 0) {
         rows.push(...flattenDict(item as unknown[], level + 1, id));
@@ -266,7 +266,7 @@ function flattenDict(
         closedValue: '{...}',
         sub: `${nestedItemsLength} item${nestedItemsLength === 1 ? '' : 's'}`,
         color: typeToColor('object'),
-        copyContent: value,
+        copyContent: JSON.stringify(JSON.parse(value), null, 2),
       });
       if (nestedItemsLength > 0) {
         rows.push(

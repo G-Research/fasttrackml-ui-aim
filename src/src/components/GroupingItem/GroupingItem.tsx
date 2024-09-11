@@ -9,6 +9,8 @@ import { Icon } from 'components/kit';
 import { IconName } from 'components/kit/Icon';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 
+import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
+
 import { IGroupingItemProps } from 'types/pages/components/GroupingItem/GroupingItem';
 
 import './GroupingItem.scss';
@@ -29,6 +31,7 @@ function GroupingItem({
   onSelect,
   onGroupingModeChange,
   groupingSelectOptions,
+  conditionalGroupingOptions,
   isDisabled,
 }: IGroupingItemProps): React.FunctionComponentElement<React.ReactNode> {
   return (
@@ -50,7 +53,9 @@ function GroupingItem({
               <div
                 className={`GroupingItem__icon__box ${opened ? 'active' : ''} ${
                   groupingSelectOptions?.length &&
-                  groupingData?.[groupName]?.length
+                  (groupingData?.[groupName]?.length ||
+                    (groupName !== GroupNameEnum.ROW &&
+                      groupingData?.conditions?.[groupName].length))
                     ? 'outlined'
                     : ''
                 }`}
@@ -66,6 +71,7 @@ function GroupingItem({
             inputLabel={inputLabel}
             groupingData={groupingData}
             groupingSelectOptions={groupingSelectOptions}
+            conditionalGroupingOptions={conditionalGroupingOptions}
             advancedComponent={advancedComponent}
             onSelect={onSelect}
             onGroupingModeChange={onGroupingModeChange}

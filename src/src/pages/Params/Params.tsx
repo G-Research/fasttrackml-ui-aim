@@ -32,8 +32,9 @@ import AppBar from 'pages/Metrics/components/MetricsBar/MetricsBar';
 import { AppNameEnum } from 'services/models/explorer';
 
 import { IParamsProps } from 'types/pages/params/Params';
+import { ISelectOption } from 'types/services/models/explorer/createAppModel';
 
-import { ChartTypeEnum } from 'utils/d3';
+import { ChartTypeEnum, ScaleEnum } from 'utils/d3';
 
 import SelectForm from './components/SelectForm/SelectForm';
 import Controls from './components/Controls/Controls';
@@ -71,8 +72,10 @@ const Params = ({
   resizeMode,
   notifyData,
   hiddenColumns,
+  unselectedColumnState,
   liveUpdateConfig,
   selectFormData,
+  selectedParams,
   onTableRowHover,
   onTableRowClick,
   hideSystemMetrics,
@@ -95,6 +98,7 @@ const Params = ({
   onTableResizeModeChange,
   onNotificationDelete,
   onColumnsVisibilityChange,
+  onDefaultColumnsVisibilityChange,
   onTableDiffShow,
   onSortReset,
   onAxisBrushExtentChange,
@@ -113,16 +117,62 @@ const Params = ({
   sortOptions,
   onRunsTagsChange,
   onRowsVisibilityChange,
+  onParamsScaleTypeChange,
+  onSelectExperimentsChange,
+  onToggleAllExperiments,
 }: IParamsProps): React.FunctionComponentElement<React.ReactNode> => {
+  let scaleStates = getDefaultScaleStates(highPlotData);
+  let newScaleStates = scaleStates;
+
+  // Updates selectedParams prop to render disabled button for point params
+  // Also updates newScaleStates to render the newly selected scales in chart
+  function updateParamsState() {
+    selectedParams.map((param) => {
+      if (scaleStates[param.key] === ScaleEnum.Point) {
+        param.scale = scaleStates[param.key];
+        return param;
+      } else {
+        return param;
+      }
+    });
+    newScaleStates = selectedParams.reduce((acc: {}, param: ISelectOption) => {
+      (acc as any)[param.key] = param.scale;
+      return acc;
+    }, {});
+  }
+
+  // Obtains the original scale for each parameter
+  // (point for string params, linear for numeric params)
+  function getDefaultScaleStates(highPlotData: any) {
+    const dimensions: { [key: string]: { scaleType: string } } =
+      highPlotData?.[0]?.dimensions;
+
+    if (!dimensions) {
+      return {};
+    }
+    const dimensionsArray = Object.entries(dimensions).map(([key, value]) => ({
+      key,
+      ...value,
+    }));
+    const result = dimensionsArray.map((dimension) => {
+      return {
+        [dimension.key]: dimension.scaleType,
+      };
+    });
+    return _.assign({}, ...result);
+  }
+
   const [isProgressBarVisible, setIsProgressBarVisible] =
     React.useState<boolean>(false);
   const chartProps: any[] = React.useMemo(() => {
+    updateParamsState();
     return (highPlotData || []).map((chartData: any) => ({
       curveInterpolation,
       isVisibleColorIndicator,
       onAxisBrushExtentChange,
       brushExtents,
       chartTitle: chartTitleData[chartData.data[0]?.chartIndex],
+      scaleStates: newScaleStates,
     }));
   }, [
     highPlotData,
@@ -131,6 +181,9 @@ const Params = ({
     chartTitleData,
     onAxisBrushExtentChange,
     brushExtents,
+    selectedParams,
+    updateParamsState,
+    newScaleStates,
   ]);
 
   return (
@@ -146,6 +199,8 @@ const Params = ({
               onResetConfigData={onResetConfigData}
               liveUpdateConfig={liveUpdateConfig}
               onLiveUpdateConfigChange={onLiveUpdateConfigChange}
+              onSelectExperimentsChange={onSelectExperimentsChange}
+              onToggleAllExperiments={onToggleAllExperiments}
               title={pageTitlesEnum.PARAMS_EXPLORER}
             />
           </div>
@@ -168,6 +223,7 @@ const Params = ({
               isDisabled={isProgressBarVisible}
               groupingData={groupingData}
               groupingSelectOptions={groupingSelectOptions}
+              conditionalGroupingOptions={groupingSelectOptions} // jescalada: TODO: Implement conditional grouping (Params/Scatters)
               onGroupingSelectChange={onGroupingSelectChange}
               onGroupingModeChange={onGroupingModeChange}
               onGroupingPaletteChange={onGroupingPaletteChange}
@@ -230,6 +286,8 @@ const Params = ({
                           }
                           onColorIndicatorChange={onColorIndicatorChange}
                           onChangeTooltip={onChangeTooltip}
+                          onParamsScaleTypeChange={onParamsScaleTypeChange}
+                          selectedParams={selectedParams}
                         />
                       }
                     />
@@ -272,6 +330,7 @@ const Params = ({
                         hiddenRows={hiddenMetrics}
                         hiddenColumns={hiddenColumns}
                         hideSystemMetrics={hideSystemMetrics}
+                        unselectedColumnState={unselectedColumnState}
                         resizeMode={resizeMode}
                         columnsWidths={columnsWidths}
                         selectedRows={selectedRows}
@@ -284,6 +343,9 @@ const Params = ({
                         onSort={onSortFieldsChange}
                         onExport={onExportTableData}
                         onColumnsVisibilityChange={onColumnsVisibilityChange}
+                        onDefaultColumnsVisibilityChange={
+                          onDefaultColumnsVisibilityChange
+                        }
                         onManageColumns={onColumnsOrderChange}
                         onRowHeightChange={onRowHeightChange}
                         onRowsChange={onParamVisibilityChange}

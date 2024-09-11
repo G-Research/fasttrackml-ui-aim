@@ -1,3 +1,4 @@
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 import { IMetricProps } from 'types/pages/metrics/Metrics';
 
 export interface IMetricsBarProps {
@@ -12,4 +13,6 @@ export interface IMetricsBarProps {
     enabled?: boolean;
   }) => void;
   title: string;
+  onSelectExperimentsChange: (experiment: IExperimentDataShort) => void;
+  onToggleAllExperiments: (experiments: IExperimentDataShort[]) => void;
 }

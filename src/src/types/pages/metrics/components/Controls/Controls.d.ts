@@ -33,9 +33,9 @@ export interface IControlProps {
   highlightMode: HighlightEnum;
   aggregationConfig: IAggregationConfig;
   axesScaleType: IAxesScaleState;
-  axesScaleRange: IAxesScaleRange;
+  axesScaleRanges: IAxesScaleRange[];
   smoothing: ISmoothing;
-  alignmentConfig: IAlignmentConfig;
+  alignmentConfigs: IAlignmentConfig[];
   densityType: DensityOptions;
   selectFormOptions: ISelectOption[];
   onChangeTooltip: (tooltip: Partial<ITooltip>) => void;

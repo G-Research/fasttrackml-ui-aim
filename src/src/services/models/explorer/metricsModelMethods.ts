@@ -1,19 +1,27 @@
 import moment from 'moment';
 import { saveAs } from 'file-saver';
 import _ from 'lodash-es';
+import { config } from 'yargs';
 
 import { IAxesScaleRange } from 'components/AxesPropsPopover';
 
 import COLORS from 'config/colors/colors';
+import { CONTROLS_DEFAULT_CONFIG } from 'config/controls/controlsDefaultConfig';
 import DASH_ARRAYS from 'config/dash-arrays/dashArrays';
 import { ResizeModeEnum } from 'config/enums/tableEnums';
-import { RowHeightSize } from 'config/table/tableConfigs';
+import {
+  RowHeightSize,
+  TABLE_DEFAULT_CONFIG,
+  UnselectedColumnState,
+} from 'config/table/tableConfigs';
 import { DensityOptions } from 'config/enums/densityEnum';
 import { RequestStatusEnum } from 'config/enums/requestStatusEnum';
 import { ANALYTICS_EVENT_KEYS } from 'config/analytics/analyticsKeysMap';
 import { DATE_EXPORTING_FORMAT, TABLE_DATE_FORMAT } from 'config/dates/dates';
 import { getSuggestionsByExplorer } from 'config/monacoConfig/monacoConfig';
 import { GroupNameEnum } from 'config/grouping/GroupingPopovers';
+
+import { IExperimentDataShort } from 'modules/core/api/experimentsApi';
 
 import {
   getMetricsTableColumns,
@@ -39,12 +47,14 @@ import {
   IGroupingSelectOption,
   IMetricAppModelState,
   IMetricsCollection,
+  IMetricsDataParams,
   IMetricTableRowData,
   IOnGroupingModeChangeParams,
   IOnGroupingSelectChangeParams,
   ISmoothing,
   ITooltip,
   LegendsConfig,
+  IGroupingCondition,
 } from 'types/services/models/metrics/metricsAppModel';
 import {
   IMetricTrace,
@@ -69,11 +79,14 @@ import {
 import exceptionHandler from 'utils/app/exceptionHandler';
 import getAggregatedData from 'utils/app/getAggregatedData';
 import getChartTitleData from 'utils/app/getChartTitleData';
+import { generateGroupValues } from 'utils/app/generateGroupValues';
+import { getConditionStrings } from 'utils/app/getConditionStrings';
 import { getFilteredGroupingOptions } from 'utils/app/getFilteredGroupingOptions';
 import getFilteredRow from 'utils/app/getFilteredRow';
 import { getGroupingPersistIndex } from 'utils/app/getGroupingPersistIndex';
 import getGroupingSelectOptions from 'utils/app/getGroupingSelectOptions';
 import getQueryStringFromSelect from 'utils/app/getQueryStringFromSelect';
+import getMetricsListFromSelect from 'utils/app/getMetricsListFromSelect';
 import getRunData from 'utils/app/getRunData';
 import onAggregationConfigChange from 'utils/app/onAggregationConfigChange';
 import onAlignmentMetricChange from 'utils/app/onAlignmentMetricChange';
@@ -82,7 +95,10 @@ import onAxesScaleTypeChange from 'utils/app/onAxesScaleTypeChange';
 import onChangeTooltip from 'utils/app/onChangeTooltip';
 import onColumnsOrderChange from 'utils/app/onColumnsOrderChange';
 import onColumnsVisibilityChange from 'utils/app/onColumnsVisibilityChange';
+import onDefaultColumnsVisibilityChange from 'utils/app/onDefaultColumnsVisibilityChange';
+import evaluateCondition from 'utils/app/evaluateCondition';
 import onGroupingApplyChange from 'utils/app/onGroupingApplyChange';
+import onGroupingConditionsChange from 'utils/app/onGroupingConditionsChange';
 import onGroupingModeChange from 'utils/app/onGroupingModeChange';
 import onGroupingPaletteChange from 'utils/app/onGroupingPaletteChange';
 import onGroupingPersistenceChange from 'utils/app/onGroupingPersistenceChange';
@@ -91,21 +107,21 @@ import onGroupingSelectChange from 'utils/app/onGroupingSelectChange';
 import onHighlightModeChange from 'utils/app/onHighlightModeChange';
 import onIgnoreOutliersChange from 'utils/app/onIgnoreOutliersChange';
 import onSelectOptionsChange from 'utils/app/onSelectOptionsChange';
+import onSelectExperimentsChange from 'utils/app/onSelectExperimentsChange';
 import onMetricVisibilityChange from 'utils/app/onMetricsVisibilityChange';
 import onRowHeightChange from 'utils/app/onRowHeightChange';
 import onRowVisibilityChange from 'utils/app/onRowVisibilityChange';
-import onSelectAdvancedQueryChange from 'utils/app/onSelectAdvancedQueryChange';
 import onSelectRunQueryChange from 'utils/app/onSelectRunQueryChange';
 import onSmoothingChange from 'utils/app/onSmoothingChange';
 import { onTableDiffShow } from 'utils/app/onTableDiffShow';
 import { onTableResizeEnd } from 'utils/app/onTableResizeEnd';
 import onTableResizeModeChange from 'utils/app/onTableResizeModeChange';
+import onToggleAllExperiments from 'utils/app/onToggleAllExperiments';
 import onTableRowClick from 'utils/app/onTableRowClick';
 import onTableRowHover from 'utils/app/onTableRowHover';
 import onTableSortChange from 'utils/app/onTableSortChange';
 import onZoomChange from 'utils/app/onZoomChange';
 import setAggregationEnabled from 'utils/app/setAggregationEnabled';
-import toggleSelectAdvancedMode from 'utils/app/toggleSelectAdvancedMode';
 import updateColumnsWidths from 'utils/app/updateColumnsWidths';
 import updateSortFields from 'utils/app/updateTableSortFields';
 import contextToString from 'utils/contextToString';
@@ -150,8 +166,12 @@ import { onCopyToClipBoard } from 'utils/onCopyToClipBoard';
 import saveRecentSearches from 'utils/saveRecentSearches';
 import getLegendsData from 'utils/app/getLegendsData';
 import onLegendsChange from 'utils/app/onLegendsChange';
+import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
+import { removeOldSelectedMetrics } from 'utils/app/removeOldSelectedMetrics';
 
 import { InitialAppModelType } from './config';
+
+import { AppNameEnum } from './index';
 
 // ************ Metrics App Model Methods
 
@@ -206,8 +226,24 @@ function getMetricsAppModelMethods(
       setModelDefaultAppConfigData();
     }
 
+    const liveUpdateState = model.getState()?.config?.liveUpdate;
+
+    if (liveUpdateState?.enabled) {
+      liveUpdateInstance = new LiveUpdateService(
+        appName,
+        updateData,
+        liveUpdateState.delay,
+      );
+    }
+  }
+
+  function fetchProjectParamsAndUpdateState() {
+    const selectedExperiments = getSelectedExperiments();
     projectsService
-      .getProjectParams(['metric'])
+      .getProjectParams(
+        ['metric'],
+        selectedExperiments.map((e) => e.id),
+      )
       .call()
       .then((data) => {
         const advancedSuggestions: Record<any, any> = getAdvancedSuggestion(
@@ -215,7 +251,7 @@ function getMetricsAppModelMethods(
         );
         model.setState({
           selectFormData: {
-            options: getSelectOptions(data, true),
+            options: getSelectOptions(data, false, false),
             suggestions: getSuggestionsByExplorer(appName, data),
             advancedSuggestions: {
               ...getSuggestionsByExplorer(appName, data),
@@ -228,16 +264,8 @@ function getMetricsAppModelMethods(
             },
           },
         });
+        removeOldSelectedMetrics(model);
       });
-    const liveUpdateState = model.getState()?.config?.liveUpdate;
-
-    if (liveUpdateState?.enabled) {
-      liveUpdateInstance = new LiveUpdateService(
-        appName,
-        updateData,
-        liveUpdateState.delay,
-      );
-    }
   }
 
   function updateData(newData: ISequence<IMetricTrace>[]): void {
@@ -275,23 +303,24 @@ function getMetricsAppModelMethods(
     const metric = configData?.chart?.alignmentConfig?.metric;
 
     if (queryString) {
-      if (configData.select.advancedMode) {
-        configData.select.advancedQuery = queryString;
-      } else {
-        configData.select.query = queryString;
-      }
+      configData.select.query = queryString;
+      configData.select.advancedMode = false;
     }
-    let query = getQueryStringFromSelect(configData?.select);
-    metricsRequestRef = metricsService.getMetricsData({
-      q: query,
-      p: configData?.chart?.densityType,
-      ...(metric ? { x_axis: metric } : {}),
-    });
 
+    let metrics = getMetricsListFromSelect(configData?.select);
+    let query = getQueryStringFromSelect(configData?.select, true);
+
+    const reqBody: IMetricsDataParams = {
+      metrics: metrics,
+      steps: configData?.chart?.densityType,
+      query: query,
+      x_axis: JSON.stringify(metric ? { x_axis: metric } : {}),
+    };
+    metricsRequestRef = metricsService.getMetricsData(reqBody);
     setRequestProgress(model);
     return {
       call: async () => {
-        if (query === '()') {
+        if (_.isEmpty(configData?.select?.options)) {
           resetModelState(configData, shouldResetSelectedRows!);
         } else {
           model.setState({
@@ -403,7 +432,7 @@ function getMetricsAppModelMethods(
       if (metricsCollection.config !== null) {
         const groupConfigData: { [key: string]: unknown } = {};
         for (let key in metricsCollection.config) {
-          groupConfigData[getValueByField(groupingSelectOptions, key)] =
+          groupConfigData[getValueByField(groupingSelectOptions, key) || key] =
             metricsCollection.config[key];
         }
         const groupHeaderRow = {
@@ -698,7 +727,7 @@ function getMetricsAppModelMethods(
             x_axis_iters,
           } = filterMetricsData(
             trace,
-            configData?.chart?.alignmentConfig.type,
+            configData?.chart?.alignmentConfigs?.[0]?.type,
             configData?.chart?.axesScaleType,
           );
 
@@ -816,6 +845,19 @@ function getMetricsAppModelMethods(
         sequenceName: 'metric',
       }),
     ];
+    // Conditional grouping allows grouping by regular select options and also metrics
+    const conditionalGroupingOptions = groupingSelectOptions.concat(
+      _.uniqBy(
+        data.map((metric) => {
+          return {
+            group: 'metric',
+            label: `metric.${metric?.config?.name}`,
+            value: `${metric?.config?.name}`,
+          };
+        }),
+        'value',
+      ),
+    );
     const sortOptions = [
       ...groupingSelectOptions,
       {
@@ -840,6 +882,39 @@ function getMetricsAppModelMethods(
       configData,
       groupingSelectOptions,
     );
+
+    const unselectedColumnState = configData.table?.unselectedColumnState;
+
+    if (unselectedColumnState !== UnselectedColumnState.DEFAULT) {
+      const selected = configData.select?.options.map(
+        (option: ISelectOption) => option.label,
+      );
+      let hiddenColumns = configData.table?.hiddenColumns;
+
+      const defaultHiddenColumns =
+        TABLE_DEFAULT_CONFIG?.[AppNameEnum.METRICS]?.hiddenColumns;
+
+      if (unselectedColumnState === UnselectedColumnState.FORCE_HIDE) {
+        // Push unique values to hiddenColumns
+        hiddenColumns = _.uniq(
+          hiddenColumns?.concat(
+            params.filter((item: string) => !selected.includes(item)),
+          ),
+        );
+      } else {
+        // Remove unselected values from hiddenColumns
+        hiddenColumns = defaultHiddenColumns;
+      }
+
+      configData = {
+        ...configData,
+        table: {
+          ...configData.table,
+          rowHeight: configData.table?.rowHeight!,
+          hiddenColumns,
+        },
+      };
+    }
 
     const tableColumns = getMetricsTableColumns(
       params,
@@ -882,6 +957,7 @@ function getMetricsAppModelMethods(
       tableColumns,
       sameValueColumns: tableData.sameValueColumns,
       groupingSelectOptions,
+      conditionalGroupingOptions,
       sortOptions,
       selectedRows,
     });
@@ -908,6 +984,19 @@ function getMetricsAppModelMethods(
         sequenceName: 'metric',
       }),
     ];
+    // Conditional grouping allows grouping by regular select options and also metrics
+    const conditionalGroupingOptions = groupingSelectOptions.concat(
+      _.uniqBy(
+        data.map((metric) => {
+          return {
+            group: 'metric',
+            label: `metric.${metric?.config?.name}`,
+            value: `${metric?.config?.name}`,
+          };
+        }),
+        'value',
+      ),
+    );
     const sortOptions = [
       ...groupingSelectOptions,
       {
@@ -932,6 +1021,27 @@ function getMetricsAppModelMethods(
       configData,
       groupingSelectOptions,
     );
+
+    const chartData = getDataAsLines(data);
+
+    const newAxesScaleRanges = chartData.map((chartDataItem, index) => ({
+      yAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.yAxis,
+      xAxis: CONTROLS_DEFAULT_CONFIG.metrics.axesScaleRange.xAxis,
+    }));
+
+    const newAlignmentConfigs = chartData.map((chartDataItem, index) => ({
+      metric: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.metric,
+      type: CONTROLS_DEFAULT_CONFIG.metrics.alignmentConfig.type,
+    }));
+
+    configData = {
+      ...configData,
+      chart: {
+        ...configData.chart,
+        axesScaleRanges: newAxesScaleRanges,
+        alignmentConfigs: newAlignmentConfigs,
+      },
+    };
 
     const tableColumns = getMetricsTableColumns(
       params,
@@ -959,9 +1069,8 @@ function getMetricsAppModelMethods(
       data,
       selectFormData: {
         ...modelState?.selectFormData,
-        [configData.select?.advancedMode ? 'advancedError' : 'error']: null,
       },
-      lineChartData: getDataAsLines(data),
+      lineChartData: chartData,
       chartTitleData: getChartTitleData<IMetric, Partial<IMetricAppModelState>>(
         {
           processedData: data,
@@ -978,6 +1087,7 @@ function getMetricsAppModelMethods(
       tableColumns: tableColumns,
       sameValueColumns: tableData.sameValueColumns,
       groupingSelectOptions,
+      conditionalGroupingOptions,
       sortOptions,
       selectedRows,
     });
@@ -986,7 +1096,8 @@ function getMetricsAppModelMethods(
   function alignData(
     data: IMetricsCollection<IMetric>[],
     type: AlignmentOptionsEnum = model.getState()!.config!.chart
-      ?.alignmentConfig.type,
+      ?.alignmentConfigs?.[0]?.type,
+    chartId: number = 0,
   ): IMetricsCollection<IMetric>[] {
     const alignmentObj: { [key: string]: Function } = {
       [AlignmentOptionsEnum.STEP]: alignByStep,
@@ -994,11 +1105,15 @@ function getMetricsAppModelMethods(
       [AlignmentOptionsEnum.RELATIVE_TIME]: alignByRelativeTime,
       [AlignmentOptionsEnum.ABSOLUTE_TIME]: alignByAbsoluteTime,
       [AlignmentOptionsEnum.CUSTOM_METRIC]: alignByCustomMetric,
-      default: () => {
-        throw new Error('Unknown value for X axis alignment');
-      },
+      // default: () => {
+      //   throw new Error('Unknown value for X axis alignment');
+      // },
+      default: alignByStep,
     };
-    const alignment = alignmentObj[type] || alignmentObj.default;
+    const alignmentConfig =
+      model.getState()!.config!.chart?.alignmentConfigs[chartId];
+    const alignment =
+      alignmentObj[alignmentConfig?.type] || alignmentObj.default;
     return alignment(data, model);
   }
 
@@ -1006,18 +1121,31 @@ function getMetricsAppModelMethods(
     const configData = model.getState()!.config;
     const grouping = configData!.grouping;
     const { paletteIndex = 0 } = grouping || {};
+
+    const colorConditions = grouping.conditions?.color || [];
+    const colorConditionStrings = getConditionStrings(colorConditions);
+    const strokeConditions = grouping.conditions?.stroke || [];
+    const strokeConditionStrings = getConditionStrings(strokeConditions);
+    const chartConditions = grouping.conditions?.chart || [];
+    const chartConditionStrings = getConditionStrings(chartConditions);
+    const allConditions = colorConditions.concat(
+      strokeConditions,
+      chartConditions,
+    );
+
     const groupByColor = getFilteredGroupingOptions({
       groupName: GroupNameEnum.COLOR,
       model,
-    });
+    }).concat(colorConditionStrings);
     const groupByStroke = getFilteredGroupingOptions({
       groupName: GroupNameEnum.STROKE,
       model,
     });
+
     const groupByChart = getFilteredGroupingOptions({
       groupName: GroupNameEnum.CHART,
       model,
-    });
+    }).concat(chartConditionStrings);
     if (
       groupByColor.length === 0 &&
       groupByStroke.length === 0 &&
@@ -1034,33 +1162,13 @@ function getMetricsAppModelMethods(
       ]);
     }
 
-    const groupValues: {
-      [key: string]: IMetricsCollection<IMetric>;
-    } = {};
-
     const groupingFields = _.uniq(
       groupByColor.concat(groupByStroke).concat(groupByChart),
     );
 
-    for (let i = 0; i < data.length; i++) {
-      const groupValue: { [key: string]: string } = {};
-      groupingFields.forEach((field) => {
-        groupValue[field] = getValue(data[i], field);
-      });
-      const groupKey = encode(groupValue);
-      if (groupValues.hasOwnProperty(groupKey)) {
-        groupValues[groupKey].data.push(data[i]);
-      } else {
-        groupValues[groupKey] = {
-          key: groupKey,
-          config: groupValue,
-          color: null,
-          dasharray: null,
-          chartIndex: 0,
-          data: [data[i]],
-        };
-      }
-    }
+    const groupValues: {
+      [key: string]: IMetricsCollection<IMetric>;
+    } = generateGroupValues(data, allConditions, groupingFields);
 
     let colorIndex = 0;
     let dasharrayIndex = 0;
@@ -1574,6 +1682,7 @@ function getMetricsAppModelMethods(
     destroy,
     deleteRuns,
     archiveRuns,
+    fetchProjectParamsAndUpdateState,
   };
 
   if (grouping) {
@@ -1628,6 +1737,18 @@ function getMetricsAppModelMethods(
           setAggregationEnabled,
         });
       },
+      onGroupingConditionsChange(
+        conditions: IGroupingCondition[],
+        groupName: GroupNameEnum,
+      ): void {
+        onGroupingConditionsChange({
+          conditions,
+          groupName,
+          model,
+          appName,
+          updateModelData,
+        });
+      },
       onShuffleChange(name: 'color' | 'stroke'): void {
         onShuffleChange({ name, model, updateModelData });
       },
@@ -1638,14 +1759,19 @@ function getMetricsAppModelMethods(
       onMetricsSelectChange<D>(data: D & Partial<ISelectOption[]>): void {
         onSelectOptionsChange({ data, model });
       },
+      onSelectExperimentsChange(experiment: IExperimentDataShort): void {
+        // Handle experiment change, then re-fetch metrics data
+        onSelectExperimentsChange(experiment);
+        fetchProjectParamsAndUpdateState();
+        getMetricsData(true, true).call();
+      },
+      onToggleAllExperiments(experiments: IExperimentDataShort[]): void {
+        onToggleAllExperiments(experiments);
+        fetchProjectParamsAndUpdateState();
+        getMetricsData(true, true).call();
+      },
       onSelectRunQueryChange(query: string): void {
         onSelectRunQueryChange({ query, model });
-      },
-      onSelectAdvancedQueryChange(query: string): void {
-        onSelectAdvancedQueryChange({ query, model });
-      },
-      toggleSelectAdvancedMode(): void {
-        toggleSelectAdvancedMode({ model, appName });
       },
     });
   }
@@ -1689,8 +1815,14 @@ function getMetricsAppModelMethods(
           setModelData,
         });
       },
-      onAlignmentTypeChange(type: AlignmentOptionsEnum): void {
-        onAlignmentTypeChange({ type, model, appName, updateModelData });
+      onAlignmentTypeChange(chartId: number, type: AlignmentOptionsEnum): void {
+        onAlignmentTypeChange({
+          chartId,
+          type,
+          model,
+          appName,
+          updateModelData,
+        });
       },
       onChangeTooltip(tooltip: Partial<ITooltip>): void {
         onChangeTooltip({
@@ -1704,8 +1836,11 @@ function getMetricsAppModelMethods(
           appName,
         });
       },
-      onAxesScaleRangeChange(range: Partial<IAxesScaleRange>): void {
-        onAxesScaleRangeChange({ range, model, appName });
+      onAxesScaleRangeChange(
+        chartId: number,
+        range: Partial<IAxesScaleRange>,
+      ): void {
+        onAxesScaleRangeChange({ chartId, range, model, appName });
       },
       onDensityTypeChange(type: DensityOptions): Promise<void> {
         return onDensityTypeChange({ type, model, appName, getMetricsData });
@@ -1737,6 +1872,14 @@ function getMetricsAppModelMethods(
       onColumnsVisibilityChange(hiddenColumns: string[]): void {
         onColumnsVisibilityChange({
           hiddenColumns,
+          model,
+          appName,
+          updateModelData,
+        });
+      },
+      onDefaultColumnsVisibilityChange(state: UnselectedColumnState): void {
+        onDefaultColumnsVisibilityChange({
+          unselectedColumnState: state,
           model,
           appName,
           updateModelData,
@@ -1775,11 +1918,15 @@ function getMetricsAppModelMethods(
       onRowSelect({
         actionType,
         data,
+        rangeStart,
+        rangeEnd,
       }: {
-        actionType: 'single' | 'selectAll' | 'removeAll';
+        actionType: 'single' | 'selectAll' | 'removeAll' | 'range';
         data?: any;
+        rangeStart?: number;
+        rangeEnd?: number;
       }): void {
-        return onRowSelect({ actionType, data, model });
+        return onRowSelect({ actionType, data, rangeStart, rangeEnd, model });
       },
       onRowsVisibilityChange(metricKeys: string[]): void {
         return onRowsVisibilityChange({

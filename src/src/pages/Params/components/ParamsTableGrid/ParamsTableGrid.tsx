@@ -327,7 +327,7 @@ function getParamsTableColumns(
     ...col,
     isHidden:
       !TABLE_DEFAULT_CONFIG.params.nonHidableColumns.has(col.key) &&
-      hiddenColumns.includes(col.key),
+      hiddenColumns.includes(col.label ?? col.key),
   }));
 
   const columnsOrder = order?.left.concat(order.middle).concat(order.right);

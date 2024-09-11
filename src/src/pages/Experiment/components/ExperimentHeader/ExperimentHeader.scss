@@ -98,3 +98,17 @@
     }
   }
 }
+
+.compact {
+  .ExperimentHeader__headerContainer {
+    &__appBarBox {
+      &__navigationContainer {
+        max-width: 100%;
+        width: 100%;
+      }
+    }
+  }
+  min-width: 30rem;
+  background-color: transparent;
+  padding-top: 0.5rem;
+}

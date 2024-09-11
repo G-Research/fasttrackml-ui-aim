@@ -132,7 +132,7 @@ export interface IImageRunData {
     archived: 0 | 1;
     creation_time: number;
     end_time: number;
-    experiment: string;
+    experiment: { [key: string]: unknown };
     name: string;
     tags: any[];
   };
