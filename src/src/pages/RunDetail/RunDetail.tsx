@@ -50,6 +50,7 @@ import onSelectExperimentChange from 'utils/app/onSelectExperimentsChange';
 import { getSelectedExperiments } from 'utils/app/getSelectedExperiments';
 
 import RunSelectPopoverContent from './RunSelectPopoverContent';
+import TraceVisualizationContainer from './TraceVisualizationContainer';
 
 import './RunDetail.scss';
 
@@ -81,6 +82,8 @@ const tabs: Record<string, string> = {
   run_parameters: 'Run Params',
   logs: 'Logs',
   metrics: 'Metrics',
+  images: 'Images',
+  texts: 'Texts',
   system: 'System',
   settings: 'Settings',
 };
@@ -146,6 +149,21 @@ function RunDetail(): React.FunctionComponentElement<React.ReactNode> {
         runTraces={runData?.runTraces}
         runBatch={runData?.runMetricsBatch}
         isRunBatchLoading={runData?.isRunBatchLoading}
+      />
+    ),
+    images: (
+      <TraceVisualizationContainer
+        runHash={runHash}
+        traceType='images'
+        traceInfo={runData?.runTraces}
+        runParams={runData?.runParams}
+      />
+    ),
+    texts: (
+      <TraceVisualizationContainer
+        runHash={runHash}
+        traceType='texts'
+        traceInfo={runData?.runTraces}
       />
     ),
     system: (
