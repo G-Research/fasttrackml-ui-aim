@@ -16,7 +16,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
       # We count the number of commits since the initial import of the upstream repo
@@ -45,22 +45,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
       - name: Setup Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@7b8cf10d4e4a01d4992d18a89f4d7dc5a3e6d6f4 # v4.3.0
         with:
           go-version: "1.21"
           check-latest: true
           cache: false
       - name: Expose GitHub Runtime
-        uses: crazy-max/ghaction-github-runtime@v3
+        uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
       - name: Run Dagger pipeline
         working-directory: builder
         run: go run main.go
         env:
           _EXPERIMENTAL_DAGGER_CACHE_CONFIG: type=gha,mode=max,url=${{ env.ACTIONS_CACHE_URL }},token=${{ env.ACTIONS_RUNTIME_TOKEN }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ui
           path: embed
@@ -77,16 +77,16 @@ jobs:
     steps:
       - name: Generate an app token
         id: generate_token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           token: ${{ steps.generate_token.outputs.token }}
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: ui
           path: embed
